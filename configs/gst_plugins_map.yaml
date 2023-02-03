@@ -1,0 +1,183 @@
+# This file defines which gst-plugins is available in specific SOC
+
+################################################################################
+# SOC:                                                                         #
+#     operation:                                                               #
+#         element: plugin_name                                                 #
+#                                                                              #
+# SOC is the env variable that is set by scripts/detect_soc.sh file.           #
+#                                                                              #
+################################################################################
+
+#==================== J721E1 ====================
+j721e:
+    dlcolorconvert:
+        element: tiovxdlcolorconvert
+        property:
+            out-pool-size: 4
+    colorconvert:
+        element: tiovxcolorconvert
+        property:
+            target: [0,1]
+            out-pool-size: 4
+    scaler:
+        element: tiovxmultiscaler
+    dlpreproc:
+        element: tiovxdlpreproc
+        property:
+            out-pool-size: 4
+    mosaic:
+        element: tiovxmosaic
+    isp:
+        element: tiovxisp
+    ldc:
+        element: tiovxldc
+    h264dec:
+        element: avdec_h264
+    h265dec:
+        element: v4l2h265dec
+    h264enc:
+        element: v4l2h264enc
+        property:
+            bitrate: 10000000
+    enable-tidl: true
+
+#==================== J721S2 ====================
+j721s2:
+    dlcolorconvert:
+        element: tiovxdlcolorconvert
+        property:
+            out-pool-size: 4
+    colorconvert:
+        element: tiovxcolorconvert
+        property:
+            target: [0]
+            out-pool-size: 4
+    scaler:
+        element: tiovxmultiscaler
+    dlpreproc:
+        element: tiovxdlpreproc
+        property:
+            out-pool-size: 4
+    mosaic:
+        element: tiovxmosaic
+    isp:
+        element: tiovxisp
+    ldc:
+        element: tiovxldc
+    h264dec:
+        element: avdec_h264
+    h265dec:
+        element: v4l2h265dec
+    h264enc:
+        element: v4l2h264enc
+        property:
+            bitrate: 10000000
+    enable-tidl: true
+
+#==================== J784S4 ====================
+j784s4:
+    dlcolorconvert:
+        element: tiovxdlcolorconvert
+        property:
+            out-pool-size: 4
+    colorconvert:
+        element: tiovxcolorconvert
+        property:
+            target: [0]
+            out-pool-size: 4
+    scaler:
+        element: tiovxmultiscaler
+    dlpreproc:
+        element: tiovxdlpreproc
+        property:
+            out-pool-size: 4
+    mosaic:
+        element: tiovxmosaic
+    isp:
+        element: tiovxisp
+    ldc:
+        element: tiovxldc
+    h264dec:
+        element: avdec_h264
+    h265dec:
+        element: v4l2h265dec
+    h264enc:
+        element: v4l2h264enc
+        property:
+            bitrate: 10000000
+    enable-tidl: true
+
+#==================== AM62A ====================
+am62a:
+    dlcolorconvert:
+        element: tiovxdlcolorconvert
+        property:
+            out-pool-size: 4
+    colorconvert:
+        element: videoconvert
+    scaler:
+        element: tiovxmultiscaler
+    dlpreproc:
+        element: tiovxdlpreproc
+        property:
+            out-pool-size: 4
+    mosaic:
+        element: tiovxmosaic
+    isp:
+        element: tiovxisp
+    ldc:
+        element: tiovxldc
+    h264dec:
+        element: avdec_h264
+    h265dec:
+        element: avdec_h265
+    h264enc:
+        element: v4l2h264enc
+    h265enc:
+        element: v4l2h265enc
+    enable-tidl: true
+
+#==================== AM62X ====================
+am62:
+    dlcolorconvert:
+        element: videoconvert
+    colorconvert:
+        element: videoconvert
+    scaler:
+        element: videoscale
+    dlpreproc: null
+    mosaic: null
+    isp: null
+    ldc: null
+    h264dec:
+        element: avdec_h264
+    h265dec:
+        element: avdec_h265
+    h264enc:
+        element: v4l2h264enc
+    h265enc:
+        element: v4l2h265enc
+    enable-tidl: false
+
+#==================== ARM-ONLY ====================
+arm:
+    dlcolorconvert:
+        element: videoconvert
+    colorconvert:
+        element: videoconvert
+    scaler:
+        element: videoscale
+    dlpreproc: null
+    mosaic: null
+    isp: null
+    ldc: null
+    h264dec:
+        element: avdec_h264
+    h265dec:
+        element: avdec_h265
+    h264enc:
+        element: v4l2h264enc
+    h265enc:
+        element: v4l2h265enc
+    enable-tidl: false

@@ -1,0 +1,37 @@
+title: "OV5640 Camera Demo"
+log_level: 2
+inputs:
+    # ov5640 should be connected to MIPI connector
+    # k3-j721e-sk-csi2-ov5640.dtbo should be applied in uenv.txt
+    input0:
+        source: /dev/video2
+        width: 1280
+        height: 720
+        format: auto
+        framerate: 30
+models:
+    model0:
+        model_path: /opt/model_zoo/TVM-CL-3090-mobileNetV2-tv
+        topN: 5
+    model1:
+        model_path: /opt/model_zoo/TFL-OD-2020-ssdLite-mobDet-DSP-coco-320x320
+        viz_threshold: 0.6
+    model2:
+        model_path: /opt/model_zoo/ONR-SS-8610-deeplabv3lite-mobv2-ade20k32-512x512
+        alpha: 0.4
+outputs:
+    output0:
+        sink: kmssink
+        width: 1920
+        height: 1080
+    output1:
+        sink: /opt/edgeai-test-data/output/output_video.mkv
+        width: 1920
+        height: 1080
+    output2:
+        sink: /opt/edgeai-test-data/output/output_image_%04d.jpg
+        width: 1920
+        height: 1080
+
+flows:
+    flow0: [input0,model1,output0,[320,180,1280,720]]
