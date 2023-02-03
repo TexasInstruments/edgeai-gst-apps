@@ -1,0 +1,397 @@
+---
+
+# Demo title
+title: "Multi instance, Multi input Demo"
+
+# Application input configuration. This is a list of inputs
+# enumerated starting with 0.
+inputs:
+    input0:
+        # Allowed sources of the input data. Allowed values
+        # - /dev/videoX             [Camera]
+        # - <some_path>/*%Nd*.jpg   [Image]
+        # - <some_path>/*%Nd*.png   [Image]
+        # - <some_path>/*.mp4       [Video]
+        # - <some_path>/*.mov       [Video]
+        #
+        #ex:- ../c/d/input_image%02d.jpg
+        #     /a/b/c/d/input_image%02d.png
+        #     /a/b/c/d/input_video.mp4
+        #     /a/b/c/d/input_video.mov
+        #
+        # The paths to images and videos can be absolute or relative to the directoty
+        # the application is launched from.
+        #
+        # Default is /dev/video1
+        source: /dev/video1
+
+        # Data format supported by camera (optional)
+        # Allowed values
+        # - jpeg - if camera supports jpeg (Ex. c270 logitech usb camera)
+        # - yuv  - for CSI camera with YUV output
+        # - raw  - for CSI camera with RAW output (video/x-bayer rggb)
+        # - auto - to let gstreamer figure out (default)
+        format: jpeg
+
+        # Input data width
+        width: 1280
+
+        # Input data height
+        height: 720
+
+        # Frame rate
+        # Default is 30 for camera and 1 for image
+        framerate: 30
+
+        # Enable dropping frames at appsink when more then 2 buffers are queued
+        # Recommended for camera source to avoid queuing of large number buffers
+        # when inference time is higher (True by default)
+        drop: True
+
+        # v4l2 device id of the sensor, need for controlling sensor parameters
+        # like exposure, gain etc...
+        # Ex: 2 id device entry is /dev/v4l-subdev2
+        subdev-id: 2
+
+    input1:
+        # Allowed sources of the input data. Allowed values
+        # - /dev/videoX             [Camera]
+        # - <some_path>/*%Nd*.jpg   [Image]
+        # - <some_path>/*%Nd*.png   [Image]
+        # - <some_path>/*.mp4       [Video]
+        # - <some_path>/*.mov       [Video]
+        #
+        #ex:- ../c/d/input_image%02d.jpg
+        #     /a/b/c/d/input_image%02d.png
+        #     /a/b/c/d/input_video.mp4
+        #     /a/b/c/d/input_video.mov
+        #
+        # The paths to images and videos can be absolute or relative to the directoty
+        # the application is launched from.
+        #
+        # Default is /dev/video1
+        source: /opt/edgeai-test-data/videos/video_0000_h264.mp4
+
+        # Video encoding format (optional)
+        # Allowed values
+        # - h264 - Uses hardware 264 decoder
+        # - h264_sw - Uses software 264 decoder
+        # - h265 - Uses hardware 265 decoder
+        # - h265_sw - Uses software 265 decoder
+        # - auto - to let gstreamer figure out (default)
+        format: h264
+
+        # Input data width
+        width: 1280
+
+        # Input data height
+        height: 720
+
+        # Frame rate
+        # Default is 30 for camera and 1 for image
+        framerate: 30
+
+        # If file input need to be looped
+        loop: False
+    input2:
+        # Allowed sources of the input data. Allowed values
+        # - /dev/videoX             [Camera]
+        # - <some_path>/*%Nd*.jpg   [Image]
+        # - <some_path>/*%Nd*.png   [Image]
+        # - <some_path>/*.mp4       [Video]
+        # - <some_path>/*.mov       [Video]
+        #
+        #ex:- ../c/d/input_image%02d.jpg
+        #     /a/b/c/d/input_image%02d.png
+        #     /a/b/c/d/input_video.mp4
+        #     /a/b/c/d/input_video.mov
+        #
+        # The paths to images and videos can be absolute or relative to the directoty
+        # the application is launched from.
+        #
+        # Default is /dev/video1
+        source: /opt/edgeai-test-data/images/%04d.jpg
+
+        # Input data width
+        width: 1280
+
+        # Input data height
+        height: 720
+
+        # Frame rate
+        # Default is 30 for camera and 1 for image
+        framerate: 1
+
+        # Start index for multiple file input
+        # This field is ignored for sources other than image
+        index: 0
+
+        # If file input need to be looped
+        loop: True
+    input3:
+        # Allowed sources of the input data. Allowed values
+        # - /dev/videoX             [Camera]
+        # - <some_path>/*%Nd*.jpg   [Image]
+        # - <some_path>/*%Nd*.png   [Image]
+        # - <some_path>/*.mp4       [Video]
+        # - <some_path>/*.mov       [Video]
+        # - rtsp://<some_path>      [RTSP Stream]
+        #
+        #ex:- ../c/d/input_image%02d.jpg
+        #     /a/b/c/d/input_image%02d.png
+        #     /a/b/c/d/input_video.mp4
+        #     /a/b/c/d/input_video.mov
+        #
+        # The paths to images and videos can be absolute or relative to the directoty
+        # the application is launched from.
+        #
+        # Default is /dev/video1
+        source: rtsp://172.24.145.220:8554/test # rtsp stream url
+
+        # Input data width
+        width: 1280
+
+        # Input data height
+        height: 720
+
+        # Frame rate
+        # Default is 30 for camera and 1 for image
+        framerate: 30
+
+        # If file input need to be looped
+        loop: True
+    input4:
+        # Gstremer test source
+        source: videotestsrc
+
+        # Input data width
+        width: 1280
+
+        # Input data height
+        height: 720
+
+        # Frame rate
+        # Default is 30 for camera and 1 for image
+        framerate: 30
+
+        # Desired color format
+        format: I420
+
+        # Video pattern refer: gst-inspect-1.0 videotestsrc
+        pattern: ball
+# Inference models. This is a list of models enumerated starting with 0.
+models:
+    model0:
+        # Path to the model
+        model_path: /opt/model_zoo/ONR-SS-8610-deeplabv3lite-mobv2-ade20k32-512x512
+
+        # Path to the filename with classnames
+        labels_path: ""
+
+        # Alpha value used for blending the sementic segmentation output
+        alpha: 0.4
+    model1:
+        # Path to the model
+        model_path: /opt/model_zoo/TFL-OD-2020-ssdLite-mobDet-DSP-coco-320x320
+
+        # Path to the filename with classnames
+        labels_path: ""
+
+        # Threshold for visualizing the output from the detection models
+        viz_threshold: 0.3
+    model2:
+        # Path to the model
+        model_path: /opt/model_zoo/TVM-CL-3090-mobileNetV2-tv
+
+        # Path to the filename with classnames
+        labels_path: ""
+
+        # Number of classification results to pick from the top of the model output
+        topN: 5
+
+# Application output configuration. This is a list of outputs
+# enumerated starting with 0.
+outputs:
+    output0:
+        # Allowed sink for the output. Allowed values
+        # - kmssink                 [Display]
+        # - <some_path>/*%Nd*.jpg   [Image]
+        # - <some_path>/*%Nd*.png   [Image]
+        # - <some_path>/*.mkv       [Video]
+        # - <some_path>/*.mp4       [Video]
+        # - <some_path>/*.mov       [Video]
+        #
+        #ex:- ../c/d/output_image%02d.jpg
+        #     /a/b/c/d/output_image%02d.png
+        #     /a/b/c/d/output_video.mkv
+        #     /a/b/c/d/output_video.mp4
+        #     /a/b/c/d/output_video.mov
+        #
+        # The paths to images and videos can be absolute or relative to the directoty
+        # the application is launched from.
+        #
+        # Default is kmssink
+        sink: kmssink
+
+        # Output display width
+        width: 1920
+
+        # Output display height
+        height: 1080
+
+        # Connector id to select output display. (optional)
+        # This field is ignored for sinks other than kmssink
+        connector: 0
+    output1:
+        # Allowed sink for the output. Allowed values
+        # - kmssink                 [Display]
+        # - <some_path>/*%Nd*.jpg   [Image]
+        # - <some_path>/*%Nd*.png   [Image]
+        # - <some_path>/*.mkv       [Video]
+        # - <some_path>/*.mp4       [Video]
+        # - <some_path>/*.mov       [Video]
+        #
+        #ex:- ../c/d/output_image%02d.jpg
+        #     /a/b/c/d/output_image%02d.png
+        #     /a/b/c/d/output_video.mkv
+        #     /a/b/c/d/output_video.mp4
+        #     /a/b/c/d/output_video.mov
+        #
+        # The paths to images and videos can be absolute or relative to the directoty
+        # the application is launched from.
+        #
+        # Default is kmssink
+        sink: /opt/edgeai-test-data/output/output_video.mkv
+
+        # Output display width
+        width: 1920
+
+        # Output display height
+        height: 1080
+    output2:
+        # Allowed sink for the output. Allowed values
+        # - kmssink                 [Display]
+        # - <some_path>/*%Nd*.jpg   [Image]
+        # - <some_path>/*%Nd*.png   [Image]
+        # - <some_path>/*.mkv       [Video]
+        # - <some_path>/*.mp4       [Video]
+        # - <some_path>/*.mov       [Video]
+        #
+        #ex:- ../c/d/output_image%02d.jpg
+        #     /a/b/c/d/output_image%02d.png
+        #     /a/b/c/d/output_video.mkv
+        #     /a/b/c/d/output_video.mp4
+        #     /a/b/c/d/output_video.mov
+        #
+        # The paths to images and videos can be absolute or relative to the directoty
+        # the application is launched from.
+        #
+        # Default is kmssink
+        sink: /opt/edgeai-test-data/output/output_image_%04d.jpg
+
+        # Output display width
+        width: 1920
+
+        # Output display height
+        height: 1080
+    output3:
+        # Sink for display on browser
+        sink: remote
+
+        # Output display width
+        width: 1280
+
+        # Output display height
+        height: 720
+
+        #The port to send the packets to(optional)(Default=8081)
+        port: 8081
+
+        #IP group to send the packets to(optional)(Default=0.0.0.0)
+        host: 0.0.0.0
+
+        #Payloader or mux to be added after encode(optional)(Default=rtph264pay)
+        payloader: rtph264pay
+    output4:
+        # Gstreamer Fakesink
+        sink: fakesink
+
+        # Output display width
+        width: 1920
+
+        # Output display height
+        height: 1080
+
+flows:
+
+    flow0: [input0,model0,output0,[0,480,640,480]]
+    flow1: [input0,model0,output1]
+    flow2: [input0,model1,output0,[640,480,640,480]]
+
+    #################################################################################
+    # flow: [*input*,*model*,*output*,[*pos_x*,*pos_y*,*width*,*height*](Optional)] #
+    # input0,input1: Input(s) to use                                                #
+    # model0,model1: Model(s) to be used (Same model can be share across as well)   #
+    # output0,output1: Output(s) to be used.                                        #
+    # If 4th argument i.e mosaic is not defined, it is assumed that no              #
+    # mosaic will be used.                                                          #
+    #                                                                               #
+    #    # Display details for each output. The number of entries must match        #
+    #    # the number of outputs using display                                      #
+    #    #                                                                          #
+    #    # *-------------------------------------------------------------------*    #
+    #    # |                                                                   |    #
+    #    # |d  pos_y|                          pos_y|                          |    #
+    #    # |i       V        mosaic0                V         mosaic1          |    #
+    #    # |s   --->*------------------------*  --->*------------------------* |    #
+    #    # |p  pos_x|                        | pos_x|                        | |    #
+    #    # |        |                        |      |                        | |    #
+    #    # |h   480 |                        |      |                        | |    #
+    #    # |e       |                        |      |                        | |    #
+    #    # |i       |                        |      |                        | |    #
+    #    # |g       *------------------------*      *------------------------* |    #
+    #    # |h                 640                              640             |    #
+    #    # |t                              disp width                          |    #
+    #    # |                                                                   |    #
+    #    # *-------------------------------------------------------------------*    #
+    #    #                                                                          #
+    #################################################################################
+
+
+#[OPTIONAL]
+# The following could be added to a given flow to be able to enable debug
+# logging to files.
+debug:
+    enable_mask: 4
+    #   MANDATORY field. It could be a combination of the following
+    #   1 - Enable Pre-processing ouput debug logging. Output files
+    #       of the form "flowX_pre_N.txt" will be generated
+    #
+    #   2 - Enable Inference ouput debug logging. Output files
+    #       of the form "flowX_infer_N.txt" will be generated
+    #
+    #   4 - Enable Post-processing ouput debug logging. Output files
+    #       of the form "flowX_post_N.txt" will be generated
+    #
+    #   enable_mask: <0..7>
+    #
+    #   OPTIONAL: Default is debug_out under current directory of execution.
+    #             If specified and if the directory path does nto exist, an attempt will
+    #             be made to create the entire diretcory path
+    #
+    #   out_dir: <dir_path>
+    #
+    #   Directory structure generated will be as follows:
+    #       <out_dir>/<cpp|python>/<input_name>/<model_name>, where
+    #       # ex:- For the flow shown above (flow0), and with the fields set as shown below,
+    #       # the outputs generated will be as follows
+    #       # enable_mask = 4
+    #       # out_dir     = some_dir
+    #       # some_dir/cpp/input0/ONR-SS-8610-deeplabv3lite-mobv2-ade20k32-512x512/flow0_post_*.txt
+    #       # some_dir/cpp/input0/TFL-OD-2020-ssdLite-mobDet-DSP-coco-320x320/flow0_post_*.txt
+    #
+    #   OPTIONAL: Default is 1
+    #   start_frame: <Frame number to start capturing the data from>
+    #
+    #   OPTIONAL: Default is MAX UINT32 value
+    #   end_frame:   <Frame number to end capturing the data after>

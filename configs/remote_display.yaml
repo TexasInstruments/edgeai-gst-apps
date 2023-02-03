@@ -1,0 +1,48 @@
+title: "Remote Display Demo"
+# If output is set to display, it runs the pipeline with udpsink as the output
+# To view the output on web browser, run the streamlit server using
+# root@soc:/opt/edgeai-gst-apps> streamlit run scripts/udp_vis.py -- --port *port_number* [Default is 8081]
+# This will start streamlit webserver and generate a link which you can open in browser
+log_level: 2
+inputs:
+    input0:
+        source: /dev/video2
+        format: jpeg
+        width: 1280
+        height: 720
+        framerate: 30
+    input1:
+        source: /opt/edgeai-test-data/videos/video_0000_h264.mp4
+        format: h264
+        width: 640
+        height: 480
+        framerate: 30
+        loop: True
+    input2:
+        source: /opt/edgeai-test-data/images/%04d.jpg
+        width: 640
+        height: 480
+        index: 0
+        framerate: 1
+        loop: True
+models:
+    model0:
+        model_path: /opt/model_zoo/ONR-SS-8610-deeplabv3lite-mobv2-ade20k32-512x512
+        alpha: 0.4
+    model1:
+        model_path: /opt/model_zoo/TFL-OD-2020-ssdLite-mobDet-DSP-coco-320x320
+        viz_threshold: 0.6
+    model2:
+        model_path: /opt/model_zoo/TFL-CL-0000-mobileNetV1-mlperf
+        topN: 5
+
+outputs:
+    output0:
+        sink: remote
+        width: 1280
+        height: 720
+        port: 8081
+        host: 0.0.0.0
+
+flows:
+    flow0: [input0,model1,output0]
