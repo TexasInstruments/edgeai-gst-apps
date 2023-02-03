@@ -1,0 +1,32 @@
+# Generic config file used for test engine
+# test script will use this to update at runtime and pass it to the applications
+
+title: "Test Demo"
+log_level: 2
+inputs:
+    input:
+        source: <source>
+        width: 1280
+        height: 720
+        framerate: 30
+        format: <format>
+        index: 0
+        subdev-id: 0
+        sen-id: ""
+        ldc: False
+
+models:
+    dl_model:
+        # This will be updated at runtime by the test_engine.sh
+        model_path: /opt/edgeai-gst-apps/models/<type>/<model>
+        topN: 5
+        viz_threshold: 0.3
+        alpha: 0.4
+outputs:
+    output:
+        sink: <sink>
+        width: 1920
+        height: 1080
+
+flows:
+    flow0: [input,dl_model,output,[320,180,1280,720]]

@@ -1,0 +1,32 @@
+Regular builds
+===============
+1) Define TENSORFLOW_INSTALL_DIR
+2) mkdir build
+3) cd build
+4) cmake ..
+5) make # builds all
+6) cmake --build . --target app_edgeai # builds associated dependencies and app_edgeai
+
+Building for Test data dumping
+==============================
+1) Define TENSORFLOW_INSTALL_DIR
+2) mkdir build
+3) cd build
+4) cmake -DEDGEAI_ENABLE_OUTPUT_FOR_TEST=ON ..
+5) make # builds all
+6) cmake --build . --target app_edgeai # builds associated dependencies and app_edgeai
+
+Cross-Compilation for the target
+================================
+The app can be cross-compiled on an x86_64 machine for the target. Here are the steps for cross-compilation.
+Here 'work_area' is used as the root directory for illustration.
+
+1) cd work_area/opt
+2) git clone https://github.com/TexasInstruments/edgeai-gst-apps.git
+3) cd edgeai-gst-apps/apps_cpp
+4) Update cmake/setup_cross_compile.sh to specify tool paths and settings
+5) source cmake/setup_cross_compile.sh
+6) mkdir build
+7) cd build
+8) cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/cross_compile_aarch64.cmake ..
+9) make -j2

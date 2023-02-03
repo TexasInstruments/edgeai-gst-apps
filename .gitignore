@@ -1,0 +1,17 @@
+binary
+
+# For python apps
+__pycache__
+
+# For C++ apps
+Makefile
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+apps_cpp/bin
+apps_cpp/lib
+apps_cpp/tags
+
+# test logs
+logs/*
+
