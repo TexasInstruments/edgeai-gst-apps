@@ -314,9 +314,12 @@ int32_t GstPipe::getBuffer(const string        &name,
             gst_structure_get_int(strc, "height", &buf.height);
 
             sample = gst_sample_make_writable(sample);
-
-            gst_structure_set (strc, "framerate", GST_TYPE_FRACTION, 30, 1, NULL);
-            gst_structure_set (strc, "pixel-aspect-ratio", GST_TYPE_FRACTION, 1, 1, NULL);
+            gst_structure_set (strc,
+                               "pixel-aspect-ratio",
+                               GST_TYPE_FRACTION,
+                               1,
+                               1,
+                               NULL);
 
             gst_sample_set_caps(sample,caps);
             gst_caps_unref(caps);
