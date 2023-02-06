@@ -69,7 +69,7 @@ class GstPipe:
             + "width=%d, " % width
             + "height=%d, " % height
             + "format=RGB, "
-            + "framerate=%d/1" % fps
+            + "framerate=%s" % str(fps)
         )
         sink = self.sink_pipe.get_by_name(name)
         sink.set_caps(caps)
