@@ -54,18 +54,11 @@ class InferPipe:
         self.run_time = sub_flow.model.run_time
         self.post_proc = PostProcess.get(sub_flow)
 
-        """
-        Hack: Setting the appsrc framerate to a constant 30 because
-        v4l2h264enc does not work if the caps of appsrc is set to
-        some arbitary value like 1 (in case of image input). In reality
-        it should be set to 0 i.e dependent on imcoming data rate.
-        """
         self.gst_post_out = gst_pipe.get_sink(
             sub_flow.gst_post_sink_name,
             sub_flow.sensor_width,
             sub_flow.sensor_height,
-            30
-            # sub_flow.input.fps,
+            sub_flow.input.fps,
         )
         self.param = sub_flow.model
         self.pre_proc_debug = None
