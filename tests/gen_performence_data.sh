@@ -46,41 +46,77 @@ VIDEO_H265_2MP()
 
 ################################################################################
 
-IMX219_0_DEV=(`$EDGEAI_GST_APPS_PATH/scripts/setup_cameras.sh | grep "CSI Camera 0" -A 4 | grep device`)
-IMX219_0_DEV=${IMX219_0_DEV[2]}
-if [ "$IMX219_0_DEV" == "" ]
-then
-  echo "[WARN] IMX219 camera 0 not connected, Skipping tests"
-fi
+IMX390()
+{
+  if [ "`$EDGEAI_GST_APPS_PATH/scripts/setup_cameras.sh | grep "imx390"`" == "" ]
+  then
+    return
+  fi
 
-IMX219_0_SUBDEV=(`$EDGEAI_GST_APPS_PATH/scripts/setup_cameras.sh | grep "CSI Camera 0" -A 4 | grep subdev_id`)
-IMX219_0_SUBDEV=${IMX219_0_SUBDEV[2]}
+  if [ "$1" == "" ]
+  then
+    return
+  fi
 
-IMX219_1_DEV=(`$EDGEAI_GST_APPS_PATH/scripts/setup_cameras.sh | grep "CSI Camera 1" -A 4 | grep device`)
-IMX219_1_DEV=${IMX219_1_DEV[2]}
-if [ "$IMX219_1_DEV" == "" ]
-then
-  echo "[WARN] IMX219 camera 1 not connected, Skipping tests"
-fi
+  IMX390_DEV=(`$EDGEAI_GST_APPS_PATH/scripts/setup_cameras.sh | grep "IMX390 Camera $1" -A 4 | grep device`)
+  IMX390_DEV=${IMX390_DEV[2]}
+  if [ "$IMX390_DEV" == "" ]
+  then
+    echo "[WARN] IMX390 camera $1 not connected, Skipping tests"
+  fi
 
-IMX219_1_SUBDEV=(`$EDGEAI_GST_APPS_PATH/scripts/setup_cameras.sh | grep "CSI Camera 1" -A 4 | grep subdev_id`)
-IMX219_1_SUBDEV=${IMX219_1_SUBDEV[2]}
+  IMX390_SUBDEV=(`$EDGEAI_GST_APPS_PATH/scripts/setup_cameras.sh | grep "IMX390 Camera $1" -A 4 | grep subdev_id`)
+  IMX390_SUBDEV=${IMX390_SUBDEV[2]}
 
-IMX219_0_SRC="v4l2src device=$IMX219_0_DEV io-mode=5 num-buffers=$NUM_BUFFERS"
-IMX219_1_SRC="v4l2src device=$IMX219_1_DEV io-mode=5 num-buffers=$NUM_BUFFERS"
-IMX219_FMT="video/x-bayer, width=1920, height=1080, format=rggb"
-IMX219_ISP_COMMON_PROPS="dcc-isp-file=/opt/imaging/imx219/dcc_viss.bin \
-                         format-msb=7 \
-                         sink_0::dcc-2a-file=/opt/imaging/imx219/dcc_2a.bin"
-IMX219_0_ISP="tiovxisp $IMX219_ISP_COMMON_PROPS sink_0::device=$IMX219_0_SUBDEV"
-IMX219_1_ISP="tiovxisp $IMX219_ISP_COMMON_PROPS sink_0::device=$IMX219_1_SUBDEV"
-IMX219_0="$IMX219_0_SRC ! queue ! $IMX219_FMT ! $IMX219_0_ISP"
-IMX219_1="$IMX219_1_SRC ! queue ! $IMX219_FMT ! $IMX219_1_ISP"
+  IMX390_SRC="v4l2src device=$IMX390_DEV io-mode=5 num-buffers=$NUM_BUFFERS"
+  IMX390_FMT="video/x-bayer, width=1936, height=1100, format=rggb12"
+  IMX390_ISP_COMMON_PROPS="dcc-isp-file=/opt/imaging/imx390/dcc_viss.bin \
+                           format-msb=11 \
+                           sensor-name=SENSOR_SONY_IMX390_UB953_D3 \
+                           sink_0::dcc-2a-file=/opt/imaging/imx390/dcc_2a.bin"
+  IMX390_ISP="tiovxisp $IMX390_ISP_COMMON_PROPS sink_0::device=$IMX390_SUBDEV"
+  IMX390_LDC_COMMON_PROPS="sensor-name=SENSOR_SONY_IMX390_UB953_D3 dcc-file=/opt/imaging/imx390/dcc_ldc.bin"
+  IMX390_LDC="tiovxldc $IMX390_LDC_COMMON_PROPS ! video/x-raw,format=NV12,width=1920,height=1080"
+  echo "$IMX390_SRC ! queue ! $IMX390_FMT ! $IMX390_ISP ! $IMX390_LDC"
+}
+
+################################################################################
+
+IMX219()
+{
+  if [ "`$EDGEAI_GST_APPS_PATH/scripts/setup_cameras.sh | grep "imx219"`" == "" ]
+  then
+    return
+  fi
+
+  if [ "$1" == "" ]
+  then
+    return
+  fi
+
+  IMX219_DEV=(`$EDGEAI_GST_APPS_PATH/scripts/setup_cameras.sh | grep "CSI Camera $1" -A 4 | grep device`)
+  IMX219_DEV=${IMX219_DEV[2]}
+  if [ "$IMX219_DEV" == "" ]
+  then
+    echo "[WARN] IMX219 camera $1 not connected, Skipping tests"
+  fi
+
+  IMX219_SUBDEV=(`$EDGEAI_GST_APPS_PATH/scripts/setup_cameras.sh | grep "CSI Camera $1" -A 4 | grep subdev_id`)
+  IMX219_SUBDEV=${IMX219_SUBDEV[2]}
+
+  IMX219_SRC="v4l2src device=$IMX219_DEV io-mode=5 num-buffers=$NUM_BUFFERS"
+  IMX219_FMT="video/x-bayer, width=1920, height=1080, format=rggb"
+  IMX219_ISP_COMMON_PROPS="dcc-isp-file=/opt/imaging/imx219/dcc_viss.bin \
+                           format-msb=7 \
+                           sink_0::dcc-2a-file=/opt/imaging/imx219/dcc_2a.bin"
+  IMX219_ISP="tiovxisp $IMX219_ISP_COMMON_PROPS sink_0::device=$IMX219_SUBDEV"
+  echo "$IMX219_SRC ! queue ! $IMX219_FMT ! $IMX219_ISP"
+}
 
 ################################################################################
 
 POST_PROC_PROPS="alpha=0.400000 viz-threshold=0.600000 top-N=5"
-POST_PROC_CAPS="video/x-raw, width=1280, height=720"
+POST_PROC_CAPS="video/x-raw, width=640, height=360"
 
 MODEL_OD=/opt/model_zoo/TFL-OD-2020-ssdLite-mobDet-DSP-coco-320x320
 MODEL_OD_PRE_PROC_PROPS="data-type=3 channel-order=1 tensor-format=rgb"
@@ -88,17 +124,24 @@ MODEL_OD_CAPS="video/x-raw, width=320, height=320"
 
 INFER_OD()
 {
+  if [ "$2" == "" ]
+  then
+    target=0
+  else
+    target=$2
+  fi
+
   if [[ "$1" == "" || "$(($1%2))" == "0" ]]
   then
-    echo "tiovxmultiscaler name=split$1"
-    echo "src_0::roi-startx=360 src_0::roi-starty=180"
-    echo "src_0::roi-width=1280 src_0::roi-height=720"
-    echo "src_1::roi-startx=360 src_1::roi-starty=180"
-    echo "src_1::roi-width=1280 src_1::roi-height=720"
-    echo "src_2::roi-startx=360 src_2::roi-starty=180"
-    echo "src_2::roi-width=1280 src_2::roi-height=720"
-    echo "src_3::roi-startx=360 src_3::roi-starty=180"
-    echo "src_3::roi-width=1280 src_3::roi-height=720"
+    echo "tiovxmultiscaler target=$target name=split$1"
+    echo "src_0::roi-startx=360 src_0::roi-starty=200"
+    echo "src_0::roi-width=1200 src_0::roi-height=680"
+    echo "src_1::roi-startx=360 src_1::roi-starty=200"
+    echo "src_1::roi-width=1200 src_1::roi-height=680"
+    echo "src_2::roi-startx=360 src_2::roi-starty=200"
+    echo "src_2::roi-width=1200 src_2::roi-height=680"
+    echo "src_3::roi-startx=360 src_3::roi-starty=200"
+    echo "src_3::roi-width=1200 src_3::roi-height=680"
     split_name="split$1"
   else
     split_name="split$(($1 - 1))"
@@ -118,9 +161,16 @@ MODEL_CL_CAPS="video/x-raw, width=224, height=224"
 
 INFER_CL()
 {
+  if [ "$2" == "" ]
+  then
+    target=0
+  else
+    target=$2
+  fi
+
   if [[ "$1" == "" || "$(($1%2))" == "0" ]]
   then
-    echo "tiovxmultiscaler name=split$1"
+    echo "tiovxmultiscaler target=$target name=split$1"
     echo "src_0::roi-startx=0 src_0::roi-starty=0"
     echo "src_0::roi-width=896 src_0::roi-height=896"
     echo "src_2::roi-startx=0 src_2::roi-starty=0"
@@ -144,9 +194,16 @@ MODEL_SS_CAPS="video/x-raw, width=512, height=512"
 
 INFER_SS()
 {
+  if [ "$2" == "" ]
+  then
+    target=0
+  else
+    target=$2
+  fi
+
   if [[ "$1" == "" || "$(($1%2))" == "0" ]]
   then
-    echo "tiovxmultiscaler name=split$1"
+    echo "tiovxmultiscaler target=$target name=split$1"
     split_name="split$1"
   else
     split_name="split$(($1 - 1))"
@@ -191,9 +248,9 @@ ENCODE_H265="v4l2h265enc ! fakesink sync=true"
 
 GST_LAUNCH()
 {
-  sleep 2
+  sleep 5
   set -x
-  gst-launch-1.0 $1
+  gst-launch-1.0 $1 -e
   set +x
 }
 
@@ -1419,6 +1476,498 @@ MIMO_TEST_CASE_0021()
 }
 
 ################################################################################
+############################## MIMO 4CH TEST CASES #############################
+################################################################################
+MIMO_4CH_TEST_CASE_0001()
+{
+  echo "" >> $LOG_FILE
+
+  NAME="MIMO_4CH_TEST_CASE_0001"
+  TITLE="4x IMX390 2MP @30fps - ISP - MSC - PreProc - 4x DLInferer (classification) - PostProc - Mosaic (2MP) - Display"
+  echo $NAME
+  echo "" >> $LOG_FILE
+
+  GST_LAUNCH "$(IMX390 0) ! $(INFER_CL 0) ! mosaic. \
+              $(IMX390 1) ! $(INFER_CL 2) ! mosaic. \
+              $(IMX390 2) ! $(INFER_CL 4) ! mosaic. \
+              $(IMX390 3) ! $(INFER_CL 6) ! mosaic. \
+              $(MOSAIC 4) ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $DISPLAY"
+
+  if [ "$?" != "0" ]; then exit; fi
+  echo "" >> $LOG_FILE
+}
+
+################################################################################
+MIMO_4CH_TEST_CASE_0002()
+{
+  echo "" >> $LOG_FILE
+
+  NAME="MIMO_4CH_TEST_CASE_0002"
+  TITLE="4x IMX390 2MP @30fps - ISP - MSC - PreProc - 4x DLInferer (classification) - PostProc (2MP) - H.264 Encode (IPP | High | 2MP @ 30fps | 10Mbps)"
+  echo $NAME
+  echo "" >> $LOG_FILE
+
+  GST_LAUNCH "$(IMX390 0) ! $(INFER_CL 0) ! mosaic. \
+              $(IMX390 1) ! $(INFER_CL 2) ! mosaic. \
+              $(IMX390 2) ! $(INFER_CL 4) ! mosaic. \
+              $(IMX390 3) ! $(INFER_CL 6) ! mosaic. \
+              $(MOSAIC 4) ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $ENCODE_H264"
+
+  if [ "$?" != "0" ]; then exit; fi
+  echo "" >> $LOG_FILE
+}
+
+################################################################################
+MIMO_4CH_TEST_CASE_0003()
+{
+  echo "" >> $LOG_FILE
+
+  NAME="MIMO_4CH_TEST_CASE_0003"
+  TITLE="4x IMX390 2MP @30fps - ISP - MSC - PreProc - 4x DLInferer (classification) - PostProc (2MP) - H.265 Encode (IPP | High | 2MP @ 30fps | 10Mbps)"
+  echo $NAME
+  echo "" >> $LOG_FILE
+
+  GST_LAUNCH "$(IMX390 0) ! $(INFER_CL 0) ! mosaic. \
+              $(IMX390 1) ! $(INFER_CL 2) ! mosaic. \
+              $(IMX390 2) ! $(INFER_CL 4) ! mosaic. \
+              $(IMX390 3) ! $(INFER_CL 6) ! mosaic. \
+              $(MOSAIC 4) ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $ENCODE_H265"
+
+  if [ "$?" != "0" ]; then exit; fi
+  echo "" >> $LOG_FILE
+}
+
+################################################################################
+
+################################################################################
+MIMO_4CH_TEST_CASE_0004()
+{
+  echo "" >> $LOG_FILE
+
+  NAME="MIMO_4CH_TEST_CASE_0004"
+  TITLE="4x video 2MP @30fps - H.264 Decode - MSC - PreProc - 4x DLInferer (classification) - PostProc - Mosaic (2MP) - Display"
+  echo $NAME
+  echo "" >> $LOG_FILE
+
+  GST_LAUNCH "$(VIDEO_H264_2MP 0) ! $(INFER_CL 0) ! mosaic. \
+              $(VIDEO_H264_2MP 1) ! $(INFER_CL 2) ! mosaic. \
+              $(VIDEO_H264_2MP 2) ! $(INFER_CL 4) ! mosaic. \
+              $(VIDEO_H264_2MP 3) ! $(INFER_CL 6) ! mosaic. \
+              $(MOSAIC 4) ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $DISPLAY"
+
+  if [ "$?" != "0" ]; then exit; fi
+  echo "" >> $LOG_FILE
+}
+
+################################################################################
+
+################################################################################
+MIMO_4CH_TEST_CASE_0005()
+{
+  echo "" >> $LOG_FILE
+
+  NAME="MIMO_4CH_TEST_CASE_0005"
+  TITLE="4x video 2MP @30fps - H.265 Decode - MSC - PreProc - 4x DLInferer (classification) - PostProc - Mosaic (2MP) - Display"
+  echo $NAME
+  echo "" >> $LOG_FILE
+
+  GST_LAUNCH "$(VIDEO_H265_2MP 0) ! $(INFER_CL 0) ! mosaic. \
+              $(VIDEO_H265_2MP 1) ! $(INFER_CL 2) ! mosaic. \
+              $(VIDEO_H265_2MP 2) ! $(INFER_CL 4) ! mosaic. \
+              $(VIDEO_H265_2MP 3) ! $(INFER_CL 6) ! mosaic. \
+              $(MOSAIC 4) ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $DISPLAY"
+
+  if [ "$?" != "0" ]; then exit; fi
+  echo "" >> $LOG_FILE
+}
+
+################################################################################
+
+################################################################################
+MIMO_4CH_TEST_CASE_0006()
+{
+  echo "" >> $LOG_FILE
+
+  NAME="MIMO_4CH_TEST_CASE_0006"
+  TITLE="4x video 2MP @30fps - H.264 Decode - MSC - PreProc - 4x DLInferer (classification) - PostProc (2MP) - H.264 Encode (IPP | High | 2MP @ 30fps | 10Mbps)"
+  echo $NAME
+  echo "" >> $LOG_FILE
+
+  GST_LAUNCH "$(VIDEO_H264_2MP 0) ! $(INFER_CL 0) ! mosaic. \
+              $(VIDEO_H264_2MP 1) ! $(INFER_CL 2) ! mosaic. \
+              $(VIDEO_H264_2MP 2) ! $(INFER_CL 4) ! mosaic. \
+              $(VIDEO_H264_2MP 3) ! $(INFER_CL 6) ! mosaic. \
+              $(MOSAIC 4) ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $ENCODE_H264"
+
+  if [ "$?" != "0" ]; then exit; fi
+  echo "" >> $LOG_FILE
+}
+################################################################################
+
+################################################################################
+MIMO_4CH_TEST_CASE_0007()
+{
+  echo "" >> $LOG_FILE
+
+  NAME="MIMO_4CH_TEST_CASE_0007"
+  TITLE="4x video 2MP @30fps - H.265 Decode - MSC - PreProc - 4x DLInferer (classification) - PostProc (2MP) - H.265 Encode (IPP | High | 2MP @ 30fps | 10Mbps)"
+  echo $NAME
+  echo "" >> $LOG_FILE
+
+  GST_LAUNCH "$(VIDEO_H265_2MP 0) ! $(INFER_CL 0) ! mosaic. \
+              $(VIDEO_H265_2MP 1) ! $(INFER_CL 2) ! mosaic. \
+              $(VIDEO_H265_2MP 2) ! $(INFER_CL 4) ! mosaic. \
+              $(VIDEO_H265_2MP 3) ! $(INFER_CL 6) ! mosaic. \
+              $(MOSAIC 4) ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $ENCODE_H265"
+
+  if [ "$?" != "0" ]; then exit; fi
+  echo "" >> $LOG_FILE
+}
+################################################################################
+############################## MIMO 6CH TEST CASES #############################
+################################################################################
+MIMO_6CH_TEST_CASE_0001()
+{
+  echo "" >> $LOG_FILE
+
+  NAME="MIMO_6CH_TEST_CASE_0001"
+  TITLE="6x IMX390 2MP @30fps - ISP - MSC - PreProc - 6x DLInferer (classification) - PostProc - Mosaic (2MP) - Display"
+  echo $NAME
+  echo "" >> $LOG_FILE
+
+  GST_LAUNCH "$(IMX390 0) ! $(INFER_CL 0 0) ! mosaic. \
+              $(IMX390 1) ! $(INFER_CL 2 0) ! mosaic. \
+              $(IMX390 2) ! $(INFER_CL 4 0) ! mosaic. \
+              $(IMX390 3) ! $(INFER_CL 6 0) ! mosaic. \
+              $(IMX390 4) ! $(INFER_CL 8 1) ! mosaic. \
+              $(IMX390 5) ! $(INFER_CL 10 1) ! mosaic. \
+              $(MOSAIC 6) ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $DISPLAY"
+
+  if [ "$?" != "0" ]; then exit; fi
+  echo "" >> $LOG_FILE
+}
+
+################################################################################
+
+MIMO_6CH_TEST_CASE_0002()
+{
+  echo "" >> $LOG_FILE
+
+  NAME="MIMO_6CH_TEST_CASE_0002"
+  TITLE="6x IMX390 2MP @30fps - ISP - MSC - PreProc - 6x DLInferer (classification) - PostProc (2MP) - H.264 Encode (IPP | High | 2MP @ 30fps | 10Mbps)"
+  echo $NAME
+  echo "" >> $LOG_FILE
+
+  GST_LAUNCH "$(IMX390 0) ! $(INFER_CL 0 0) ! mosaic. \
+              $(IMX390 1) ! $(INFER_CL 2 0) ! mosaic. \
+              $(IMX390 2) ! $(INFER_CL 4 0) ! mosaic. \
+              $(IMX390 3) ! $(INFER_CL 6 0) ! mosaic. \
+              $(IMX390 4) ! $(INFER_CL 8 1) ! mosaic. \
+              $(IMX390 5) ! $(INFER_CL 10 1) ! mosaic. \
+              $(MOSAIC 6) ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $ENCODE_H264"
+
+  if [ "$?" != "0" ]; then exit; fi
+  echo "" >> $LOG_FILE
+}
+
+################################################################################
+
+MIMO_6CH_TEST_CASE_0003()
+{
+  echo "" >> $LOG_FILE
+
+  NAME="MIMO_6CH_TEST_CASE_0003"
+  TITLE="6x IMX390 2MP @30fps - ISP - MSC - PreProc - 6x DLInferer (classification) - PostProc (2MP) - H.265 Encode (IPP | High | 2MP @ 30fps | 10Mbps)"
+  echo $NAME
+  echo "" >> $LOG_FILE
+
+  GST_LAUNCH "$(IMX390 0) ! $(INFER_CL 0 0) ! mosaic. \
+              $(IMX390 1) ! $(INFER_CL 2 0) ! mosaic. \
+              $(IMX390 2) ! $(INFER_CL 4 0) ! mosaic. \
+              $(IMX390 3) ! $(INFER_CL 6 0) ! mosaic. \
+              $(IMX390 4) ! $(INFER_CL 8 1) ! mosaic. \
+              $(IMX390 5) ! $(INFER_CL 10 1) ! mosaic. \
+              $(MOSAIC 6) ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $ENCODE_H265"
+
+  if [ "$?" != "0" ]; then exit; fi
+  echo "" >> $LOG_FILE
+}
+
+################################################################################
+
+MIMO_6CH_TEST_CASE_0004()
+{
+  echo "" >> $LOG_FILE
+
+  NAME="MIMO_6CH_TEST_CASE_0004"
+  TITLE="6x video 2MP @30fps - H.264 Decode - MSC - PreProc - 6x DLInferer (classification) - PostProc - Mosaic (2MP) - Display"
+  echo $NAME
+  echo "" >> $LOG_FILE
+
+  GST_LAUNCH "$(VIDEO_H264_2MP 0) ! $(INFER_CL 0 0) ! mosaic. \
+              $(VIDEO_H264_2MP 1) ! $(INFER_CL 2 0) ! mosaic. \
+              $(VIDEO_H264_2MP 2) ! $(INFER_CL 4 0) ! mosaic. \
+              $(VIDEO_H264_2MP 3) ! $(INFER_CL 6 0) ! mosaic. \
+              $(VIDEO_H264_2MP 4) ! $(INFER_CL 8 1) ! mosaic. \
+              $(VIDEO_H264_2MP 5) ! $(INFER_CL 10 1) ! mosaic. \
+              $(MOSAIC 6) ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $DISPLAY"
+
+  if [ "$?" != "0" ]; then exit; fi
+  echo "" >> $LOG_FILE
+}
+
+################################################################################
+
+MIMO_6CH_TEST_CASE_0005()
+{
+  echo "" >> $LOG_FILE
+
+  NAME="MIMO_6CH_TEST_CASE_0005"
+  TITLE="6x video 2MP @30fps - H.265 Decode - MSC - PreProc - 6x DLInferer (classification) - PostProc - Mosaic (2MP) - Display"
+  echo $NAME
+  echo "" >> $LOG_FILE
+
+  GST_LAUNCH "$(VIDEO_H265_2MP 0) ! $(INFER_CL 0 0) ! mosaic. \
+              $(VIDEO_H265_2MP 1) ! $(INFER_CL 2 0) ! mosaic. \
+              $(VIDEO_H265_2MP 2) ! $(INFER_CL 4 0) ! mosaic. \
+              $(VIDEO_H265_2MP 3) ! $(INFER_CL 6 0) ! mosaic. \
+              $(VIDEO_H265_2MP 4) ! $(INFER_CL 8 1) ! mosaic. \
+              $(VIDEO_H265_2MP 5) ! $(INFER_CL 10 1) ! mosaic. \
+              $(MOSAIC 6) ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $DISPLAY"
+
+  if [ "$?" != "0" ]; then exit; fi
+  echo "" >> $LOG_FILE
+}
+
+################################################################################
+
+MIMO_6CH_TEST_CASE_0006()
+{
+  echo "" >> $LOG_FILE
+
+  NAME="MIMO_6CH_TEST_CASE_0006"
+  TITLE="6x video 2MP @30fps - H.264 Decode - MSC - PreProc - 6x DLInferer (classification) - PostProc (2MP) - H.264 Encode (IPP | High | 2MP @ 30fps | 10Mbps)"
+  echo $NAME
+  echo "" >> $LOG_FILE
+
+  GST_LAUNCH "$(VIDEO_H264_2MP 0) ! $(INFER_CL 0 0) ! mosaic. \
+              $(VIDEO_H264_2MP 1) ! $(INFER_CL 2 0) ! mosaic. \
+              $(VIDEO_H264_2MP 2) ! $(INFER_CL 4 0) ! mosaic. \
+              $(VIDEO_H264_2MP 3) ! $(INFER_CL 6 0) ! mosaic. \
+              $(VIDEO_H264_2MP 4) ! $(INFER_CL 8 1) ! mosaic. \
+              $(VIDEO_H264_2MP 5) ! $(INFER_CL 10 1) ! mosaic. \
+              $(MOSAIC 6) ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $ENCODE_H264"
+
+  if [ "$?" != "0" ]; then exit; fi
+  echo "" >> $LOG_FILE
+}
+
+################################################################################
+
+################################################################################
+
+MIMO_6CH_TEST_CASE_0007()
+{
+  echo "" >> $LOG_FILE
+
+  NAME="MIMO_6CH_TEST_CASE_0007"
+  TITLE="6x video 2MP @30fps - H.265 Decode - MSC - PreProc - 6x DLInferer (classification) - PostProc (2MP) - H.265 Encode (IPP | High | 2MP @ 30fps | 10Mbps)"
+  echo $NAME
+  echo "" >> $LOG_FILE
+
+  GST_LAUNCH "$(VIDEO_H265_2MP 0) ! $(INFER_CL 0 0) ! mosaic. \
+              $(VIDEO_H265_2MP 1) ! $(INFER_CL 2 0) ! mosaic. \
+              $(VIDEO_H265_2MP 2) ! $(INFER_CL 4 0) ! mosaic. \
+              $(VIDEO_H265_2MP 3) ! $(INFER_CL 6 0) ! mosaic. \
+              $(VIDEO_H265_2MP 4) ! $(INFER_CL 8 1) ! mosaic. \
+              $(VIDEO_H265_2MP 5) ! $(INFER_CL 10 1) ! mosaic. \
+              $(MOSAIC 6) ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $ENCODE_H265"
+
+  if [ "$?" != "0" ]; then exit; fi
+  echo "" >> $LOG_FILE
+}
+
+################################################################################
+############################## MIMO 8CH TEST CASES #############################
+################################################################################
+MIMO_8CH_TEST_CASE_0001()
+{
+  echo "" >> $LOG_FILE
+
+  NAME="MIMO_8CH_TEST_CASE_0001"
+  TITLE="8x IMX390 2MP @30fps - ISP - MSC - PreProc - 8x DLInferer (classification) - PostProc - Mosaic (2MP) - Display"
+  echo $NAME
+  echo "" >> $LOG_FILE
+
+  GST_LAUNCH "$(IMX390 0) ! $(INFER_CL 0 0) ! mosaic. \
+              $(IMX390 1) ! $(INFER_CL 2 0) ! mosaic. \
+              $(IMX390 2) ! $(INFER_CL 4 0) ! mosaic. \
+              $(IMX390 3) ! $(INFER_CL 6 0) ! mosaic. \
+              $(IMX390 4) ! $(INFER_CL 8 0) ! mosaic. \
+              $(IMX390 5) ! $(INFER_CL 10 1) ! mosaic. \
+              $(IMX390 6) ! $(INFER_CL 12 1) ! mosaic. \
+              $(IMX390 7) ! $(INFER_CL 14 1) ! mosaic. \
+              $(MOSAIC 8) ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $DISPLAY"
+
+  if [ "$?" != "0" ]; then exit; fi
+  echo "" >> $LOG_FILE
+}
+
+################################################################################
+
+MIMO_8CH_TEST_CASE_0002()
+{
+  echo "" >> $LOG_FILE
+
+  NAME="MIMO_8CH_TEST_CASE_0002"
+  TITLE="8x IMX390 2MP @30fps - ISP - MSC - PreProc - 8x DLInferer (classification) - PostProc (2MP) - H.264 Encode (IPP | High | 2MP @ 30fps | 10Mbps)"
+  echo $NAME
+  echo "" >> $LOG_FILE
+
+  GST_LAUNCH "$(IMX390 0) ! $(INFER_CL 0 0) ! mosaic. \
+              $(IMX390 1) ! $(INFER_CL 2 0) ! mosaic. \
+              $(IMX390 2) ! $(INFER_CL 4 0) ! mosaic. \
+              $(IMX390 3) ! $(INFER_CL 6 0) ! mosaic. \
+              $(IMX390 4) ! $(INFER_CL 8 0) ! mosaic. \
+              $(IMX390 5) ! $(INFER_CL 10 1) ! mosaic. \
+              $(IMX390 6) ! $(INFER_CL 12 1) ! mosaic. \
+              $(IMX390 7) ! $(INFER_CL 14 1) ! mosaic. \
+              $(MOSAIC 8) ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $ENCODE_H264"
+
+  if [ "$?" != "0" ]; then exit; fi
+  echo "" >> $LOG_FILE
+}
+
+################################################################################
+
+MIMO_8CH_TEST_CASE_0003()
+{
+  echo "" >> $LOG_FILE
+
+  NAME="MIMO_8CH_TEST_CASE_0003"
+  TITLE="8x IMX390 2MP @30fps - ISP - MSC - PreProc - 8x DLInferer (classification) - PostProc (2MP) - H.265 Encode (IPP | High | 2MP @ 30fps | 10Mbps)"
+  echo $NAME
+  echo "" >> $LOG_FILE
+
+  GST_LAUNCH "$(IMX390 0) ! $(INFER_CL 0 0) ! mosaic. \
+              $(IMX390 1) ! $(INFER_CL 2 0) ! mosaic. \
+              $(IMX390 2) ! $(INFER_CL 4 0) ! mosaic. \
+              $(IMX390 3) ! $(INFER_CL 6 0) ! mosaic. \
+              $(IMX390 4) ! $(INFER_CL 8 0) ! mosaic. \
+              $(IMX390 5) ! $(INFER_CL 10 1) ! mosaic. \
+              $(IMX390 6) ! $(INFER_CL 12 1) ! mosaic. \
+              $(IMX390 7) ! $(INFER_CL 14 1) ! mosaic. \
+              $(MOSAIC 8) ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $ENCODE_H265"
+
+  if [ "$?" != "0" ]; then exit; fi
+  echo "" >> $LOG_FILE
+}
+
+################################################################################
+
+MIMO_8CH_TEST_CASE_0004()
+{
+  echo "" >> $LOG_FILE
+
+  NAME="MIMO_8CH_TEST_CASE_0004"
+  TITLE="8x video 2MP @30fps - H.264 Decode - MSC - PreProc - 8x DLInferer (classification) - PostProc - Mosaic (2MP) - Display"
+  echo $NAME
+  echo "" >> $LOG_FILE
+
+  GST_LAUNCH "$(VIDEO_H264_2MP 0) ! $(INFER_CL 0 0) ! mosaic. \
+              $(VIDEO_H264_2MP 1) ! $(INFER_CL 2 0) ! mosaic. \
+              $(VIDEO_H264_2MP 2) ! $(INFER_CL 4 0) ! mosaic. \
+              $(VIDEO_H264_2MP 3) ! $(INFER_CL 6 0) ! mosaic. \
+              $(VIDEO_H264_2MP 4) ! $(INFER_CL 8 0) ! mosaic. \
+              $(VIDEO_H264_2MP 5) ! $(INFER_CL 10 1) ! mosaic. \
+              $(VIDEO_H264_2MP 6) ! $(INFER_CL 12 1) ! mosaic. \
+              $(VIDEO_H264_2MP 7) ! $(INFER_CL 14 1) ! mosaic. \
+              $(MOSAIC 8) ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $DISPLAY"
+
+  if [ "$?" != "0" ]; then exit; fi
+  echo "" >> $LOG_FILE
+}
+
+################################################################################
+
+MIMO_8CH_TEST_CASE_0005()
+{
+  echo "" >> $LOG_FILE
+
+  NAME="MIMO_8CH_TEST_CASE_0005"
+  TITLE="8x video 2MP @30fps - H.265 Decode - MSC - PreProc - 8x DLInferer (classification) - PostProc - Mosaic (2MP) - Display"
+  echo $NAME
+  echo "" >> $LOG_FILE
+
+  GST_LAUNCH "$(VIDEO_H265_2MP 0) ! $(INFER_CL 0 0) ! mosaic. \
+              $(VIDEO_H265_2MP 1) ! $(INFER_CL 2 0) ! mosaic. \
+              $(VIDEO_H265_2MP 2) ! $(INFER_CL 4 0) ! mosaic. \
+              $(VIDEO_H265_2MP 3) ! $(INFER_CL 6 0) ! mosaic. \
+              $(VIDEO_H265_2MP 4) ! $(INFER_CL 8 0) ! mosaic. \
+              $(VIDEO_H265_2MP 5) ! $(INFER_CL 10 1) ! mosaic. \
+              $(VIDEO_H265_2MP 6) ! $(INFER_CL 12 1) ! mosaic. \
+              $(VIDEO_H265_2MP 7) ! $(INFER_CL 14 1) ! mosaic. \
+              $(MOSAIC 8) ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $DISPLAY"
+
+  if [ "$?" != "0" ]; then exit; fi
+  echo "" >> $LOG_FILE
+}
+
+################################################################################
+
+MIMO_8CH_TEST_CASE_0006()
+{
+  echo "" >> $LOG_FILE
+
+  NAME="MIMO_8CH_TEST_CASE_0006"
+  TITLE="8x video 2MP @30fps - H.264 Decode - MSC - PreProc - 8x DLInferer (classification) - PostProc (2MP) - H.264 Encode (IPP | High | 2MP @ 30fps | 10Mbps)"
+  echo $NAME
+  echo "" >> $LOG_FILE
+
+  GST_LAUNCH "$(VIDEO_H264_2MP 0) ! $(INFER_CL 0 0) ! mosaic. \
+              $(VIDEO_H264_2MP 1) ! $(INFER_CL 2 0) ! mosaic. \
+              $(VIDEO_H264_2MP 2) ! $(INFER_CL 4 0) ! mosaic. \
+              $(VIDEO_H264_2MP 3) ! $(INFER_CL 6 0) ! mosaic. \
+              $(VIDEO_H264_2MP 4) ! $(INFER_CL 8 0) ! mosaic. \
+              $(VIDEO_H264_2MP 5) ! $(INFER_CL 10 1) ! mosaic. \
+              $(VIDEO_H264_2MP 6) ! $(INFER_CL 12 1) ! mosaic. \
+              $(VIDEO_H264_2MP 7) ! $(INFER_CL 14 1) ! mosaic. \
+              $(MOSAIC 8) ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $ENCODE_H264"
+
+  if [ "$?" != "0" ]; then exit; fi
+  echo "" >> $LOG_FILE
+}
+
+################################################################################
+
+################################################################################
+
+MIMO_8CH_TEST_CASE_0007()
+{
+  echo "" >> $LOG_FILE
+
+  NAME="MIMO_8CH_TEST_CASE_0007"
+  TITLE="8x video 2MP @30fps - H.265 Decode - MSC - PreProc - 6x DLInferer (classification) - PostProc (2MP) - H.265 Encode (IPP | High | 2MP @ 30fps | 10Mbps)"
+  echo $NAME
+  echo "" >> $LOG_FILE
+
+  GST_LAUNCH "$(VIDEO_H265_2MP 0) ! $(INFER_CL 0 0) ! mosaic. \
+              $(VIDEO_H265_2MP 1) ! $(INFER_CL 2 0) ! mosaic. \
+              $(VIDEO_H265_2MP 2) ! $(INFER_CL 4 0) ! mosaic. \
+              $(VIDEO_H265_2MP 3) ! $(INFER_CL 6 0) ! mosaic. \
+              $(VIDEO_H265_2MP 4) ! $(INFER_CL 8 0) ! mosaic. \
+              $(VIDEO_H265_2MP 5) ! $(INFER_CL 10 1) ! mosaic. \
+              $(VIDEO_H265_2MP 6) ! $(INFER_CL 12 1) ! mosaic. \
+              $(VIDEO_H265_2MP 7) ! $(INFER_CL 14 1) ! mosaic. \
+              $(MOSAIC 8) ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $ENCODE_H265"
+
+  if [ "$?" != "0" ]; then exit; fi
+  echo "" >> $LOG_FILE
+}
+
+################################################################################
+
+################################################################################
 
 if [ "$IMX219_0_DEV" != "" ]
 then
@@ -1511,4 +2060,46 @@ then
   MIMO_TEST_CASE_0019
   MIMO_TEST_CASE_0020
   MIMO_TEST_CASE_0021
+fi
+
+MIMO_4CH_TEST_CASE_0001
+MIMO_4CH_TEST_CASE_0002
+if [ "$SOC" != "j721e" ]
+then
+  MIMO_4CH_TEST_CASE_0003
+fi
+MIMO_4CH_TEST_CASE_0004
+MIMO_4CH_TEST_CASE_0005
+MIMO_4CH_TEST_CASE_0006
+if [ "$SOC" != "j721e" ]
+then
+  MIMO_4CH_TEST_CASE_0007
+fi
+
+MIMO_6CH_TEST_CASE_0001
+MIMO_6CH_TEST_CASE_0002
+if [ "$SOC" != "j721e" ]
+then
+  MIMO_6CH_TEST_CASE_0003
+fi
+MIMO_6CH_TEST_CASE_0004
+MIMO_6CH_TEST_CASE_0005
+MIMO_6CH_TEST_CASE_0006
+if [ "$SOC" != "j721e" ]
+then
+  MIMO_6CH_TEST_CASE_0007
+fi
+
+MIMO_8CH_TEST_CASE_0001
+MIMO_8CH_TEST_CASE_0002
+if [ "$SOC" != "j721e" ]
+then
+  MIMO_8CH_TEST_CASE_0003
+fi
+MIMO_8CH_TEST_CASE_0004
+MIMO_8CH_TEST_CASE_0005
+MIMO_8CH_TEST_CASE_0006
+if [ "$SOC" != "j721e" ]
+then
+  MIMO_8CH_TEST_CASE_0007
 fi
