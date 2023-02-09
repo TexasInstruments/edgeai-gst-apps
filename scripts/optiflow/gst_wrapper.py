@@ -168,7 +168,7 @@ def get_input_str(input):
                                 input.sen_id + \
                               ' sensor-name=%s !' % sen_name + \
                               ' video/x-raw, format=NV12,' + \
-                              ' width=1920, height=1080 !'
+                              ' width=1920, height=1080 ! '
                 input.width = 1920
                 input.height = 1080
         else:
