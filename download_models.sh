@@ -36,16 +36,16 @@ WGET="wget --proxy off"
 
 if [ "$SOC" == "j721e" ]
 then
-	URLs="https://software-dl.ti.com/jacinto7/esd/modelzoo/08_05_00_01/modelartifacts/j721e/8bits/"
+	URLs="ftp://swubn03.india.englab.ti.com/work/edge_ai/models_zoo/j721e/"
 elif [ "$SOC" == "j721s2" ]
 then
-	URLs="https://software-dl.ti.com/jacinto7/esd/modelzoo/08_05_00_01/modelartifacts/j721s2/8bits/"
+	URLs="ftp://swubn03.india.englab.ti.com/work/edge_ai/models_zoo/j721s2/"
 elif [ "$SOC" == "j784s4" ]
 then
-	URLs="https://software-dl.ti.com/jacinto7/esd/modelzoo/08_05_00_01/modelartifacts/j784s4/8bits/"
+	URLs="ftp://swubn03.india.englab.ti.com/work/edge_ai/models_zoo/j784s4/"
 elif [ "$SOC" == "am62a" ]
 then
-	URLs="https://software-dl.ti.com/jacinto7/esd/modelzoo/08_05_00_01/modelartifacts/am62a/8bits/"
+	URLs="ftp://swubn03.india.englab.ti.com/work/edge_ai/models_zoo/am62a/"
 else
 	echo "ERROR: "$SOC" not supported"
 	exit
