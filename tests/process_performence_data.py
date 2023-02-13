@@ -92,7 +92,7 @@ def generate_plot(df):
         colors = ['green' for _ in range(len(values))]
         for j in range(len(values)):
             values[j] = (values[j]/max_value[j]) * 100
-            if values[j] > 50 and values[j] <= 90:
+            if values[j] > 75 and values[j] <= 90:
                 colors[j] = 'yellow'
             elif values[j] > 90:
                 colors[j] = 'red'

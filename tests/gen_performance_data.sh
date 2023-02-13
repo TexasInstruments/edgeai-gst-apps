@@ -50,6 +50,7 @@ VIDEO_H265_2MP()
 
 IMX390()
 {
+
   if [ "`$EDGEAI_GST_APPS_PATH/scripts/setup_cameras.sh | grep "imx390"`" == "" ]
   then
     return
@@ -120,9 +121,9 @@ IMX219()
 POST_PROC_PROPS="alpha=0.400000 viz-threshold=0.600000 top-N=5"
 POST_PROC_CAPS="video/x-raw, width=640, height=360"
 
-MODEL_OD=/opt/model_zoo/TFL-OD-2000-ssd-mobV1-coco-mlperf-300x300
-MODEL_OD_PRE_PROC_PROPS="data-type=3 channel-order=1 tensor-format=rgb out-pool-size=4"
-MODEL_OD_CAPS="video/x-raw, width=300, height=300"
+MODEL_OD=/opt/model_zoo/ONR-OD-8200-yolox-nano-lite-mmdet-coco-416x416
+MODEL_OD_PRE_PROC_PROPS="data-type=3 channel-order=0 tensor-format=bgr out-pool-size=4"
+MODEL_OD_CAPS="video/x-raw, width=416, height=416"
 
 INFER_OD()
 {
@@ -2108,8 +2109,8 @@ IMX390_4CH_TEST_CASE_0002()
 
   GST_LAUNCH "$(IMX390 0) ! $(INFER_OD 0) ! queue ! mosaic. \
               $(IMX390 1) ! $(INFER_OD 2) ! queue ! mosaic. \
-              $(IMX390 2) ! $(INFER_OD 4) ! queue ! mosaic. \
-              $(IMX390 3) ! $(INFER_OD 6) ! queue ! mosaic. \
+              $(IMX390 2) ! $(INFER_OD 4 1) ! queue ! mosaic. \
+              $(IMX390 3) ! $(INFER_OD 6 1) ! queue ! mosaic. \
               $(MOSAIC 4) ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $DISPLAY"
 
   if [ "$?" != "0" ]; then exit; fi
@@ -2163,8 +2164,8 @@ IMX390_4CH_TEST_CASE_0005()
 
   GST_LAUNCH "$(IMX390 0) ! $(INFER_OD 0) ! tiovxmux ! tiovxdemux ! $ENCODE_H264 \
               $(IMX390 1) ! $(INFER_OD 2) ! tiovxmux ! tiovxdemux ! $ENCODE_H264 \
-              $(IMX390 2) ! $(INFER_OD 4) ! tiovxmux ! tiovxdemux ! $ENCODE_H264 \
-              $(IMX390 3) ! $(INFER_OD 6) ! tiovxmux ! tiovxdemux ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $ENCODE_H264"
+              $(IMX390 2) ! $(INFER_OD 4 1) ! tiovxmux ! tiovxdemux ! $ENCODE_H264 \
+              $(IMX390 3) ! $(INFER_OD 6 1) ! tiovxmux ! tiovxdemux ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $ENCODE_H264"
 
   if [ "$?" != "0" ]; then exit; fi
   echo "" >> $LOG_FILE
@@ -2181,8 +2182,8 @@ IMX390_4CH_TEST_CASE_0006()
 
   GST_LAUNCH "$(IMX390 0) ! $(INFER_OD 0) ! tiovxmux ! tiovxdemux ! $ENCODE_H265 \
               $(IMX390 1) ! $(INFER_OD 2) ! tiovxmux ! tiovxdemux ! $ENCODE_H265 \
-              $(IMX390 2) ! $(INFER_OD 4) ! tiovxmux ! tiovxdemux ! $ENCODE_H265 \
-              $(IMX390 3) ! $(INFER_OD 6) ! tiovxmux ! tiovxdemux ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $ENCODE_H265"
+              $(IMX390 2) ! $(INFER_OD 4 1) ! tiovxmux ! tiovxdemux ! $ENCODE_H265 \
+              $(IMX390 3) ! $(INFER_OD 6 1) ! tiovxmux ! tiovxdemux ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $ENCODE_H265"
 
   if [ "$?" != "0" ]; then exit; fi
   echo "" >> $LOG_FILE
@@ -2723,7 +2724,7 @@ VIDEO_2CH_TEST_CASE_0007()
   echo "" >> $LOG_FILE
 
   GST_LAUNCH "$(VIDEO_H264_2MP 0) ! $(INFER_OD 0) ! tiovxmux ! tiovxdemux ! $ENCODE_H264 \
-              $(VIDEO_H264_2MP 1) ! $(INFER_OD 2 1) ! tiovxmux ! tiovxdemux ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $ENCODE_H264"
+              $(VIDEO_H264_2MP 1) ! $(INFER_OD 2 1) ! $PERF name=\"$NAME\" title=\"$TITLE\" ! tiovxmux ! tiovxdemux ! $ENCODE_H264"
 
   if [ "$?" != "0" ]; then exit; fi
   echo "" >> $LOG_FILE
@@ -2739,7 +2740,7 @@ VIDEO_2CH_TEST_CASE_0008()
   echo "" >> $LOG_FILE
 
   GST_LAUNCH "$(VIDEO_H264_2MP 0) ! $(INFER_OD 0) ! tiovxmux ! tiovxdemux ! $ENCODE_H265 \
-              $(VIDEO_H264_2MP 1) ! $(INFER_OD 2 1) ! tiovxmux ! tiovxdemux ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $ENCODE_H265"
+              $(VIDEO_H264_2MP 1) ! $(INFER_OD 2 1) ! $PERF name=\"$NAME\" title=\"$TITLE\" ! tiovxmux ! tiovxdemux ! $ENCODE_H265"
 
   if [ "$?" != "0" ]; then exit; fi
   echo "" >> $LOG_FILE
@@ -2755,7 +2756,7 @@ VIDEO_2CH_TEST_CASE_0009()
   echo "" >> $LOG_FILE
 
   GST_LAUNCH "$(VIDEO_H265_2MP 0) ! $(INFER_OD 0) ! tiovxmux ! tiovxdemux ! $ENCODE_H264 \
-              $(VIDEO_H265_2MP 1) ! $(INFER_OD 2 1) ! tiovxmux ! tiovxdemux ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $ENCODE_H264"
+              $(VIDEO_H265_2MP 1) ! $(INFER_OD 2 1) ! $PERF name=\"$NAME\" title=\"$TITLE\" ! tiovxmux ! tiovxdemux ! $ENCODE_H264"
 
   if [ "$?" != "0" ]; then exit; fi
   echo "" >> $LOG_FILE
@@ -2770,8 +2771,8 @@ VIDEO_2CH_TEST_CASE_00010()
   echo $NAME
   echo "" >> $LOG_FILE
 
-  GST_LAUNCH "$(VIDEO_H265_2MP 0) ! $(INFER_CL 0) ! tiovxmux ! tiovxdemux ! $ENCODE_H265 \
-              $(VIDEO_H265_2MP 1) ! $(INFER_OD 2 1) ! tiovxmux ! tiovxdemux ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $ENCODE_H265"
+  GST_LAUNCH "$(VIDEO_H265_2MP 0) ! $(INFER_OD 0) ! tiovxmux ! tiovxdemux ! $ENCODE_H265 \
+              $(VIDEO_H265_2MP 1) ! $(INFER_OD 2 1) ! $PERF name=\"$NAME\" title=\"$TITLE\" ! tiovxmux ! tiovxdemux ! $ENCODE_H265"
 
   if [ "$?" != "0" ]; then exit; fi
   echo "" >> $LOG_FILE
@@ -3105,7 +3106,7 @@ VIDEO_6CH_TEST_CASE_0007()
               $(VIDEO_H264_2MP 2) ! $(INFER_OD 4) ! tiovxmux ! tiovxdemux ! $ENCODE_H264 \
               $(VIDEO_H264_2MP 3) ! $(INFER_OD 6 1) ! tiovxmux ! tiovxdemux ! $ENCODE_H264 \
               $(VIDEO_H264_2MP 4) ! $(INFER_OD 8 1) ! tiovxmux ! tiovxdemux ! $ENCODE_H264 \
-              $(VIDEO_H264_2MP 5) ! $(INFER_OD 10 1) ! tiovxmux ! tiovxdemux ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $ENCODE_H264"
+              $(VIDEO_H264_2MP 5) ! $(INFER_OD 10 1) ! $PERF name=\"$NAME\" title=\"$TITLE\" ! tiovxmux ! tiovxdemux ! $ENCODE_H264"
 
   if [ "$?" != "0" ]; then exit; fi
   echo "" >> $LOG_FILE
@@ -3125,7 +3126,7 @@ VIDEO_6CH_TEST_CASE_0008()
               $(VIDEO_H264_2MP 2) ! $(INFER_OD 4) ! tiovxmux ! tiovxdemux ! $ENCODE_H265 \
               $(VIDEO_H264_2MP 3) ! $(INFER_OD 6 1) ! tiovxmux ! tiovxdemux ! $ENCODE_H265 \
               $(VIDEO_H264_2MP 4) ! $(INFER_OD 8 1) ! tiovxmux ! tiovxdemux ! $ENCODE_H265 \
-              $(VIDEO_H264_2MP 5) ! $(INFER_OD 10 1) ! tiovxmux ! tiovxdemux ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $ENCODE_H265"
+              $(VIDEO_H264_2MP 5) ! $(INFER_OD 10 1) ! $PERF name=\"$NAME\" title=\"$TITLE\" ! tiovxmux ! tiovxdemux ! $ENCODE_H265"
 
   if [ "$?" != "0" ]; then exit; fi
   echo "" >> $LOG_FILE
@@ -3145,7 +3146,7 @@ VIDEO_6CH_TEST_CASE_0009()
               $(VIDEO_H265_2MP 2) ! $(INFER_OD 4) ! tiovxmux ! tiovxdemux ! $ENCODE_H264 \
               $(VIDEO_H265_2MP 3) ! $(INFER_OD 6 1) ! tiovxmux ! tiovxdemux ! $ENCODE_H264 \
               $(VIDEO_H265_2MP 4) ! $(INFER_OD 8 1) ! tiovxmux ! tiovxdemux ! $ENCODE_H264 \
-              $(VIDEO_H265_2MP 5) ! $(INFER_OD 10 1) ! tiovxmux ! tiovxdemux ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $ENCODE_H264"
+              $(VIDEO_H265_2MP 5) ! $(INFER_OD 10 1) ! $PERF name=\"$NAME\" title=\"$TITLE\" ! tiovxmux ! tiovxdemux ! $ENCODE_H264"
 
   if [ "$?" != "0" ]; then exit; fi
   echo "" >> $LOG_FILE
@@ -3165,7 +3166,7 @@ VIDEO_6CH_TEST_CASE_00010()
               $(VIDEO_H265_2MP 2) ! $(INFER_OD 4) ! tiovxmux ! tiovxdemux ! $ENCODE_H265 \
               $(VIDEO_H265_2MP 3) ! $(INFER_OD 6 1) ! tiovxmux ! tiovxdemux ! $ENCODE_H265 \
               $(VIDEO_H265_2MP 4) ! $(INFER_OD 8 1) ! tiovxmux ! tiovxdemux ! $ENCODE_H265 \
-              $(VIDEO_H265_2MP 5) ! $(INFER_OD 10 1) ! tiovxmux ! tiovxdemux ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $ENCODE_H265"
+              $(VIDEO_H265_2MP 5) ! $(INFER_OD 10 1) ! $PERF name=\"$NAME\" title=\"$TITLE\" ! tiovxmux ! tiovxdemux ! $ENCODE_H265"
 
   if [ "$?" != "0" ]; then exit; fi
   echo "" >> $LOG_FILE
@@ -3259,7 +3260,7 @@ VIDEO_8CH_TEST_CASE_0004()
               $(VIDEO_H265_2MP 5) ! $(INFER_OD 10 1) ! queue ! mosaic. \
               $(VIDEO_H265_2MP 6) ! $(INFER_OD 12 1) ! queue ! mosaic. \
               $(VIDEO_H265_2MP 7) ! $(INFER_OD 14 1) ! queue ! mosaic. \
-              $(MOSAIC 6) ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $DISPLAY"
+              $(MOSAIC 8) ! $PERF name=\"$NAME\" title=\"$TITLE\" ! $DISPLAY"
 
   if [ "$?" != "0" ]; then exit; fi
   echo "" >> $LOG_FILE
