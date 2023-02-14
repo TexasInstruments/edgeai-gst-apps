@@ -296,7 +296,7 @@ download_models()
 		then
 			rm -rf ${!name}"/model"
 			cd ${!name}"/artifacts"
-			for file in *.j7; do mv $file ${file%.*}; done
+			for file in `ls *.evm 2>/dev/null`; do mv $file ${file%.*}; done
 			rm -rf *.pc
 		fi
 		cd $BASE_DIR
