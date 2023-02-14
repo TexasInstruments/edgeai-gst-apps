@@ -89,7 +89,7 @@ class EdgeAIDemo:
                 model_config =  config["models"][model]
                 model_path = model_config["model_path"]
                 # Make model Config. This class is present in edgeai_dl_inferer
-                model_obj = ModelConfig(model_path,gst_element_map["enable-tidl"])
+                model_obj = ModelConfig(model_path,gst_element_map["enable-tidl"],1)
                 # task specific params
                 if "alpha" in model_config:
                     model_obj.alpha = model_config["alpha"]

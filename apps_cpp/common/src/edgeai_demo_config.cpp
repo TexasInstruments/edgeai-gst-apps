@@ -1440,7 +1440,7 @@ int32_t ModelInfo::initialize()
     if (status == 0)
     {
         // Populate infConfig
-        status = infConfig.getConfig(m_modelPath, enableTidl);
+        status = infConfig.getConfig(m_modelPath, enableTidl, 1);
 
         if (status < 0)
         {
