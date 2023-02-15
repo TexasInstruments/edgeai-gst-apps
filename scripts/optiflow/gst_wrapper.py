@@ -89,7 +89,9 @@ def get_input_str(input):
     elif (input.source.startswith('rtsp')):
         source = 'rtsp'
     elif (os.path.isfile(input.source)):
-        if (source_ext in video_ext):
+        if (source_ext == ".h264" or source_ext == ".h265"):
+            source = 'raw_video'
+        elif (source_ext in video_ext):
             source = 'video'
         elif (source_ext in image_dec):
             source = 'image'
@@ -200,6 +202,14 @@ def get_input_str(input):
         source_cmd += gst_element_map["dlcolorconvert"]["element"] + \
                       ' ! video/x-raw, format=NV12 ! '
 
+    elif (source == 'raw_video'):
+        source_cmd = 'multifilesrc location=' + input.source
+        source_cmd += ' loop=true' if input.loop else ''
+        source_cmd += ' caps=video/x-' + input.format
+        source_cmd += ',width=%d,height=%d,framerate=%d/1' % (input.width,input.height,input.fps)
+        source_cmd +=  video_dec[input.format]
+        source_cmd += ' ! '
+
     elif (source == 'video'):
         if not(input.format in video_dec):
             input.format = "auto"
@@ -214,7 +224,6 @@ def get_input_str(input):
         if input.format != 'NV12':
             source_cmd += gst_element_map["dlcolorconvert"]["element"] + \
                           ' ! video/x-raw, format=NV12 ! '
-
     return source_cmd
 
 def get_input_split_str(input):
