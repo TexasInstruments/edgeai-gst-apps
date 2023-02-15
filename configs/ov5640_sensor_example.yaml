@@ -1,4 +1,4 @@
-title: "OV5640 Camera Demo"
+title: "OV5640 Camera"
 log_level: 2
 inputs:
     # ov5640 should be connected to MIPI connector
@@ -24,6 +24,7 @@ outputs:
         sink: kmssink
         width: 1920
         height: 1080
+        overlay-performance: True
     output1:
         sink: /opt/edgeai-test-data/output/output_video.mkv
         width: 1920

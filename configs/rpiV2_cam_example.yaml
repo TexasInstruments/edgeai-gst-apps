@@ -1,4 +1,4 @@
-title: "RPi Camera Demo"
+title: "RPi Camera"
 log_level: 2
 inputs:
     # rpi camera is supported only in Starter Kit
@@ -26,6 +26,7 @@ outputs:
         sink: kmssink
         width: 1920
         height: 1080
+        overlay-performance: True
     output1:
         sink: /opt/edgeai-test-data/output/output_video.mkv
         width: 1920

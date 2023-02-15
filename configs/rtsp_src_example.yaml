@@ -1,4 +1,4 @@
-title: "RTSP stream Demo"
+title: "RTSP stream"
 log_level: 2
 inputs:
     # https://gist.github.com/Santiago-vdk/80c378a315722a1b813ae5da1661f890
@@ -25,6 +25,7 @@ outputs:
         sink: kmssink
         width: 1920
         height: 1080
+        overlay-performance: True
     output1:
         sink: /opt/edgeai-test-data/output/output_video.mkv
         width: 1920

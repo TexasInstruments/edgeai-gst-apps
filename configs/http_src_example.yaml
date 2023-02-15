@@ -1,4 +1,4 @@
-title: "HTTP source Demo"
+title: "HTTP source"
 log_level: 2
 inputs:
     input0:
@@ -22,6 +22,7 @@ outputs:
         sink: kmssink
         width: 1280
         height: 720
+        overlay-performance: True
     output1:
         sink: /opt/edgeai-test-data/output/output_video.mkv
         width: 1280
@@ -32,4 +33,4 @@ outputs:
         height: 720
 
 flows:
-    flow0: [input0,model1,output0,[320,180,640,480]]
+    flow0: [input0,model1,output0,[320,120,640,480]]

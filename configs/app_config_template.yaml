@@ -1,7 +1,7 @@
 ---
 
 # Demo title
-title: "Multi instance, Multi input Demo"
+title: "Title"
 
 # Application input configuration. This is a list of inputs
 # enumerated starting with 0.
@@ -239,9 +239,13 @@ outputs:
         # Output display height
         height: 1080
 
+        # Overlay performance stats (optional, Default=False)
+        overlay-performance: False
+
         # Connector id to select output display. (optional)
         # This field is ignored for sinks other than kmssink
         connector: 0
+
     output1:
         # Allowed sink for the output. Allowed values
         # - kmssink                 [Display]
@@ -268,6 +272,9 @@ outputs:
 
         # Output display height
         height: 1080
+
+        #Bitrate of encoder (optional)(Default=10000000)
+        bitrate: 10000000
     output2:
         # Allowed sink for the output. Allowed values
         # - kmssink                 [Display]
@@ -312,6 +319,13 @@ outputs:
 
         #Payloader or mux to be added after encode(optional)(Default=rtph264pay)
         payloader: rtph264pay
+        
+        #Bitrate of encoder (optional)(Default=10000000)
+        bitrate: 10000000
+
+        #Gop size of encoder(optional)(Default=30)
+        gop-size: 30
+
     output4:
         # Gstreamer Fakesink
         sink: fakesink
