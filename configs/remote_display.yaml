@@ -1,4 +1,4 @@
-title: "Remote Display Demo"
+title: "Remote Display"
 # If output is set to display, it runs the pipeline with udpsink as the output
 # To view the output on web browser, run the streamlit server using
 # root@soc:/opt/edgeai-gst-apps> streamlit run scripts/udp_vis.py -- --port *port_number* [Default is 8081]
@@ -43,6 +43,7 @@ outputs:
         height: 720
         port: 8081
         host: 0.0.0.0
+        overlay-performance: True
 
 flows:
     flow0: [input0,model1,output0]
