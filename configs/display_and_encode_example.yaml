@@ -1,4 +1,4 @@
-title: "Object Detection Demo"
+title: "Display and Encode"
 log_level: 2
 inputs:
     input0:
@@ -39,6 +39,7 @@ outputs:
         sink: kmssink
         width: 1920
         height: 1080
+        overlay-performance: True
     output1:
         sink: /opt/edgeai-test-data/output/output_video0.mkv
         width: 1280

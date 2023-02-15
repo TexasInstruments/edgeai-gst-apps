@@ -1,4 +1,4 @@
-title: "imx390 Camera Demo"
+title: "IMX390 Camera"
 log_level: 2
 inputs:
     # Needs fusion board and imx390 cameras conneted over FPD links
@@ -29,6 +29,7 @@ outputs:
         sink: kmssink
         width: 1920
         height: 1080
+        overlay-performance: True
     output1:
         sink: /opt/edgeai-test-data/output/output_video.mkv
         width: 1920
