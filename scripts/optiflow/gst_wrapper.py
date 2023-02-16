@@ -62,18 +62,28 @@ def get_input_str(input):
     
 
     if gst_element_map["h264dec"]["element"] == "v4l2h264dec":
-        video_dec["h264"] += " ! v4l2h264dec capture-io-mode=5 " + \
-                             " ! tiovxmemalloc pool-size=8 " + \
-                             " ! video/x-raw, format=NV12 "
+        video_dec["h264"] += " ! v4l2h264dec"
+
+        if "property" in gst_element_map["h264dec"]:
+            if "capture-io-mode" in gst_element_map["h264dec"]["property"]:
+                video_dec["h264"] += " capture-io-mode=%s" % \
+                       gst_element_map["h264dec"]["property"]["capture-io-mode"]
+
+        video_dec["h264"] += " ! tiovxmemalloc pool-size=8" + \
+                             " ! video/x-raw, format=NV12"
     else:
-        video_dec["h264"] += " ! " + gst_element_map["h264dec"]["element"] + " "  
+        video_dec["h264"] += " ! " + gst_element_map["h264dec"]["element"]
     
     if gst_element_map["h265dec"]["element"] == "v4l2h265dec":
-        video_dec["h265"] += " ! v4l2h265dec capture-io-mode=5 " + \
-                             " ! tiovxmemalloc pool-size=8 " + \
-                             " ! video/x-raw, format=NV12 "
+        video_dec["h265"] += " ! v4l2h265dec"
+        if "property" in gst_element_map["h265dec"]:
+            if "capture-io-mode" in gst_element_map["h265dec"]["property"]:
+                video_dec["h265"] += " capture-io-mode=%s" % \
+                       gst_element_map["h265dec"]["property"]["capture-io-mode"]
+        video_dec["h265"] += " ! tiovxmemalloc pool-size=8" + \
+                             " ! video/x-raw, format=NV12"
     else:
-        video_dec["h265"] += " ! " + gst_element_map["h265dec"]["element"] + " "
+        video_dec["h265"] += " ! " + gst_element_map["h265dec"]["element"]
 
     source_ext = os.path.splitext(input.source)[1]
     status = 0
@@ -189,7 +199,7 @@ def get_input_str(input):
     elif (source == 'rtsp'):
         source_cmd = 'rtspsrc location=' + input.source + \
                      ' latency=0 buffer-mode=auto ! rtph264depay' + \
-                     video_dec["h264"]
+                     video_dec["h264"] + ' ! '
 
     elif (source == 'image'):
         source_cmd = 'multifilesrc location=' + input.source

@@ -524,7 +524,11 @@ def get_input_elements(input):
 
     # Add decoder and caps if defined
     if gst_element_map["h264dec"]["element"] == "v4l2h264dec":
-        property = {"capture-io-mode": 5}
+        property = {}
+        if "property" in gst_element_map["h264dec"]:
+            if "capture-io-mode" in gst_element_map["h264dec"]["property"]:
+                property["capture-io-mode"] = \
+                            gst_element_map["h264dec"]["property"]["capture-io-mode"]
         video_dec["h264"].append(
             [gst_element_map["h264dec"]["element"], property, None]
         )
@@ -535,7 +539,11 @@ def get_input_elements(input):
         video_dec["h264"].append([gst_element_map["h264dec"]["element"], None, None])
 
     if gst_element_map["h265dec"]["element"] == "v4l2h265dec":
-        property = {"capture-io-mode": 5}
+        property = {}
+        if "property" in gst_element_map["h265dec"]:
+            if "capture-io-mode" in gst_element_map["h265dec"]["property"]:
+                property["capture-io-mode"] = \
+                            gst_element_map["h265dec"]["property"]["capture-io-mode"]
         video_dec["h265"].append(
             [gst_element_map["h265dec"]["element"], property, None]
         )
