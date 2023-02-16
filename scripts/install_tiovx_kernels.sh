@@ -38,7 +38,7 @@ if [ `arch` == "aarch64" ]; then
 else
     install_dir="../../"
 fi
-while getopts ":i:d" flag; do
+while getopts ":i:dn" flag; do
     case "${flag}" in
         i)
             if [ -z $OPTARG ] || [ ! -d $OPTARG ]; then
@@ -50,6 +50,9 @@ while getopts ":i:d" flag; do
             ;;
         d)
             build_flag="-DCMAKE_BUILD_TYPE=Debug"
+            ;;
+        n)
+            NO_CLEAN=1
             ;;
         *)
             if [ $OPTARG == i ]; then
@@ -74,15 +77,31 @@ fi
 
 set -e
 
-# Install if running from target else skip
-if [ `arch` == "aarch64" ]; then
-    cd edgeai-tiovx-kernels
+if [ `arch` != "aarch64" ]; then
+    build_flag="$build_flag -DCMAKE_TOOLCHAIN_FILE=../cmake/cross_compile_aarch64.cmake"
+fi
+
+cd edgeai-tiovx-kernels
+if [ "$NO_CLEAN" != "1" ]; then
     rm -rf build
+fi
+if [ ! -d build ]; then
     mkdir build
     cd build
     cmake $build_flag ..
-    make -j2
-    make install
+else
+    cd build
+fi
+make -j2
+if [ "$INSTALL_PATH" != "" ]; then
+    if [ ! -w $TARGET_FS ]; then
+        echo "You do not have write permission to $TARGET_FS, adding sudo to install command"
+        sudo make -j`nproc` install DESTDIR=$INSTALL_PATH
+    else
+        make -j`nproc` install DESTDIR=$INSTALL_PATH
+    fi
+else
+    echo "INSTALL_PATH not defined, Skipping install !"
 fi
 
 cd $current_dir

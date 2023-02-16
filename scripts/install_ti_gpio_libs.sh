@@ -38,7 +38,7 @@ if [ `arch` == "aarch64" ]; then
 else
     install_dir="../../"
 fi
-while getopts ":i:d" flag; do
+while getopts ":i:dn" flag; do
     case "${flag}" in
         i)
             if [ -z $OPTARG ] || [ ! -d $OPTARG ]; then
@@ -50,6 +50,9 @@ while getopts ":i:d" flag; do
             ;;
         d)
             build_flag="-DCMAKE_BUILD_TYPE=Debug"
+            ;;
+        n)
+            NO_CLEAN=1
             ;;
         *)
             if [ $OPTARG == i ]; then
@@ -74,7 +77,7 @@ if [ "$?" -ne "0" ]; then
 fi
 
 # Install if running from target else skip
-if [ `arch` == "aarch64" ]; then
+if [[ `arch` == "aarch64" && "$NO_CLEAN" ]]; then
     # Install python library
     echo "Installing TI.GPIO python libraries."
     cd ti-gpio-py && pip3 install .
@@ -97,7 +100,7 @@ if [ "$?" -ne "0" ]; then
 fi
 
 # Install if running from target else skip
-if [ `arch` == "aarch64" ]; then
+if [[ `arch` == "aarch64" && "$NO_CLEAN" != "1" ]]; then
     cd gpiozero
     pip3 install .
     cd ..
@@ -116,7 +119,7 @@ fi
 set -e
 
 # Install if running from target else skip
-if [ `arch` == "aarch64" ]; then
+if [[ `arch` == "aarch64" && "$NO_CLEAN" != "1" ]]; then
     echo "Building and installing TI GPIO CPP libraries."
     # Build and install CPP libraries
     cd ti-gpio-cpp && rm -rf build && mkdir build && cd build && \

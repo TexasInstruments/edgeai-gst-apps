@@ -38,7 +38,7 @@ if [ `arch` == "aarch64" ]; then
 else
     install_dir="../../"
 fi
-while getopts ":i:d" flag; do
+while getopts ":i:dn" flag; do
     case "${flag}" in
         i)
             if [ -z $OPTARG ] || [ ! -d $OPTARG ]; then
@@ -50,6 +50,9 @@ while getopts ":i:d" flag; do
             ;;
         d)
             build_flag="--buildtype=debug"
+            ;;
+        n)
+            NO_CLEAN=1
             ;;
         *)
             if [ $OPTARG == i ]; then
@@ -74,14 +77,45 @@ fi
 
 set -e
 
-# Install if running from target else skip
-if [ `arch` == "aarch64" ]; then
-    cd edgeai-gst-plugins
+cd edgeai-gst-plugins
+if [ `arch` != "aarch64" ]; then
+    build_flag="$build_flag --cross-file aarch64-none-linux-gnu.ini --cross-file crossbuild/crosscompile.ini"
+    cat << END > aarch64-none-linux-gnu.ini
+[constants]
+TOOLCHAIN = '$CROSS_COMPILER_PATH/bin/$CROSS_COMPILER_PREFIX'
+SYSROOT = '$TARGET_FS'
+PKG_CONFIG_LIBDIR = '$TARGET_FS/usr/lib/pkgconfig:`pwd`/pkgconfig'
+
+SYSTEM = 'linux-gnu'
+CPU_FAMILY = 'aarch64'
+CPU = 'aarch64-none'
+ENDIAN = 'little'
+
+PREFIX = '/usr'
+LIBDIR = '/usr/lib'
+END
+else
+    build_flag="$build_flag --prefix=/usr -Dpkg_config_path=pkgconfig"
+fi
+
+ls crossbuild/crosscompile.ini
+if [ "$NO_CLEAN" != "1" ]; then
     rm -rf build
-    meson build --prefix=/usr -Dpkg_config_path=pkgconfig $build_flag
-    ninja -C build
-    ninja -C build install
-    ldconfig
+fi
+if [ ! -d build ]; then
+    PKG_CONFIG_PATH='' meson build $build_flag
+fi
+
+ninja -C build
+if [ "$INSTALL_PATH" != "" ]; then
+    if [ ! -w $TARGET_FS ]; then
+        echo "You do not have write permission to $TARGET_FS, adding sudo to install command"
+        sudo -E ninja -C build install
+    else
+        ninja -C build install
+    fi
+else
+    echo "INSTALL_PATH not defined, Skipping install !"
 fi
 
 cd $current_dir
