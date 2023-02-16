@@ -30,17 +30,74 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+if [ "$(basename "/"$0)" != "setup_script.sh" ]
+then
+    SOURCED=1
+fi
+
 current_dir=$(pwd)
 cd $(dirname $0)
 
+SOC_LIST=(j721e j721s2 j784s4 am62a)
+
 exit_setup()
 {
-    echo "Setup FAILED! : Make sure you have active network connection"
+    echo "Setup FAILED!"
     cd $current_dir
-    exit 1
+    if [ "$SOURCED" == "1" ]; then
+        return
+    else
+        exit 1
+    fi
 }
 
-source ./scripts/detect_soc.sh
+# Get SOC
+if [ `arch` == "aarch64" ]; then
+    source ./scripts/detect_soc.sh
+elif [ "$SOC" == "" ]; then
+    echo "Please enter the SOC you want to build for"
+    read -p "(`echo ${SOC_LIST[@]}`): " SOC
+    export SOC
+fi
+
+SOC_VALID=0
+for S in ${SOC_LIST[@]}
+do
+    if [ "$S" == $SOC ]; then
+        SOC_VALID=1
+        break
+    fi
+done
+
+if [ "$SOC_VALID" == "0" ]; then
+    echo "$SOC is not valid SOC!"
+    exit_setup
+fi
+
+# Get TOOLCHAIN and TARGET_FS
+if [ `arch` != "aarch64" ]; then
+    export CROSS_COMPILER_PREFIX=aarch64-none-linux-gnu-
+    if [ "$TARGET_FS" == "" ]; then
+        echo "Please enter the target filesystem PATH"
+        read -e -p "TARGET_FS: " TARGET_FS
+        export TARGET_FS
+    fi
+
+    if [ "$CROSS_COMPILER_PATH" == "" ]; then
+        echo "Please enter the cross compiler toolchain path"
+        read -e -p "CROSS_COMPILER_PATH: " CROSS_COMPILER_PATH
+        export CROSS_COMPILER_PATH
+    fi
+
+    if [ "$INSTALL_PATH" == "" ]; then
+        echo "Please enter the install path"
+        read -e -p "INSTALL PATH: " INSTALL_PATH
+        export INSTALL_PATH
+    fi
+else
+    export TARGET_FS="/"
+    export INSTALL_PATH="/"
+fi
 
 # Install DL Inferer library and its depencendy
 ./scripts/install_dl_inferer.sh $*
@@ -81,11 +138,10 @@ fi
 # Install streamlit
 if [ `arch` == "aarch64" ]; then
     pip3 install streamlit --disable-pip-version-check
+    ldconfig
 fi
 
 cd $current_dir
 
-ldconfig
 sync
-
 echo "Setup Done!"

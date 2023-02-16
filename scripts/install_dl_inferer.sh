@@ -38,7 +38,7 @@ if [ `arch` == "aarch64" ]; then
 else
     install_dir="../../"
 fi
-while getopts ":i:d" flag; do
+while getopts ":i:dn" flag; do
     case "${flag}" in
         i)
             if [ -z $OPTARG ] || [ ! -d $OPTARG ]; then
@@ -49,7 +49,10 @@ while getopts ":i:d" flag; do
             install_dir="$OPTARG"
             ;;
         d)
-            optarg="-d"
+            optarg="$optarg -d"
+            ;;
+        n)
+            optarg="$optarg -n"
             ;;
         *)
             if [ $OPTARG == i ]; then
@@ -74,10 +77,7 @@ fi
 
 set -e
 
-# Install if running from target else skip
-if [ `arch` == "aarch64" ]; then
-    cd edgeai-dl-inferer
-    ./setup_script.sh $optarg
-fi
+cd edgeai-dl-inferer
+./setup_script.sh $optarg
 
 cd $current_dir

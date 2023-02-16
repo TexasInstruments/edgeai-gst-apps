@@ -30,13 +30,16 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-while getopts ":d:o" flag; do
+while getopts ":d:on" flag; do
     case "${flag}" in
         d)
             build_flag="-DCMAKE_BUILD_TYPE=Debug"
             ;;
         o)
             build_flag="-DEDGEAI_ENABLE_OUTPUT_FOR_TEST=ON"
+            ;;
+        n)
+            NO_CLEAN=1
             ;;
         *)
             ;;
@@ -48,14 +51,36 @@ set -e
 current_dir=$(pwd)
 cd $(dirname $0)
 
-# Install if running from target else skip
-if [ `arch` == "aarch64" ]; then
-    cd ../apps_cpp
-    rm -rf build bin lib
+if [ `arch` != "aarch64" ]; then
+    build_flag="$build_flag -DCMAKE_TOOLCHAIN_FILE=../cmake/cross_compile_aarch64.cmake"
+fi
+
+cd ../apps_cpp
+mkdir -p build
+if [ "$NO_CLEAN" != "1" ]; then
+    rm -rf build
+fi
+if [ ! -d build ]; then
     mkdir build
     cd build
     cmake $build_flag ..
-    make -j2
+else
+    cd build
 fi
+make -j2
 
 cd $current_dir
+
+if [ "$INSTALL_PATH" != "" ]; then
+    if [ `arch` != "aarch64" ]; then
+        echo "Copying apps to /opt, This will replace the apps in $TARGET_FS"
+        if [ ! -w $TARGET_FS ]; then
+            echo "You do not have write permission to $TARGET_FS, adding sudo to install command"
+            sudo cp -r ../edgeai-gst-apps $TARGET_FS/opt
+        else
+            cp -r ../edgeai-gst-apps $TARGET_FS/opt
+        fi
+    fi
+else
+    echo "INSTALL_PATH not defined, Skipping install !"
+fi
