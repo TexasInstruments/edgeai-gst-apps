@@ -567,7 +567,10 @@ def get_input_elements(input):
     elif input.source.startswith("rtsp"):
         source = "rtsp"
     elif os.path.isfile(input.source):
-        if source_ext in video_ext:
+        if (source_ext == ".h264" or source_ext == ".h265"):
+            source = 'raw_video'
+            stop_index = 0
+        elif source_ext in video_ext:
             source = "video"
         elif source_ext in image_dec:
             source = "image"
@@ -716,6 +719,30 @@ def get_input_elements(input):
         caps = "video/x-raw, width=%d, height=%d" % (input.width, input.height)
         element = make_element("videoscale", caps=caps)
         input_element_list += element
+
+    if source == "raw_video":
+        if not (input.format in video_dec):
+            input.format = "auto"
+        property = {
+            "location": input.source,
+            "stop-index": stop_index,
+            "name": source_name,
+        }
+        if input.loop == True:
+            property["loop"] = True
+
+        #Set caps only in case of hardware decoder
+        if ((input.format == "h264" and gst_element_map["h264dec"]["element"] == "v4l2h264dec") or
+            (input.format == "h265" and gst_element_map["h264dec"]["element"] == "v4l2h264dec")):
+            caps_string = "video/x-" + input.format
+            caps_string += ",width=%d,height=%d,framerate=%s" % (input.width,input.height,input.fps)
+            property["caps"] = Gst.caps_from_string(caps_string)
+
+        element = make_element("multifilesrc", property=property)
+        input_element_list += element
+        for i in video_dec[input.format]:
+            input_element_list += make_element(i[0], property=i[1], caps=i[2])
+
 
     elif source == "video":
         if not (input.format in video_dec):

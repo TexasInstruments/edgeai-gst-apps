@@ -6,23 +6,28 @@ title: "Title"
 # Application input configuration. This is a list of inputs
 # enumerated starting with 0.
 inputs:
+    # Allowed sources of the input data. Allowed values
+    # - /dev/videoX             [Camera]
+    # - <some_path>/*%Nd*.jpg   [Image]
+    # - <some_path>/*%Nd*.png   [Image]
+    # - <some_path>/*.h264      [Raw Video]
+    # - <some_path>/*.h265      [Raw Video]
+    # - <some_path>/*.mp4       [Video]
+    # - <some_path>/*.mov       [Video]
+    # - rtsp://ip               [RTSP]
+    # - http://link             [HTTP]
+    #
+    #ex:- ../c/d/input_image%02d.jpg
+    #     /a/b/c/d/input_image%02d.png
+    #     /a/b/c/d/input_video.h264
+    #     /a/b/c/d/input_video.mp4
+    #     /a/b/c/d/input_video.mov
+    #
+    # The paths to images and videos can be absolute or relative to the directoty
+    # the application is launched from.
+    #
     input0:
-        # Allowed sources of the input data. Allowed values
-        # - /dev/videoX             [Camera]
-        # - <some_path>/*%Nd*.jpg   [Image]
-        # - <some_path>/*%Nd*.png   [Image]
-        # - <some_path>/*.mp4       [Video]
-        # - <some_path>/*.mov       [Video]
-        #
-        #ex:- ../c/d/input_image%02d.jpg
-        #     /a/b/c/d/input_image%02d.png
-        #     /a/b/c/d/input_video.mp4
-        #     /a/b/c/d/input_video.mov
-        #
-        # The paths to images and videos can be absolute or relative to the directoty
-        # the application is launched from.
-        #
-        # Default is /dev/video1
+        # USB Camera Source
         source: /dev/video1
 
         # Data format supported by camera (optional)
@@ -54,30 +59,13 @@ inputs:
         subdev-id: 2
 
     input1:
-        # Allowed sources of the input data. Allowed values
-        # - /dev/videoX             [Camera]
-        # - <some_path>/*%Nd*.jpg   [Image]
-        # - <some_path>/*%Nd*.png   [Image]
-        # - <some_path>/*.mp4       [Video]
-        # - <some_path>/*.mov       [Video]
-        #
-        #ex:- ../c/d/input_image%02d.jpg
-        #     /a/b/c/d/input_image%02d.png
-        #     /a/b/c/d/input_video.mp4
-        #     /a/b/c/d/input_video.mov
-        #
-        # The paths to images and videos can be absolute or relative to the directoty
-        # the application is launched from.
-        #
-        # Default is /dev/video1
-        source: /opt/edgeai-test-data/videos/video_0000_h264.mp4
+        # Raw Video Source
+        source: /opt/edgeai-test-data/videos/video_0000_h264.h264
 
         # Video encoding format (optional)
         # Allowed values
-        # - h264 - Uses hardware 264 decoder
-        # - h264_sw - Uses software 264 decoder
-        # - h265 - Uses hardware 265 decoder
-        # - h265_sw - Uses software 265 decoder
+        # - h264 - Uses 264 decoder for h264 videos
+        # - h265 - Uses 265 decoder for h265 videos
         # - auto - to let gstreamer figure out (default)
         format: h264
 
@@ -91,25 +79,35 @@ inputs:
         # Default is 30 for camera and 1 for image
         framerate: 30
 
-        # If file input need to be looped
-        loop: False
+        # If input need to be looped
+        loop: True
+
     input2:
-        # Allowed sources of the input data. Allowed values
-        # - /dev/videoX             [Camera]
-        # - <some_path>/*%Nd*.jpg   [Image]
-        # - <some_path>/*%Nd*.png   [Image]
-        # - <some_path>/*.mp4       [Video]
-        # - <some_path>/*.mov       [Video]
-        #
-        #ex:- ../c/d/input_image%02d.jpg
-        #     /a/b/c/d/input_image%02d.png
-        #     /a/b/c/d/input_video.mp4
-        #     /a/b/c/d/input_video.mov
-        #
-        # The paths to images and videos can be absolute or relative to the directoty
-        # the application is launched from.
-        #
-        # Default is /dev/video1
+        # Video Source
+        source: /opt/edgeai-test-data/videos/video_0000_h264.mp4
+
+        # Video encoding format (optional)
+        # Allowed values
+        # - h264 - Uses 264 decoder
+        # - h265 - Uses 265 decoder
+        # - auto - to let gstreamer figure out (default)
+        format: h264
+
+        # Input data width
+        width: 1280
+
+        # Input data height
+        height: 720
+
+        # Frame rate
+        # Default is 30 for camera and 1 for image
+        framerate: 30
+
+        # If input need to be looped
+        loop: True
+
+    input3:
+        # Image Source
         source: /opt/edgeai-test-data/images/%04d.jpg
 
         # Input data width
@@ -128,24 +126,8 @@ inputs:
 
         # If file input need to be looped
         loop: True
-    input3:
-        # Allowed sources of the input data. Allowed values
-        # - /dev/videoX             [Camera]
-        # - <some_path>/*%Nd*.jpg   [Image]
-        # - <some_path>/*%Nd*.png   [Image]
-        # - <some_path>/*.mp4       [Video]
-        # - <some_path>/*.mov       [Video]
-        # - rtsp://<some_path>      [RTSP Stream]
-        #
-        #ex:- ../c/d/input_image%02d.jpg
-        #     /a/b/c/d/input_image%02d.png
-        #     /a/b/c/d/input_video.mp4
-        #     /a/b/c/d/input_video.mov
-        #
-        # The paths to images and videos can be absolute or relative to the directoty
-        # the application is launched from.
-        #
-        # Default is /dev/video1
+    input4:
+        # RTSP Surce
         source: rtsp://172.24.145.220:8554/test # rtsp stream url
 
         # Input data width
@@ -160,7 +142,7 @@ inputs:
 
         # If file input need to be looped
         loop: True
-    input4:
+    input5:
         # Gstremer test source
         source: videotestsrc
 

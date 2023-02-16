@@ -195,7 +195,12 @@ int32_t InputInfo::addGstPipeline(vector<vector<GstElement*>>   &preProcElementV
 
     if (filesystem::exists(m_source))
     {
-        if (gVideoInExtMap.find(srcExt) != gVideoInExtMap.end())
+        if (srcExt == ".h264" || srcExt == ".h265")
+        {
+            m_srcType = "raw_video";
+            indexEnd = 0;
+        }
+        else if (gVideoInExtMap.find(srcExt) != gVideoInExtMap.end())
         {
             m_srcType = "video";
         }
@@ -374,6 +379,94 @@ int32_t InputInfo::addGstPipeline(vector<vector<GstElement*>>   &preProcElementV
 
             string caps = "video/x-raw," + whStr;
             makeElement(m_inputElements,"videoscale",m_gstElementProperty,caps.c_str());
+        }
+
+        else if (m_srcType == "raw_video")
+        {
+            if (gVideoDecMap.find(m_format) == gVideoDecMap.end())
+            {
+                m_format = "auto";
+            }
+
+            string multifile_caps = "";
+            if ((m_format == "h264" &&
+                 gstElementMap["h264dec"]["element"].as<string>() == "v4l2h264dec")
+                ||
+                (m_format == "h265" &&
+                 gstElementMap["h264dec"]["element"].as<string>() == "v4l2h265dec"))
+            {
+                multifile_caps = "video/x-" +
+                                 m_format +
+                                 ",width=" +
+                                 to_string(m_width) +
+                                 ",height=" +
+                                 to_string(m_height) +
+                                 ",framerate=" +
+                                 m_framerate;
+            }
+
+            if (multifile_caps != "")
+            {
+                m_gstElementProperty = {{"location",m_source.c_str()},
+                                        {"loop",to_string(m_loop).c_str()},
+                                        {"stop-index",to_string(indexEnd).c_str()},
+                                        {"caps",multifile_caps.c_str()},
+                                        {"name",srcName.c_str()}
+                                        };
+            }
+
+            else
+            {
+                m_gstElementProperty = {{"location",m_source.c_str()},
+                                        {"loop",to_string(m_loop).c_str()},
+                                        {"stop-index",to_string(indexEnd).c_str()},
+                                        {"name",srcName.c_str()}
+                                        };
+            }
+
+            makeElement(m_inputElements,"multifilesrc",m_gstElementProperty, NULL);
+
+            for (uint32_t i=0;i<gVideoDecMap[m_format].size();i++)
+            {
+                if (gVideoDecMap[m_format][i] == "v4l2h264dec" ||
+                    gVideoDecMap[m_format][i] == "v4l2h265dec")
+                {
+                    string capture_io_mode;
+                    if(gVideoDecMap[m_format][i] == "v4l2h264dec" &&
+                       gstElementMap["h264dec"]["property"] &&
+                       gstElementMap["h264dec"]["property"]["capture-io-mode"])
+                    {
+                        capture_io_mode = gstElementMap["h264dec"]["property"]["capture-io-mode"].as<string>();
+                        m_gstElementProperty = {{"capture-io-mode",capture_io_mode.c_str()}};
+                    }
+
+                    if(gVideoDecMap[m_format][i] == "v4l2h265dec" &&
+                       gstElementMap["h265dec"]["property"] &&
+                       gstElementMap["h265dec"]["property"]["capture-io-mode"])
+                    {
+                        capture_io_mode = gstElementMap["h265dec"]["property"]["capture-io-mode"].as<string>();
+                        m_gstElementProperty = {{"capture-io-mode",capture_io_mode.c_str()}};
+                    }
+
+                    makeElement(m_inputElements,
+                                gVideoDecMap[m_format][i].c_str(),
+                                m_gstElementProperty,
+                                NULL);
+
+                    m_gstElementProperty = {{"pool-size","8"}};
+                    string caps = "video/x-raw, format=NV12";
+                    makeElement(m_inputElements,
+                                "tiovxmemalloc",
+                                m_gstElementProperty,
+                                caps.c_str());
+                }
+                else {
+                    makeElement(m_inputElements,
+                                gVideoDecMap[m_format][i].c_str(),
+                                m_gstElementProperty,
+                                NULL);
+                }
+            }
         }
 
         else if (m_srcType == "video")
@@ -1172,6 +1265,7 @@ int32_t OutputInfo::appendGstPipeline()
                                 {"name",name.c_str()}};
         makeElement(m_dispElements,"multifilesink",m_gstElementProperty,NULL);
     }
+
     else if (sinkType == "video")
     {
         for(unsigned i=0;i<gVideoEncMap[sinkExt].size();i++)
