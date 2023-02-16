@@ -8,7 +8,7 @@ inputs:
         height: 720
         framerate: 30
     input1:
-        source: /opt/edgeai-test-data/videos/video_0000_h264.mp4
+        source: /opt/edgeai-test-data/videos/video_0000_h264.h264
         format: h264
         width: 1280
         height: 720
