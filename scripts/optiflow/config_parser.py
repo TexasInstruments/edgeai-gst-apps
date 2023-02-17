@@ -157,6 +157,7 @@ class Output:
         self.subflows.append(subflow)
         if (self.mosaic):
             self.gst_mosaic_str = self.gst_mosaic_str + \
+                         'src::pool-size=3 ' + \
                          'sink_%d::startx="<%d>"  ' % (disp_id, subflow.x_pos) + \
                          'sink_%d::starty="<%d>"  ' % (disp_id, subflow.y_pos) + \
                          'sink_%d::widths="<%d>"   ' % (disp_id, subflow.width) + \

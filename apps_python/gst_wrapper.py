@@ -1522,6 +1522,9 @@ def get_gst_pipe(flows, outputs):
                         )
                     link_elements(o.gst_mosaic_elements[-1], o.gst_disp_elements[0])
 
+                    if (o.overlay_performance):
+                        Gst.ChildProxy.set_property(mosaic, "src::pool-size", 3)
+
                 else:
                     """
                     Use Scaler if expected output dimension does'nt match the

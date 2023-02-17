@@ -2209,6 +2209,18 @@ int32_t FlowInfo::getSinkPipeline(GstElement*       &sinkPipeline,
                     addAndLink(sinkPipeline,output->m_dispElements);
                 }
                 link(output->m_mosaicElements.back(),output->m_dispElements.front());
+
+                if (output->m_overlayPerformance)
+                {
+                    GValue val = G_VALUE_INIT;
+                    g_value_init (&val, G_TYPE_INT);
+                    g_value_set_int (&val,3);
+                    gst_child_proxy_set_property (GST_CHILD_PROXY (mosaic),
+                                                  "src::pool-size",
+                                                  &val);
+                    g_value_unset (&val);
+                }
+
             }
             else
             {
