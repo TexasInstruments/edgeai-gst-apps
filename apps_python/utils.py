@@ -485,6 +485,7 @@ def print_sink_pipeline(pipeline, mosaic_prop, title=None):
     for mosaic in mosaic_list:
         mosaic_name = mosaic.get_name()
         string = "%s name=%s\n" % (get_name_with_prop(mosaic), mosaic_name)
+        string += 'src::pool-size=%d ' % mosaic.srcpads[0].get_property("pool-size")
         for i, (x, y, w, h) in enumerate(mosaic_prop[mosaic_name]):
             sink_name = "sink_%d::" % i
             string += 'sink_%d::startx="<%d>" ' % (i, x)

@@ -228,6 +228,18 @@ namespace ti::edgeai::common
         string      prop_name;
         guint       value;
 
+
+        GValue val = G_VALUE_INIT;
+        g_value_init (&val, G_TYPE_INT);
+        gst_child_proxy_get_property(GST_CHILD_PROXY (mosaic),
+                                     "src::pool-size",
+                                     &val);
+        value = g_value_get_int(&val);
+        g_value_unset(&val);
+        property_string += "src::pool-size=" +
+                            to_string(value) +
+                            " ";
+
         for (guint pad = 0; pad < mosaic->numsinkpads; pad++)
         {
             GValue array = G_VALUE_INIT;
@@ -241,8 +253,7 @@ namespace ti::edgeai::common
                                             &array);
             value = g_value_get_uint(gst_value_array_get_value (&array, 0));
             g_value_unset(&array);
-            property_string += " " +
-                               prop_name +
+            property_string += prop_name +
                                "=\"<" +
                                to_string(value) +
                                ">\" ";
@@ -283,6 +294,7 @@ namespace ti::edgeai::common
                                to_string(value) +
                                ">\"\n";
         }
+
         return property_string;
     }
 
