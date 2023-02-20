@@ -43,7 +43,9 @@ j721e:
         property:
             bitrate: 10000000
     h265enc: null
-    enable-tidl: true
+    inferer:
+        target: dsp
+        core-id: [1]
 
 #==================== J721S2 ====================
 j721s2:
@@ -78,7 +80,9 @@ j721s2:
             bitrate: 10000000
     h265enc:
         element: v4l2h265enc
-    enable-tidl: true
+    inferer:
+        target: dsp
+        core-id: [1]
 
 #==================== J784S4 ====================
 j784s4:
@@ -101,8 +105,12 @@ j784s4:
         element: tiovxmosaic
     isp:
         element: tiovxisp
+        property:
+            target: [0,1]
     ldc:
         element: tiovxldc
+        property:
+            target: [0,1]
     h264dec:
         element: v4l2h264dec
     h265dec:
@@ -113,7 +121,9 @@ j784s4:
             bitrate: 10000000
     h265enc:
         element: v4l2h265enc
-    enable-tidl: true
+    inferer:
+        target: dsp
+        core-id: [1,2,3,4]
 
 #==================== AM62A ====================
 am62a:
@@ -143,7 +153,9 @@ am62a:
         element: v4l2h264enc
     h265enc:
         element: v4l2h265enc
-    enable-tidl: true
+    inferer:
+        target: dsp
+        core-id: [1]
 
 #==================== AM62X ====================
 am62:
@@ -165,8 +177,8 @@ am62:
         element: v4l2h264enc
     h265enc:
         element: v4l2h265enc
-    enable-tidl: false
-
+    inferer:
+        target: arm
 #==================== ARM-ONLY ====================
 arm:
     dlcolorconvert:
@@ -187,4 +199,5 @@ arm:
         element: v4l2h264enc
     h265enc:
         element: v4l2h265enc
-    enable-tidl: false
+    inferer:
+        target: arm

@@ -48,6 +48,10 @@ using namespace cv;
 using namespace ti::edgeai::common;
 using namespace ti::dl_inferer;
 
+uint32_t C7_CORE_ID_INDEX = 0;
+uint32_t ISP_TARGET_INDEX = 0;
+uint32_t LDC_TARGET_INDEX = 0;
+
 static char gFilePath[2048];
 
 static map<string, string> gImageFormatMap =
@@ -312,8 +316,26 @@ int32_t InputInfo::addGstPipeline(vector<vector<GstElement*>>   &preProcElementV
 
                 m_gstElementProperty = {{"sensor-name",senName.c_str()},
                                         {"dcc-isp-file",dcc_isp_file.c_str()},
-                                        {"format-msb",formatMsb.c_str()}
+                                        {"format-msb",formatMsb.c_str()},
                                         };
+
+                vector<int> ispTargets;
+                int         ispTarget;
+                string      ispTargetStr;
+                if (gstElementMap["isp"]["property"] &&
+                    gstElementMap["isp"]["property"]["target"])
+                {
+                    ispTargets = gstElementMap["isp"]["property"]["target"].as<vector<int>>();
+                    ispTarget = ispTargets[ISP_TARGET_INDEX];
+                    ISP_TARGET_INDEX++;
+                    if(ISP_TARGET_INDEX >= ispTargets.size())
+                    {
+                        ISP_TARGET_INDEX = 0;
+                    }
+                    ispTargetStr = to_string(ispTarget);
+                    m_gstElementProperty.push_back({"target",ispTargetStr.c_str()});
+                }
+
                 caps = "video/x-raw, format=NV12";
                 makeElement(m_inputElements,
                             gstElementMap["isp"]["element"].as<string>().c_str(),
@@ -339,6 +361,24 @@ int32_t InputInfo::addGstPipeline(vector<vector<GstElement*>>   &preProcElementV
                     m_gstElementProperty = {{"sensor-name",senName.c_str()},
                                             {"dcc-file",dcc_file.c_str()},
                                             };
+
+                    vector<int> ldcTargets;
+                    int         ldcTarget;
+                    string      ldcTargetStr;
+                    if (gstElementMap["ldc"]["property"] &&
+                        gstElementMap["ldc"]["property"]["target"])
+                    {
+                        ldcTargets = gstElementMap["ldc"]["property"]["target"].as<vector<int>>();
+                        ldcTarget = ldcTargets[LDC_TARGET_INDEX];
+                        LDC_TARGET_INDEX++;
+                        if(LDC_TARGET_INDEX >= ldcTargets.size())
+                        {
+                            LDC_TARGET_INDEX = 0;
+                        }
+                        ldcTargetStr = to_string(ldcTarget);
+                        m_gstElementProperty.push_back({"target",ldcTargetStr.c_str()});
+                    }
+
                     caps = "video/x-raw,format=NV12," +whStr;
 
                     makeElement(m_inputElements,
@@ -1248,6 +1288,7 @@ int32_t OutputInfo::appendGstPipeline()
     {
         m_gstElementProperty = {{"sync","false"},
                                 {"driver-name","tidss"},
+                                {"force-modesetting","true"},
                                 {"name",name.c_str()}};
         if (m_connector)
         {
@@ -1538,7 +1579,8 @@ int32_t ModelInfo::initialize()
     YAML::Node          yaml;
     InfererConfig       infConfig;
     int32_t             status = 0;
-    const bool          enableTidl = gstElementMap["enable-tidl"].as<bool>();
+    bool                enableTidl = false;
+    int                 coreId = 1;
     // Check if the specified configuration file exists
     if (!std::filesystem::exists(m_modelPath))
     {
@@ -1549,8 +1591,29 @@ int32_t ModelInfo::initialize()
 
     if (status == 0)
     {
+        string infererTarget = gstElementMap["inferer"]["target"].as<string>();
+        if (infererTarget == "dsp")
+        {
+            enableTidl = true;
+            if (gstElementMap["inferer"]["core-id"])
+            {
+                vector<int> coreIds = gstElementMap["inferer"]["core-id"].as<vector<int>>();
+                coreId = coreIds[C7_CORE_ID_INDEX];
+                C7_CORE_ID_INDEX ++;
+                if(C7_CORE_ID_INDEX >= coreIds.size())
+                {
+                    C7_CORE_ID_INDEX = 0;
+                }
+            }
+        }
+
+        else if (infererTarget != "arm")
+        {
+            LOG_ERROR("Invalid target specified for inferer. Defaulting to ARM.\n");
+        }
+
         // Populate infConfig
-        status = infConfig.getConfig(m_modelPath, enableTidl, 1);
+        status = infConfig.getConfig(m_modelPath, enableTidl, coreId);
 
         if (status < 0)
         {

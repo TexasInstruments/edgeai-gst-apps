@@ -13,7 +13,9 @@ from gst_element_map import gst_element_map
 
 Gst.init(None)
 
-target_idx = 0
+preproc_target_idx = 0
+isp_target_idx = 0
+ldc_target_idx = 0
 
 class GstPipe:
     """
@@ -642,6 +644,15 @@ def get_input_elements(input):
                 "dcc-isp-file": "/opt/imaging/%s/dcc_viss.bin" % input.sen_id,
                 "format-msb": format_msb,
             }
+
+            global isp_target_idx
+            if "property" in gst_element_map["isp"]:
+                if "target" in gst_element_map["isp"]["property"]:
+                    property["target"] = gst_element_map["isp"]["property"]["target"][isp_target_idx]
+                    isp_target_idx += 1
+                    if isp_target_idx >= len(gst_element_map["isp"]["property"]["target"]):
+                        isp_target_idx = 0
+
             caps = "video/x-raw, format=NV12"
             element = make_element(gst_element_map["isp"], property=property, caps=caps)
             input_element_list += element
@@ -650,6 +661,15 @@ def get_input_elements(input):
                     "sensor-name": sen_name,
                     "dcc-file": "/opt/imaging/%s/dcc_ldc.bin" % input.sen_id,
                 }
+
+                global ldc_target_idx
+                if "property" in gst_element_map["ldc"]:
+                    if "target" in gst_element_map["ldc"]["property"]:
+                        property["target"] = gst_element_map["ldc"]["property"]["target"][ldc_target_idx]
+                        ldc_target_idx += 1
+                        if ldc_target_idx >= len(gst_element_map["ldc"]["property"]["target"]):
+                            ldc_target_idx = 0
+
                 caps = "video/x-raw, format=NV12, width=1920, height=1080"
                 element = make_element(
                     gst_element_map["ldc"], property=property, caps=caps
@@ -930,7 +950,7 @@ def get_output_elements(output):
     sink_name = "sink%d" % (output.id)
 
     if sink == "display":
-        property = {"sync": False, "driver-name": "tidss", "name": sink_name}
+        property = {"sync": False, "driver-name": "tidss", "name": sink_name, "force-modesetting": True}
         if output.connector:
             property["connector-id"] = output.connector
         sink_elements += make_element("kmssink", property=property)
@@ -1006,7 +1026,7 @@ def get_pre_proc_elements(flow):
     Args:
         flow: flow configuration
     """
-    global target_idx
+    global preproc_target_idx
     pre_proc_element_list = []
 
     if flow.model.task_type == "classification":
@@ -1060,10 +1080,10 @@ def get_pre_proc_elements(flow):
         property["tensor-format"] = tensor_fmt
 
         if "target" in gst_element_map["dlpreproc"]["property"]:
-            property["target"] = gst_element_map["dlpreproc"]["property"]["target"][target_idx]
-            target_idx += 1
-            if target_idx >= len(gst_element_map["dlpreproc"]["property"]["target"]):
-                target_idx = 0
+            property["target"] = gst_element_map["dlpreproc"]["property"]["target"][preproc_target_idx]
+            preproc_target_idx += 1
+            if preproc_target_idx >= len(gst_element_map["dlpreproc"]["property"]["target"]):
+                preproc_target_idx = 0
 
         if "out-pool-size" in gst_element_map["dlpreproc"]["property"]:
             property["out-pool-size"] = gst_element_map["dlpreproc"]["property"][

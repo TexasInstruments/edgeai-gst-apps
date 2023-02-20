@@ -37,7 +37,9 @@ abspath = Path(__file__).parent.absolute()
 sys.path.insert(0,os.path.join(abspath,'../../apps_python'))
 from gst_element_map import gst_element_map
 
-target_idx = 0
+preproc_target_idx = 0
+isp_target_idx = 0
+ldc_target_idx = 0
 
 def get_input_str(input):
     """
@@ -172,15 +174,33 @@ def get_input_str(input):
                 source_cmd += ' sink_0::device=/dev/v4l-subdev%d' % \
                               input.subdev_id
             
+            global isp_target_idx
+            if "property" in gst_element_map["isp"]:
+                if "target" in gst_element_map["isp"]["property"]:
+                    source_cmd += ' target=%s' % \
+                        gst_element_map["isp"]["property"]["target"][isp_target_idx]
+                    isp_target_idx += 1
+                    if isp_target_idx >= len(gst_element_map["isp"]["property"]["target"]):
+                        isp_target_idx = 0
+
             source_cmd += ' ! video/x-raw, format=NV12 ! '
 
             if input.ldc:
                 source_cmd += ' tiovxldc' + \
                               ' dcc-file=/opt/imaging/%s/dcc_ldc.bin' % \
                                 input.sen_id + \
-                              ' sensor-name=%s !' % sen_name + \
-                              ' video/x-raw, format=NV12,' + \
-                              ' width=1920, height=1080 ! '
+                              ' sensor-name=%s' % sen_name
+
+                global ldc_target_idx
+                if "property" in gst_element_map["ldc"]:
+                    if "target" in gst_element_map["ldc"]["property"]:
+                        source_cmd += ' target=%s' % \
+                            gst_element_map["ldc"]["property"]["target"][ldc_target_idx]
+                        ldc_target_idx += 1
+                        if ldc_target_idx >= len(gst_element_map["ldc"]["property"]["target"]):
+                            ldc_target_idx = 0
+
+                source_cmd += ' ! video/x-raw,format=NV12,width=1920,height=1080 ! '
                 input.width = 1920
                 input.height = 1080
         else:
@@ -286,7 +306,7 @@ def get_output_str(output):
         sink = 'others'
 
     if (sink == 'display'):
-        sink_cmd = ' queue ! tiperfoverlay ! kmssink sync=false driver-name=tidss'
+        sink_cmd = ' queue ! tiperfoverlay ! kmssink sync=false driver-name=tidss force-modesetting=true'
         if (output.connector):
                 sink_cmd += ' connector-id=%d' % output.connector
     elif (sink == 'image'):
@@ -315,7 +335,7 @@ def get_pre_proc_str(flow):
     Args:
         flow: flow configuration
     """
-    global target_idx
+    global preproc_target_idx
     cmd = ''
 
     if (flow.model.task_type == 'classification'):
@@ -394,10 +414,10 @@ def get_pre_proc_str(flow):
 
     target = None
     if "target" in gst_element_map["dlpreproc"]["property"]:
-        target = gst_element_map["dlpreproc"]["property"]["target"][target_idx]
-        target_idx += 1
-        if target_idx >= len(gst_element_map["dlpreproc"]["property"]["target"]):
-            target_idx = 0
+        target = gst_element_map["dlpreproc"]["property"]["target"][preproc_target_idx]
+        preproc_target_idx += 1
+        if preproc_target_idx >= len(gst_element_map["dlpreproc"]["property"]["target"]):
+            preproc_target_idx = 0
 
     if target != None:
         cmd += 'target=%d ' % target
@@ -416,7 +436,7 @@ def get_pre_proc_str(flow):
         split_name = "tee_split%d" % (flow.input.id)
 
     cmd =   split_name + '. ! queue ! ' + cmd + \
-            'tidlinferer model=%s ! %s.tensor ' % (flow.model.path, flow.gst_post_name)
+            'tidlinferer target=%s model=%s ! %s.tensor ' % (flow.model.core_number, flow.model.path, flow.gst_post_name)
 
     return cmd
 
