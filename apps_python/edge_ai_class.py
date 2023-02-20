@@ -37,13 +37,13 @@ import utils
 import sys
 import os
 
-
 class EdgeAIDemo:
     """
     Abstract the functionality required for the Edge AI demo.
     Creates Input, Model, Output and Flow objects. Sets up infer pipes
     for each flow and starts the infer pipes
     """
+    C7_CORE_ID_INDEX = 0
 
     def __init__(self, config):
         """
@@ -89,7 +89,19 @@ class EdgeAIDemo:
                 model_config =  config["models"][model]
                 model_path = model_config["model_path"]
                 # Make model Config. This class is present in edgeai_dl_inferer
-                model_obj = ModelConfig(model_path,gst_element_map["enable-tidl"],1)
+                enable_tidl = False
+                core_id = 1
+                if (gst_element_map['inferer']['target'] == 'dsp'):
+                    enable_tidl = True
+                    if 'core-id' in gst_element_map['inferer']:
+                        core_id = gst_element_map['inferer']['core-id'][EdgeAIDemo.C7_CORE_ID_INDEX]
+                        EdgeAIDemo.C7_CORE_ID_INDEX += 1
+                        if EdgeAIDemo.C7_CORE_ID_INDEX >= len(gst_element_map['inferer']['core-id']):
+                            EdgeAIDemo.C7_CORE_ID_INDEX = 0
+                elif (gst_element_map['inferer']['target'] != 'arm'):
+                    print("[WARNING] Invalid target specified for inferer. Defaulting to ARM.")
+
+                model_obj = ModelConfig(model_path,enable_tidl,core_id)
                 # task specific params
                 if "alpha" in model_config:
                     model_obj.alpha = model_config["alpha"]
