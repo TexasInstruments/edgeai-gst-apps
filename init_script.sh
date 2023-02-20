@@ -44,63 +44,6 @@ source ./scripts/detect_soc.sh
 killall weston 2>/dev/null
 sleep 1
 
-BG_IMAGE=/usr/share/demo/
-if grep -q sk /proc/device-tree/compatible
-then
-    BG_IMAGE+=$SOC-sk-wallpaper.jpg
-else
-    BG_IMAGE+=$SOC-evm-wallpaper.jpg
-fi
-
-if [ "$BG_IMAGE" != "" ]
-then
-#get ip addr to overlay
-arr=(`ifconfig eth0 2>&1 | grep inet | grep -v inet6`)
-ip_eth0=${arr[1]}
-arr=(`ifconfig wlp1s0 2>&1 | grep inet | grep -v inet6`)
-ip_wlp1s0=${arr[1]}
-
-TEXTOVERLAY="textoverlay font-desc=\"Arial 8\" color=0xFF000000 \
-            valignment=3 halignment=right draw-shadow=false \
-            draw-outline=false"
-
-GST_OVERLAY_STR=""
-YPOS=0.03
-STEP=0.03
-if [ "$ip_eth0" == "" -a "$ip_wlp1s0" == "" ]
-then
-    GST_OVERLAY_STR+="$TEXTOVERLAY text=\"Ethernet and WiFi Not connected, \
-                          use UART for accessing the board\" \
-                          ypos=$YPOS ! "
-    YPOS=`bc <<< $YPOS+$STEP`
-fi
-
-if [ "$ip_eth0" != "" ]
-then
-    GST_OVERLAY_STR+="$TEXTOVERLAY text=\"ip_eth0=$ip_eth0\" ypos=$YPOS !"
-    YPOS=`bc <<< $YPOS+$STEP`
-    GST_OVERLAY_STR+="$TEXTOVERLAY text=\"user:pwd=root:root\" ypos=$YPOS !"
-    YPOS=`bc <<< $YPOS+2*$STEP`
-fi
-
-if [ "$ip_wlp1s0" != "" ]
-then
-    GST_OVERLAY_STR+="$TEXTOVERLAY text=\"ip_wlp1s0=$ip_wlp1s0\" ypos=$YPOS !"
-    YPOS=`bc <<< $YPOS+$STEP`
-    GST_OVERLAY_STR+="$TEXTOVERLAY text=\"`cat /usr/share/intel9260/hostapd.conf | grep ssid `\" ypos=$YPOS !"
-    YPOS=`bc <<< $YPOS+$STEP`
-    GST_OVERLAY_STR+="$TEXTOVERLAY text=\"user:pwd=root:root\" ypos=$YPOS !"
-    YPOS=`bc <<< $YPOS+2*$STEP`
-fi
-
-gcc scripts/get_fb_resolution.c -o get_fb_resolution
-gst-launch-1.0 filesrc location=$BG_IMAGE ! jpegdec ! videoconvert ! \
-video/x-raw, format=BGRA ! videoscale ! `./get_fb_resolution` ! \
-$GST_OVERLAY_STR \
-filesink location=/dev/fb > /dev/null 2>&1
-rm -rf get_fb_resolution
-fi
-
 export PYTHONPATH=/usr/lib/python3.8/site-packages/
 
 # Disable Neo-DLR phone-home feature
