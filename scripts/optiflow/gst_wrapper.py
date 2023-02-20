@@ -303,7 +303,7 @@ def get_output_str(output):
 
     if (output.mosaic):
         sink_cmd = '! video/x-raw,format=NV12, width=%d, height=%d ' % (output.width,output.height) + '!' + sink_cmd
-        mosaic_cmd = 'tiovxmosaic target=1 name=mosaic_%d' % (output.id) + ' \\\n'
+        mosaic_cmd = 'tiovxmosaic target=1 src::pool-size=3 name=mosaic_%d' % (output.id) + ' \\\n'
     else:
         mosaic_cmd = ''
 
@@ -485,7 +485,7 @@ def get_gst_str(flows, outputs):
             src_str += s.gst_sensor_str + '\\\n'
             src_str += s.gst_post_proc_str + "\\\n"
 
-            if ("multifilesrc" in s.input.gst_str):
+            if (os.path.splitext(s.input.source)[1] in ['.jpg','.jpeg','.png']):
                 s.output.gst_disp_str = s.output.gst_disp_str.replace("sync=false","sync=true")
 
             if s.output.mosaic:
