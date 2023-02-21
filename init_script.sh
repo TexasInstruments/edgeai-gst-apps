@@ -40,10 +40,6 @@ cd $(dirname "$(readlink -f "$BASH_SOURCE")")
 
 source ./scripts/detect_soc.sh
 
-# Putting display on standby
-killall weston 2>/dev/null
-sleep 1
-
 export PYTHONPATH=/usr/lib/python3.8/site-packages/
 
 # Disable Neo-DLR phone-home feature
@@ -70,12 +66,6 @@ k3conf set clock 290 0 720000000 &> /dev/null
 k3conf set clock 48 0 480000000 &> /dev/null
 
 source ./scripts/setup_proxy.sh
-
-#Set time
-if ! ps -ef  | grep -v grep | grep -q ntpd
-then
-    ntpd -s
-fi
 
 export EDGEAI_GST_APPS_PATH=/opt/edgeai-gst-apps
 export EDGEAI_DATA_PATH=/opt/edgeai-test-data
