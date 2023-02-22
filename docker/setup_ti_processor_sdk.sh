@@ -34,6 +34,10 @@
 ln -snf /host/usr/lib/libtidl_tfl_delegate.so /usr/lib/libtidl_tfl_delegate.so
 ln -snf /host/usr/lib/libtidl_tfl_delegate.so.1.0 /usr/lib/libtidl_tfl_delegate.so.1.0
 
+# Link libraries for ONNX delegate
+ln -snf /host/usr/lib/libtidl_onnxrt_EP.so /usr/lib/libtidl_onnxrt_EP.so
+ln -snf /host/usr/lib/libtidl_onnxrt_EP.so.1.0 /usr/lib/libtidl_onnxrt_EP.1.0
+
 # Link TI specific headers and libraries
 ln -snf /host/usr/lib/libvx_tidl_rt.so /usr/lib/libvx_tidl_rt.so
 ln -snf /host/usr/lib/libvx_tidl_rt.so.1.0 /usr/lib/libvx_tidl_rt.so.1.0
