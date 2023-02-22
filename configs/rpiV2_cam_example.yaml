@@ -16,7 +16,7 @@ models:
         model_path: /opt/model_zoo/TVM-CL-3090-mobileNetV2-tv
         topN: 5
     model1:
-        model_path: /opt/model_zoo/ONR-OD-8050-ssd-lite-regNetX-800mf-fpn-bgr-mmdet-coco-512x512
+        model_path: /opt/model_zoo/ONR-OD-8200-yolox-nano-lite-mmdet-coco-416x416
         viz_threshold: 0.6
     model2:
         model_path: /opt/model_zoo/ONR-SS-8610-deeplabv3lite-mobv2-ade20k32-512x512
