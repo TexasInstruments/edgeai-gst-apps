@@ -70,3 +70,4 @@ source ./scripts/setup_proxy.sh
 export EDGEAI_GST_APPS_PATH=/opt/edgeai-gst-apps
 export EDGEAI_DATA_PATH=/opt/edgeai-test-data
 export MODEL_ZOO_PATH=/opt/model_zoo
+export EDGEAI_VERSION=8.6
