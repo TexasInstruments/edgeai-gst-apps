@@ -65,8 +65,6 @@ rm -rf ~/.cache/gstreamer-1.0/registry.aarch64.bin
 k3conf set clock 290 0 720000000 &> /dev/null
 k3conf set clock 48 0 480000000 &> /dev/null
 
-source ./scripts/setup_proxy.sh
-
 export EDGEAI_GST_APPS_PATH=/opt/edgeai-gst-apps
 export EDGEAI_DATA_PATH=/opt/edgeai-test-data
 export MODEL_ZOO_PATH=/opt/model_zoo

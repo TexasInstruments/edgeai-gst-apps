@@ -28,13 +28,33 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-FROM arm64v8/ubuntu:20.04 as edgeaikit
+ARG USE_PROXY
+ARG HTTP_PROXY
+ARG REPO_LOCATION=arm64v8
 ARG DEBIAN_FRONTEND=noninteractive
 ARG NPROC=1
 ARG PROJECT_NAME=edgeai-gst-apps
 
+#=========================================================================
+# The environment variable REPO_LOCATION is set from outside as needed,
+# based on network
+FROM ${REPO_LOCATION}/ubuntu:20.04 AS base-0
+
+#=========================================================================
+FROM base-0 AS base-1
+ARG USE_PROXY
+ENV USE_PROXY=${USE_PROXY}
+ARG HTTP_PROXY
+ENV http_proxy=${HTTP_PROXY}
+ENV https_proxy=${HTTP_PROXY}
+
+#=========================================================================
+FROM base-${USE_PROXY} AS ubuntu-stage1
+ARG DEBIAN_FRONTEND
+
 # Setup proxy settings
 ADD entrypoint.sh setup_proxy.sh setup_ti_processor_sdk.sh /usr/bin/
+ADD proxy /root/proxy
 RUN /usr/bin/setup_proxy.sh
 
 RUN apt-get update -y && apt-get dist-upgrade -y && apt-get install -y \
