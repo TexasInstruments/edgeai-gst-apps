@@ -34,7 +34,7 @@ cd $(dirname $0)
 BASE_DIR=`pwd`
 
 WGET="wget --proxy off"
-URL="https://software-dl.ti.com/jacinto7/esd/edgeai-test-data/edgeai-test-data.tar.gz"
+URL="https://software-dl.ti.com/jacinto7/esd/edgeai-test-data/$EDGEAI_SDK_VERSION/edgeai-test-data.tar.gz"
 
 cd ${EDGEAI_DATA_PATH%/*}
 $WGET $URL
