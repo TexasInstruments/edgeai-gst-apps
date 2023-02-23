@@ -47,6 +47,7 @@ then
         -v /:/host \
         --privileged \
         --network host \
+         --env USE_PROXY=$USE_PROXY \
         edge_ai_kit $SOC $PYTHONPATH
 # If one container exist, execute that container.
 elif [ $cont_count -eq 1 ]

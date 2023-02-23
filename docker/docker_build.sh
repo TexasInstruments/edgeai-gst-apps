@@ -33,8 +33,28 @@
 # Number of process to build OpenCV application
 NPROC=1
 
+mkdir -p /opt/proxy
+mkdir -p ./proxy
+
+if [ -d "/opt/proxy" ]; then
+    cp -rp /opt/proxy/* ./proxy
+fi
+
+# modify the server and proxy URLs as requied
+if [ "${USE_PROXY}" -ne "0" ]; then
+    REPO_LOCATION=
+    HTTP_PROXY=
+else
+    REPO_LOCATION=
+fi
+echo "USE_PROXY = $USE_PROXY"
+echo "REPO_LOCATION = $DOCKER_REPO_INTERNAL"
+
 # Build docker image
 docker build \
     -f Dockerfile \
     -t edge_ai_kit \
+    --build-arg USE_PROXY=$USE_PROXY \
+    --build-arg REPO_LOCATION=$DOCKER_REPO_INTERNAL \
+    --build-arg HTTP_PROXY=$HTTP_PROXY \
     --build-arg NPROC=$NPROC --no-cache .
