@@ -188,7 +188,7 @@ static T1 *overlayTopNClasses(T1                   *frame,
     argmax = get_topN<T2>(results, N, size);
     Mat img = Mat(outDataHeight, outDataWidth, CV_8UC3, frame);
 
-    std::string title = "Top " + std::to_string(N) + " detected classes:";
+    std::string title = "Recognized Classes (Top " + std::to_string(N) + "):";
     putText(img, title.c_str(), Point(5, 2 * rowSize),
             FONT_HERSHEY_SIMPLEX, txtSize, Scalar(0, 255, 0), 2);
 
