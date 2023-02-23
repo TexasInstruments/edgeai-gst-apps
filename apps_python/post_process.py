@@ -132,7 +132,7 @@ class PostProcessClassification(PostProcess):
         topN_classes = np.argsort(results)[: (-1 * N) - 1 : -1]
         cv2.putText(
             frame,
-            "Top %d detected classes:" % N,
+            "Recognized Classes (Top %d):" % N,
             (5, 2 * row_size),
             cv2.FONT_HERSHEY_SIMPLEX,
             font_size,
