@@ -65,7 +65,7 @@ done
 cd $install_dir
 ls | grep "edgeai-tiovx-kernels"
 if [ "$?" -ne "0" ]; then
-    git clone --single-branch --branch develop https://git.ti.com/cgit/edgeai/edgeai-tiovx-kernels
+    git clone --single-branch --branch EDGEAI_APP_STACK_08_06_00_02 https://git.ti.com/cgit/edgeai/edgeai-tiovx-kernels
     if [ "$?" -ne "0" ]; then
         cd $current_dir
         exit 1
