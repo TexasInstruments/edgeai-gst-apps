@@ -969,12 +969,26 @@ def get_output_elements(output):
         )
 
     elif sink == "remote":
-        property = {"gop-size": output.gop_size, "bitrate": output.bitrate}
-        sink_elements += make_element("v4l2h264enc", property=property)
-        sink_elements += make_element("h264parse")
+        property = {}
+        if output.encoder == "v4l2h264enc":
+            property = {"gop-size": output.gop_size, "bitrate": output.bitrate}
+
+        sink_elements += make_element(output.encoder, property=property)
+
+        if output.encoder == "v4l2h264enc":
+            sink_elements += make_element("h264parse")
+
         if output.payloader == "mp4mux":
             property = {"fragment-duration":1}
+        elif output.payloader == "multipartmux":
+            property = {"boundary":"spionisto"}
+
         sink_elements += make_element(output.payloader, property=property)
+
+        if output.payloader == "multipartmux":
+            property = {"max":65000}
+            sink_elements += make_element("rndbuffersize", property=property)
+
         property = {
             "host": output.host,
             "port": output.port,

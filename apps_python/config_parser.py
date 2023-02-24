@@ -105,6 +105,10 @@ class Output:
             self.payloader = output_config["payloader"]
         else:
             self.payloader = "rtph264pay"
+        if "encoder" in output_config:
+            self.encoder = output_config["encoder"]
+        else:
+            self.encoder = "v4l2h264enc"
         if "gop-size" in output_config:
             self.gop_size = output_config["gop-size"]
         else:
