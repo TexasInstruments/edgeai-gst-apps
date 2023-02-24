@@ -34,10 +34,20 @@ cd $(dirname $0)
 BASE_DIR=`pwd`
 
 WGET="wget --proxy off"
-URL="https://software-dl.ti.com/jacinto7/esd/edgeai-test-data/$EDGEAI_SDK_VERSION/edgeai-test-data.tar.gz"
+TEST_DATA_URL="https://software-dl.ti.com/jacinto7/esd/edgeai-test-data/$EDGEAI_SDK_VERSION/edgeai-test-data.tar.gz"
+OOB_ASSETS_URL="https://software-dl.ti.com/jacinto7/esd/edgeai-test-data/$EDGEAI_SDK_VERSION/$SOC-oob-demo-assets.tar.gz"
 
 cd ${EDGEAI_DATA_PATH%/*}
-$WGET $URL
+$WGET $TEST_DATA_URL
 tar xf edgeai-test-data.tar.gz
 rm -rf edgeai-test-data.tar.gz
+
+cd ${OOB_DEMO_ASSETS_PATH%/*}
+$WGET $OOB_ASSETS_URL
+tar xf $SOC-oob-demo-assets.tar.gz
+rm -rf $SOC-oob-demo-assets.tar.gz
+rm -rf $OOB_DEMO_ASSETS_PATH
+mv $SOC-oob-demo-assets $OOB_DEMO_ASSETS_PATH
+ln -sf $OOB_DEMO_ASSETS_PATH/*.h264 $EDGEAI_DATA_PATH/videos/
+
 cd $BASE_DIR
