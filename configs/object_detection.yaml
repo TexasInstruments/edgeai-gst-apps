@@ -49,4 +49,4 @@ outputs:
         host: 0.0.0.0
 
 flows:
-    flow0: [input1,model1,output0,[320,180,1280,720]]
+    flow0: [input1,model2,output0,[320,180,1280,720]]
