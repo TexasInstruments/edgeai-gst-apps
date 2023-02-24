@@ -174,7 +174,7 @@ models:
         alpha: 0.4
     model1:
         # Path to the model
-        model_path: /opt/model_zoo/TFL-OD-2020-ssdLite-mobDet-DSP-coco-320x320
+        model_path: /opt/model_zoo/TFL-OD-2010-ssd-mobV2-coco-mlperf-300x300
 
         # Path to the filename with classnames
         labels_path: ""
@@ -384,7 +384,7 @@ debug:
     #       # enable_mask = 4
     #       # out_dir     = some_dir
     #       # some_dir/cpp/input0/ONR-SS-8610-deeplabv3lite-mobv2-ade20k32-512x512/flow0_post_*.txt
-    #       # some_dir/cpp/input0/TFL-OD-2020-ssdLite-mobDet-DSP-coco-320x320/flow0_post_*.txt
+    #       # some_dir/cpp/input0/TFL-OD-2010-ssd-mobV2-coco-mlperf-300x300/flow0_post_*.txt
     #
     #   OPTIONAL: Default is 1
     #   start_frame: <Frame number to start capturing the data from>
