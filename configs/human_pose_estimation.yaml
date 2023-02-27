@@ -1,0 +1,44 @@
+title: "Human Pose Estimation"
+log_level: 2
+inputs:
+    input0:
+        source: /dev/video2
+        format: jpeg
+        width: 1280
+        height: 720
+        framerate: 30
+    input1:
+        source: /opt/edgeai-test-data/videos/human_pose_estimation_sample.h264
+        format: h264
+        width: 1280
+        height: 720
+        framerate: 30
+        loop: True
+    input2:
+        source: /opt/edgeai-test-data/data/images/%04d.jpg
+        width: 1280
+        height: 720
+        index: 0
+        framerate: 1
+        loop: True
+models:
+    model0:
+        model_path: /opt/model_zoo/ONR-KD-7060-human-pose-yolox-s-640x640
+        viz_threshold: 0.6
+outputs:
+    output0:
+        sink: kmssink
+        width: 1920
+        height: 1080
+        overlay-performace: True
+    output1:
+        sink: /opt/edgeai-test-data/output/output_video.mkv
+        width: 1920
+        height: 1080
+    output2:
+        sink: /opt/edgeai-test-data/output/output_image_%04d.jpg
+        width: 1920
+        height: 1080
+
+flows:
+    flow0: [input1,model0,output0,[320,180,1280,720]]

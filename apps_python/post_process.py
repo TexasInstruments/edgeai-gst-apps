@@ -92,6 +92,8 @@ class PostProcess:
             return PostProcessDetection(flow)
         elif flow.model.task_type == "segmentation":
             return PostProcessSegmentation(flow)
+        elif flow.model.task_type == "human_pose_estimation":
+            return PostProcessHumanPoseEstimation(flow)
 
 
 class PostProcessClassification(PostProcess):
@@ -317,3 +319,177 @@ class PostProcessSegmentation(PostProcess):
         b_map = (inp * 30).astype(np.uint8)
 
         return cv2.merge((r_map, g_map, b_map))
+class PostProcessHumanPoseEstimation(PostProcess):
+    def __init__(self, flow):
+        super().__init__(flow)
+
+        # This list is used to identify the color of a bounding box.
+        self._CLASS_COLOR_MAP = [
+            (0, 0, 255),  # Person (blue).
+            (255, 0, 0),  # Bear (red).
+            (0, 255, 0),  # Tree (lime).
+            (255, 0, 255),  # Bird (fuchsia).
+            (0, 255, 255),  # Sky (aqua).
+            (255, 255, 0),  # Cat (yellow).
+        ]
+
+        # This list is used to identify the color of the keypoint
+        self.palette = np.array(
+            [
+                [255, 128, 0],
+                [255, 153, 51],
+                [255, 178, 102],
+                [230, 230, 0],
+                [255, 153, 255],
+                [153, 204, 255],
+                [255, 102, 255],
+                [255, 51, 255],
+                [102, 178, 255],
+                [51, 153, 255],
+                [255, 153, 153],
+                [255, 102, 102],
+                [255, 51, 51],
+                [153, 255, 153],
+                [102, 255, 102],
+                [51, 255, 51],
+                [0, 255, 0],
+                [0, 0, 255],
+                [255, 0, 0],
+                [255, 255, 255],
+            ]
+        )
+
+        # This list gives the information that which two keypoints needs to connect.
+        self.skeleton = [
+            [16, 14],
+            [14, 12],
+            [17, 15],
+            [15, 13],
+            [12, 13],
+            [6, 12],
+            [7, 13],
+            [6, 7],
+            [6, 8],
+            [7, 9],
+            [8, 10],
+            [9, 11],
+            [2, 3],
+            [1, 2],
+            [1, 3],
+            [2, 4],
+            [3, 5],
+            [4, 6],
+            [5, 7],
+        ]
+        # Choosing color of a link
+        self.pose_limb_color = self.palette[
+            [9, 9, 9, 9, 7, 7, 7, 0, 0, 0, 0, 0, 16, 16, 16, 16, 16, 16, 16]
+        ]
+        # Choosing color of a keypoint
+        self.pose_kpt_color = self.palette[
+            [16, 16, 16, 16, 16, 0, 0, 0, 0, 0, 0, 9, 9, 9, 9, 9, 9]
+        ]
+        self.radius = 5
+
+    def __call__(self, img, result):
+        """
+        Post process function for pose estimation
+        Args:
+            img: Input frame
+            result: output of inference
+        """
+        output = np.squeeze(result[0])
+
+        # No of rows represents no of persons in that frame, first 4 columns gives the co-ordinates of rectangle
+        # 4 : score, 5 : label, from 6 to end : co-ordeinates of 17 keypoints and its confidence score.
+        det_bboxes, det_scores, det_labels, kpts = (
+            np.array(output[:, 0:4]),
+            np.array(output[:, 4]),
+            np.array(output[:, 5]),
+            np.array(output[:, 6:]),
+        )
+        for idx in range(len(det_bboxes)):
+            det_bbox = det_bboxes[idx]
+            kpt = kpts[idx]
+            if det_scores[idx] > self.model.viz_threshold:
+                color_map = self._CLASS_COLOR_MAP[int(det_labels[idx])]
+                # Resizing the co-ordinates
+                det_bbox[..., (0, 2)] /= self.model.resize[0]
+                det_bbox[..., (1, 3)] /= self.model.resize[1]
+                det_bbox[..., (0, 2)] *= img.shape[1]
+                det_bbox[..., (1, 3)] *= img.shape[0]
+                # Drawing rectangle
+                img = cv2.rectangle(
+                    img,
+                    (det_bbox[0], det_bbox[1]),
+                    (det_bbox[2], det_bbox[3]),
+                    color_map[::-1],
+                    2,
+                )
+                cv2.putText(
+                    img,
+                    "id:{}".format(int(det_labels[idx])),
+                    (int(det_bbox[0] + 5), int(det_bbox[1]) + 15),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.5,
+                    color_map[::-1],
+                    2,
+                )
+                cv2.putText(
+                    img,
+                    "score:{:2.1f}".format(det_scores[idx]),
+                    (int(det_bbox[0] + 5), int(det_bbox[1]) + 30),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.5,
+                    color_map[::-1],
+                    2,
+                )
+                img = self.plot_skeleton_kpts(img, kpt)
+        return img
+
+    def plot_skeleton_kpts(self, img, kpts, steps=3):
+        """
+        Draw the skeleton like structure
+        by joining the appropriate key points with lines
+        Args:
+            img: Input frame.
+            kpts (numoy array): Contains the co-ordinates and confidence score of a single person.
+            steps: by default 3 values are needed to represent each keypoint (x_cord, y_cord, conf).
+        """
+
+        num_kpts = len(kpts) // steps
+        for kid in range(num_kpts):
+            r, g, b = self.pose_kpt_color[kid]
+            x_coord, y_coord = kpts[steps * kid], kpts[steps * kid + 1]
+            # Resizing
+            x_coord = x_coord * img.shape[1] / self.model.resize[0]
+            y_coord = y_coord * img.shape[0] / self.model.resize[1]
+            conf = kpts[steps * kid + 2]
+            if conf > 0.5:
+                # Drawing circle
+                cv2.circle(
+                    img,
+                    (int(x_coord), int(y_coord)),
+                    self.radius + 3,
+                    (int(r), int(g), int(b)),
+                    -1,
+                )
+
+        for sk_id, sk in enumerate(self.skeleton):
+            r, g, b = self.pose_limb_color[sk_id]
+            pos1 = (int(kpts[(sk[0] - 1) * steps]), int(kpts[(sk[0] - 1) * steps + 1]))
+            pos1 = (
+                int(pos1[0] * img.shape[1] / self.model.resize[0]),
+                int(pos1[1] * img.shape[0] / self.model.resize[1]),
+            )
+            pos2 = (int(kpts[(sk[1] - 1) * steps]), int(kpts[(sk[1] - 1) * steps + 1]))
+            pos2 = (
+                int(pos2[0] * img.shape[1] / self.model.resize[0]),
+                int(pos2[1] * img.shape[0] / self.model.resize[1]),
+            )
+            conf1 = kpts[(sk[0] - 1) * steps + 2]
+            conf2 = kpts[(sk[1] - 1) * steps + 2]
+            if conf1 > 0.5 and conf2 > 0.5:
+                # Connecting two keypoints with line
+                cv2.line(img, pos1, pos2, (int(r), int(g), int(b)), thickness=2)
+        return img

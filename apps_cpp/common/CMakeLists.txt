@@ -10,6 +10,7 @@ set(EDGEAI_COMMON_SRCS
     src/post_process_image_classify.cpp
     src/post_process_image_object_detect.cpp
     src/post_process_image_segmentation.cpp
+    src/post_process_image_human_pose_estimation.cpp
     src/edgeai_inference_pipe.cpp
     src/edgeai_demo.cpp
     src/edgeai_cmd_line_parse.cpp

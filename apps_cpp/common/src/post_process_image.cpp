@@ -46,6 +46,8 @@
 #include <common/include/post_process_image_classify.h>
 #include <common/include/post_process_image_object_detect.h>
 #include <common/include/post_process_image_segmentation.h>
+#include <common/include/post_process_image_human_pose_estimation.h>
+
 
 namespace ti::edgeai::common
 {
@@ -77,6 +79,10 @@ PostprocessImage* PostprocessImage::makePostprocessImageObj(const PostprocessIma
     else if (config.taskType == "segmentation")
     {
         cntxt = new PostprocessImageSemanticSeg(config,debugConfig);
+    }
+    else if (config.taskType == "human_pose_estimation")
+    {
+        cntxt = new PostprocessImageHumanPoseEstimation(config,debugConfig);
     }
     else
     {

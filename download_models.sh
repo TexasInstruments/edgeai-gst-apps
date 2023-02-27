@@ -51,7 +51,7 @@ else
 	exit
 fi
 
-types="classification detection segmentation"
+types="classification detection segmentation human_pose_estimation"
 DEST_DIR=../model_zoo/
 mkdir -p $DEST_DIR
 declare -A keys
@@ -195,6 +195,7 @@ list_models()
 	echo "                    classification          - To download all classification models"
 	echo "                    detection               - To download all object detection models"
 	echo "                    segmentation            - To download all semantic segmentation models"
+	echo "                    human_pose_estimation   - To downaload all human pose estimation models"
 	echo "               Ex: ./download_models.sh -d classification - Will download all classification models"
 }
 
@@ -249,6 +250,7 @@ usage()
 	echo "                    classification          - To download all classification models"
 	echo "                    detection               - To download all object detection models"
 	echo "                    segmentation            - To download all semantic segmentation models"
+	echo "                    human_pose_estimation   - To download all semantic human pose estimation models"
 	echo "               Ex: ./download_models.sh -d classification - Will download all classification models"
 	echo "./download_models.sh --recommended  | -r - To download out of the box models"
 	echo "./download_models.sh --help | -h - To display this"
