@@ -12,12 +12,53 @@ message(STATUS "CMAKE_BUILD_TYPE = ${CMAKE_BUILD_TYPE} PROJECT_NAME = ${PROJECT_
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 
-include_directories(/usr/include/processor_sdk/vision_apps
-                    ../../apps_cpp)
+if (NOT DEFINED ENV{SOC})
+    message(FATAL_ERROR "SOC not defined.")
+endif()
+
+set(TARGET_SOC_LOWER $ENV{SOC})
+
+if ("${TARGET_SOC_LOWER}" STREQUAL "j721e")
+    set(TARGET_PLATFORM     J7)
+    set(TARGET_CPU          A72)
+    set(TARGET_OS           LINUX)
+    set(TARGET_SOC          J721E)
+elseif ("${TARGET_SOC_LOWER}" STREQUAL "j721s2")
+    set(TARGET_PLATFORM     J7)
+    set(TARGET_CPU          A72)
+    set(TARGET_OS           LINUX)
+    set(TARGET_SOC          J721S2)
+elseif ("${TARGET_SOC_LOWER}" STREQUAL "j784s4")
+    set(TARGET_PLATFORM     J7)
+    set(TARGET_CPU          A72)
+    set(TARGET_OS           LINUX)
+    set(TARGET_SOC          J784S4)
+elseif ("${TARGET_SOC_LOWER}" STREQUAL "am62a")
+    set(TARGET_PLATFORM     SITARA)
+    set(TARGET_CPU          A53)
+    set(TARGET_OS           LINUX)
+    set(TARGET_SOC          AM62A)
+elseif ("${TARGET_SOC_LOWER}" STREQUAL "am62")
+    set(TARGET_PLATFORM     SITARA)
+    set(TARGET_CPU          A53)
+    set(TARGET_OS           LINUX)
+    set(TARGET_SOC          AM62)
+else()
+    message(FATAL_ERROR "SOC ${TARGET_SOC_LOWER} is not supported.")
+endif()
+
+message("SOC=${TARGET_SOC_LOWER}")
+
+add_definitions(
+    -DTARGET_CPU=${TARGET_CPU}
+    -DTARGET_OS=${TARGET_OS}
+    -DSOC_${TARGET_SOC}
+)
+
+include_directories(/usr/include/processor_sdk/vision_apps)
 
 set(APP_PERF_STATS_SRCS
-    ti_perfstats.cpp
-    ../../apps_cpp/utils/src/edgeai_perfstats.cpp)
+    ti_perfstats.cpp)
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib/${CMAKE_BUILD_TYPE})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE})

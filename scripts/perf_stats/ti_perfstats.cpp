@@ -35,97 +35,31 @@
 #include <getopt.h>
 #include <thread>
 #include <stdlib.h>
+#include <string.h>
+
+extern "C" {
 
 /* Module headers. */
 #include <utils/app_init/include/app_init.h>
-#include <utils/include/edgeai_perfstats.h>
+#include <utils/perf_stats/include/app_perf_stats.h>
+#include <utils/ipc/include/app_ipc.h>
 
-static bool gStop = false;
-static bool gDisplay = true;
-static bool gLogToFile = false;
-static char *gSubDirName = nullptr;
-static std::thread gDispThreadId;
-
-static void showUsage(const char *name)
-{
-    printf("# \n");
-    printf("# %s [OPTIONAL PARAMETERS]\n", name);
-    printf("# OPTIONAL PARAMETERS:\n");
-    printf("#  [--no-display |-n Display report to the screen. "
-           "Display is enabled by default.]\n");
-    printf("#  [--log        |-l Log the reports to files.\n");
-    printf("#  [--dir        |-d Sub-directory for storing the log files. "
-            "The generated files will be stored under "
-            "../perf_logs/<sub_dir> directory.\n"); 
-    printf("#                    Note that the directory location is relative "
-            "to the current directory the tool is invoked from.\n");
-    printf("#  [--help       |-h]\n");
-    printf("# \n");
-    printf("# (C) Texas Instruments 2021\n");
-    printf("# \n");
-    printf("# EXAMPLE:\n");
-    printf("# Turn off the report display to screen.\n");
-    printf("#    %s -n \n", name);
-    printf("# \n");
-    printf("# Turn on the report logging to files.\n");
-    printf("#    %s -l \n", name);
-    printf("# \n");
-    exit(0);
 }
 
-static int32_t  parse(int32_t   argc,
-                      char     *argv[])
-{
-    int32_t longIndex;
-    int32_t opt;
-    static struct option long_options[] = {
-        {"help",       no_argument,       0, 'h' },
-        {"no-display", no_argument,       0, 'n' },
-        {"log",        no_argument,       0, 'l' },
-        {"dir",        required_argument, 0, 'd' },
-        {0,            0,                 0,  0  }
-    };
-
-    while ((opt = getopt_long(argc, argv,"-hnld:", 
-                   long_options, &longIndex )) != -1)
-    {
-        switch (opt)
-        {
-            case 'l' :
-                gLogToFile = true;
-                break;
-
-            case 'n' :
-                gDisplay = false;
-                break;
-
-            case 'd' :
-                gSubDirName = optarg;
-                break;
-
-            case 'h' :
-            default:
-                showUsage(argv[0]);
-                return -1;
-
-        } // switch (opt)
-
-    }
-
-    return 0;
-
-} // End of parse()
+static bool gStop = false;
+static std::thread gDispThreadId;
 
 static void sigHandler(int32_t sig)
 {
     gStop = true;
-
-    /* Disable the performance report. */
-    ti::utils::disableReport();
 }
 
 void displayThread()
 {
+
+    int32_t status=0;
+    app_perf_stats_cpu_load_t cpu_load;
+
 #if defined(SOC_J721E)
     /* open sysfs files for reading temperature data*/
     FILE *cpuTempFd  = fopen("/sys/class/thermal/thermal_zone1/temp", "rb");
@@ -139,7 +73,20 @@ void displayThread()
     while (!gStop)
     {
         system("clear");
-        appPerfStatsCpuLoadPrintAll();
+
+        printf("Summary of CPU load,\n");
+        printf("====================\n\n");
+
+        for(int cpu_id=0; cpu_id<APP_IPC_CPU_MAX; cpu_id++) {
+            if (strstr(appIpcGetCpuName(cpu_id), "mcu") != NULL) {
+                continue;
+            }
+            status = appPerfStatsCpuLoadGet(cpu_id, &cpu_load);
+            if(status==0)
+            {
+                appPerfStatsCpuLoadPrint(cpu_id, &cpu_load);
+            }
+        }
         appPerfStatsHwaLoadPrintAll();
         appPerfStatsDdrStatsPrintAll();
         appPerfStatsResetAll();
@@ -183,7 +130,7 @@ void displayThread()
         printf("GPU:\t%0.2f degree Celsius\n", float(gpuTemp)/1000);
         printf("R5F:\t%0.2f degree Celsius\n", float(r5fTemp)/1000);
 #endif
-        this_thread::sleep_for(chrono::milliseconds(2000));
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
     }
 
 #if defined(SOC_J721E)
@@ -196,19 +143,12 @@ void displayThread()
 #endif
 }
 
-int main(int argc, char *argv[])
+int main()
 {
     int32_t status = 0;
 
     /* Register SIGINT handler. */
     signal(SIGINT, sigHandler);
-
-    status = parse(argc, argv);
-
-    if (status < 0)
-    {
-        return status;
-    }
 
     /* Initialize the system. */
     status = appInit();
@@ -219,20 +159,9 @@ int main(int argc, char *argv[])
         return status;
     }
 
-    /* Configure the performance report. */
-    ti::utils::enableReport(gLogToFile, gSubDirName);
+    gDispThreadId = std::thread([]{displayThread();});
 
-    if (gDisplay)
-    {
-        gDispThreadId = std::thread([]{displayThread();});
-
-        gDispThreadId.join();
-    }
-
-    if (gLogToFile)
-    {
-        ti::utils::waitForPerfThreadExit();
-    }
+    gDispThreadId.join();
 
     printf("CALLING DE-INIT.\n");
 
