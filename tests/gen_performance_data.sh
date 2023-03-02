@@ -202,7 +202,7 @@ if [ "$SOC" == "j784s4" ]
 then
   NUM_C7X=4
 else
-  NUM_C7X=2
+  NUM_C7X=1
 fi
 
 C7X=0
