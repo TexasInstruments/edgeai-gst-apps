@@ -47,6 +47,8 @@ def get_input_str(input):
     Args:
         input: input configuration
     """
+    source_ext = os.path.splitext(input.source)[1]
+
     image_fmt = {'.jpg':'jpeg', '.png':'png'}
     image_dec = {'.jpg':' ! jpegdec ' , '.png':' ! pngdec '}
     video_ext = {
@@ -67,7 +69,8 @@ def get_input_str(input):
         video_dec["h264"] += " ! v4l2h264dec"
 
         if "property" in gst_element_map["h264dec"]:
-            if "capture-io-mode" in gst_element_map["h264dec"]["property"]:
+            if ("capture-io-mode" in gst_element_map["h264dec"]["property"] and \
+                source_ext != ".avi") :
                 video_dec["h264"] += " capture-io-mode=%s" % \
                        gst_element_map["h264dec"]["property"]["capture-io-mode"]
 
@@ -79,7 +82,8 @@ def get_input_str(input):
     if gst_element_map["h265dec"]["element"] == "v4l2h265dec":
         video_dec["h265"] += " ! v4l2h265dec"
         if "property" in gst_element_map["h265dec"]:
-            if "capture-io-mode" in gst_element_map["h265dec"]["property"]:
+            if ("capture-io-mode" in gst_element_map["h265dec"]["property"] and \
+                source_ext != ".avi") :
                 video_dec["h265"] += " capture-io-mode=%s" % \
                        gst_element_map["h265dec"]["property"]["capture-io-mode"]
         video_dec["h265"] += " ! tiovxmemalloc pool-size=8" + \
@@ -87,7 +91,6 @@ def get_input_str(input):
     else:
         video_dec["h265"] += " ! " + gst_element_map["h265dec"]["element"]
 
-    source_ext = os.path.splitext(input.source)[1]
     status = 0
     stop_index = -1
     if (input.source.startswith('/dev/video')):

@@ -532,7 +532,8 @@ int32_t InputInfo::addGstPipeline(vector<vector<GstElement*>>   &preProcElementV
                     string capture_io_mode;
                     if(gVideoDecMap[m_format][i] == "v4l2h264dec" &&
                        gstElementMap["h264dec"]["property"] &&
-                       gstElementMap["h264dec"]["property"]["capture-io-mode"])
+                       gstElementMap["h264dec"]["property"]["capture-io-mode"] &&
+                       srcExt != ".avi")
                     {
                         capture_io_mode = gstElementMap["h264dec"]["property"]["capture-io-mode"].as<string>();
                         m_gstElementProperty = {{"capture-io-mode",capture_io_mode.c_str()}};
@@ -540,7 +541,8 @@ int32_t InputInfo::addGstPipeline(vector<vector<GstElement*>>   &preProcElementV
 
                     if(gVideoDecMap[m_format][i] == "v4l2h265dec" &&
                        gstElementMap["h265dec"]["property"] &&
-                       gstElementMap["h265dec"]["property"]["capture-io-mode"])
+                       gstElementMap["h265dec"]["property"]["capture-io-mode"] &&
+                       srcExt != ".avi")
                     {
                         capture_io_mode = gstElementMap["h265dec"]["property"]["capture-io-mode"].as<string>();
                         m_gstElementProperty = {{"capture-io-mode",capture_io_mode.c_str()}};

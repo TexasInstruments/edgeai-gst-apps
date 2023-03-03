@@ -508,6 +508,8 @@ def get_input_elements(input):
     Args:
         input: input configuration
     """
+    source_ext = os.path.splitext(input.source)[1]
+
     input_element_list = []
     image_fmt = {".jpg": "jpeg", ".png": "png"}
     image_dec = {".jpg": "jpegdec", ".png": "pngdec"}
@@ -528,7 +530,8 @@ def get_input_elements(input):
     if gst_element_map["h264dec"]["element"] == "v4l2h264dec":
         property = {}
         if "property" in gst_element_map["h264dec"]:
-            if "capture-io-mode" in gst_element_map["h264dec"]["property"]:
+            if ("capture-io-mode" in gst_element_map["h264dec"]["property"] and
+                source_ext != ".avi") :
                 property["capture-io-mode"] = \
                             gst_element_map["h264dec"]["property"]["capture-io-mode"]
         video_dec["h264"].append(
@@ -543,7 +546,8 @@ def get_input_elements(input):
     if gst_element_map["h265dec"]["element"] == "v4l2h265dec":
         property = {}
         if "property" in gst_element_map["h265dec"]:
-            if "capture-io-mode" in gst_element_map["h265dec"]["property"]:
+            if ("capture-io-mode" in gst_element_map["h265dec"]["property"] and
+                source_ext != ".avi") :
                 property["capture-io-mode"] = \
                             gst_element_map["h265dec"]["property"]["capture-io-mode"]
         video_dec["h265"].append(
@@ -555,7 +559,6 @@ def get_input_elements(input):
     else:
         video_dec["h265"].append([gst_element_map["h265dec"]["element"], None, None])
 
-    source_ext = os.path.splitext(input.source)[1]
     status = 0
     stop_index = -1
     if input.source.startswith("/dev/video"):
