@@ -71,7 +71,7 @@ def get_input_str(input):
                 video_dec["h264"] += " capture-io-mode=%s" % \
                        gst_element_map["h264dec"]["property"]["capture-io-mode"]
 
-        video_dec["h264"] += " ! tiovxmemalloc pool-size=8" + \
+        video_dec["h264"] += " ! tiovxmemalloc pool-size=12" + \
                              " ! video/x-raw, format=NV12"
     else:
         video_dec["h264"] += " ! " + gst_element_map["h264dec"]["element"]
@@ -82,7 +82,7 @@ def get_input_str(input):
             if "capture-io-mode" in gst_element_map["h265dec"]["property"]:
                 video_dec["h265"] += " capture-io-mode=%s" % \
                        gst_element_map["h265dec"]["property"]["capture-io-mode"]
-        video_dec["h265"] += " ! tiovxmemalloc pool-size=8" + \
+        video_dec["h265"] += " ! tiovxmemalloc pool-size=12" + \
                              " ! video/x-raw, format=NV12"
     else:
         video_dec["h265"] += " ! " + gst_element_map["h265dec"]["element"]
