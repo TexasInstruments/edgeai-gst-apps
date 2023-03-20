@@ -58,7 +58,7 @@ def get_cmdline_args(sysv_args):
                "    ex: " + sysv_args[0] + " ../configs/app_config.yaml"
     parser.add_argument("config", help = help_str_config)
 
-    help_str_terminal = "Run Directly on Terminal\n" + "default: Disabled"
+    help_str_terminal = "Just print the pipeline (Enabling this option will not run the pipeline)\n" + "default: Disabled"
     parser.add_argument(
         "-t", "--terminal", help=help_str_terminal, action="store_true", default=False
     )
@@ -145,3 +145,22 @@ def get_format(pipeline_string):
     del pipeline
 
     return format
+
+def to_fraction(num):
+    """
+    Function to convert numebe to string fraction
+    Eg: 0.5 -> "1/2"
+    Args:
+        num: Number to convert to fraction
+    """
+    if type(num) == int:
+        framerate = "%d/1" % num
+        return framerate
+    elif type(num) == float:
+        num = str(num)
+        _, decimal = num.split(".")
+        numerator = str(int(num.replace(".", "")))
+        denomerator = str(10 ** len(decimal))
+        return "%s/%s" % (numerator, denomerator)
+    else:
+        print("[ERROR] Framerate is not numeric.")

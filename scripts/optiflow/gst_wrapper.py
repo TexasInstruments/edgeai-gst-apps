@@ -27,7 +27,11 @@
 #  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+import gi
 
+gi.require_version("Gst", "1.0")
+gi.require_version("GstApp", "1.0")
+from gi.repository import Gst, GstApp, GLib, GObject
 import os
 import numpy as np
 import utils
@@ -37,9 +41,49 @@ abspath = Path(__file__).parent.absolute()
 sys.path.insert(0,os.path.join(abspath,'../../apps_python'))
 from gst_element_map import gst_element_map
 
+Gst.init(None)
+
 preproc_target_idx = 0
 isp_target_idx = 0
 ldc_target_idx = 0
+
+import time
+class GstPipe:
+    """
+    Class to handle gstreamer pipeline related things
+    Exposes apis to get appsrc, appsink and push, pull frames
+    to gst pipeline
+    """
+
+    def __init__(self, pipeline):
+        """
+        Create a gst pipeline using gst launch string
+        Args:
+            pipeline: Gstreamer pipeline string
+        """
+        pipeline = pipeline.replace("\\","")
+        pipeline = pipeline.replace("\n","")
+        self.pipeline = Gst.parse_launch(pipeline)
+        self.loop = GObject.MainLoop()
+
+    def run(self):
+        """
+        Start the gst pipeline
+        """
+        ret = self.pipeline.set_state(Gst.State.PLAYING)
+        bus = self.pipeline.get_bus()
+        if ret == Gst.StateChangeReturn.FAILURE:
+            msg = bus.timed_pop_filtered(Gst.CLOCK_TIME_NONE, Gst.MessageType.ERROR)
+            err, debug_info = msg.parse_error()
+            print("[ERROR]", err.message)
+            sys.exit(1)
+
+        # Run the pipeline till keyboard interrupt
+        try:
+            self.loop.run()
+        except KeyboardInterrupt:
+            self.loop.quit()
+        self.pipeline.set_state(Gst.State.NULL)
 
 def get_input_str(input):
     """
@@ -225,7 +269,7 @@ def get_input_str(input):
         source_cmd = 'multifilesrc location=' + input.source
         source_cmd += ' loop=true' if input.loop else '' + \
                            ' index=%d stop-index=%d' % (input.index, stop_index)
-        source_cmd += ' caps=image/' + image_fmt[source_ext] + ',framerate=1/1 '
+        source_cmd += ' caps=image/' + image_fmt[source_ext] + ',framerate=%s ' % input.fps
         source_cmd += image_dec[source_ext]
         source_cmd += ' ! videoscale ! video/x-raw, width=%d, height=%d ! ' % \
                                                      (input.width, input.height)
@@ -234,13 +278,13 @@ def get_input_str(input):
 
     elif (source == 'raw_video'):
         source_cmd = 'multifilesrc location=' + input.source
-        source_cmd += ' loop=true stop-index=0' if input.loop else ''
+        source_cmd += ' loop=true stop-index=-1' if input.loop else ' loop=false stop-index=0'
 
         # Set caps only in case of hardware decoder
         if ((input.format == "h264" and gst_element_map["h264dec"]["element"] == "v4l2h264dec") or
             (input.format == "h265" and gst_element_map["h264dec"]["element"] == "v4l2h264dec")):
             source_cmd += ' caps=video/x-' + input.format
-            source_cmd += ',width=%d,height=%d,framerate=%d/1' % (input.width,input.height,input.fps)
+            source_cmd += ',width=%d,height=%d,framerate=%s' % (input.width,input.height,input.fps)
 
         source_cmd +=  video_dec[input.format]
         source_cmd += ' ! '
@@ -413,29 +457,7 @@ def get_pre_proc_str(flow):
         cmd += 'videobox left=%d right=%d top=%d bottom=%d ! ' % \
                                                       (left, right, top, bottom)
 
-    layout = 0 if flow.model.data_layout == "NCHW"  else 1
-    tensor_fmt = "bgr" if (flow.model.reverse_channels) else "rgb"
-
-    if   (flow.model.data_type == np.int8):
-        data_type = 2
-    elif (flow.model.data_type == np.uint8):
-        data_type = 3
-    elif (flow.model.data_type == np.int16):
-        data_type = 4
-    elif (flow.model.data_type == np.uint16):
-        data_type = 5
-    elif (flow.model.data_type == np.int32):
-        data_type = 6
-    elif (flow.model.data_type == np.uint32):
-        data_type = 7
-    elif (flow.model.data_type == np.float32):
-        data_type = 10
-    else:
-        print("[ERROR] Unsupported data type for input tensor")
-        sys.exit(1)
-
-    cmd += 'tiovxdlpreproc data-type=%d ' % data_type + \
-           'channel-order=%d ' % layout
+    cmd += 'tiovxdlpreproc '
 
     target = None
     if "target" in gst_element_map["dlpreproc"]["property"]:
@@ -447,14 +469,7 @@ def get_pre_proc_str(flow):
     if target != None:
         cmd += 'target=%d ' % target
 
-    if (flow.model.mean):
-        cmd += 'mean-0=%f mean-1=%f mean-2=%f ' % tuple(flow.model.mean)
-
-    if (flow.model.scale):
-        cmd += 'scale-0=%f scale-1=%f scale-2=%f ' % tuple(flow.model.scale)
-
-    cmd += 'tensor-format=%s ' % tensor_fmt + \
-           'out-pool-size=4 ! application/x-tensor-tiovx ! '
+    cmd += 'model=%s out-pool-size=4 ! application/x-tensor-tiovx ! ' % flow.model.path
 
     split_name = flow.input.get_split_name()
     if (gst_element_map["scaler"]["element"] != "tiovxmultiscaler"):
@@ -483,7 +498,7 @@ def get_sensor_str(flow):
     return cmd
 
 def get_post_proc_str(flow):
-    cmd = 'tidlpostproc name=%s model=%s alpha=%f viz-threshold=%f top-N=%d ! ' % \
+    cmd = 'tidlpostproc name=%s model=%s alpha=%f viz-threshold=%f top-N=%d display-model=true ! ' % \
           (flow.gst_post_name, flow.model.path, flow.model.alpha, flow.model.viz_threshold, flow.model.topN)
 
     if (flow.output.mosaic):

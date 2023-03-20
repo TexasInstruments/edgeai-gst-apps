@@ -93,7 +93,11 @@ class OptiFlowClass:
                 elif (gst_element_map['inferer']['target'] != 'arm'):
                     print("[WARNING] Invalid target specified for inferer. Defaulting to ARM.")
 
-                model_obj = ModelConfig(model_path,enable_tidl,core_id)
+                '''
+                We just need basic information about the model. No need to create runtime
+                since runtime is handled by tidlinferer plugin
+                '''
+                model_obj = ModelConfig(model_path,enable_tidl,core_id,create_runtime=False)
                 # task specific params
                 if "alpha" in model_config:
                     model_obj.alpha = model_config["alpha"]
@@ -166,6 +170,16 @@ class OptiFlowClass:
             self.pipeline = self.pipeline.replace('tiperfoverlay',
                                                   'tiperfoverlay title="%s"' % self.title)
 
+    def run(self):
+        """
+        Member function to run the pipeline
+        """
+        self.gst_pipe = gst_wrapper.GstPipe(self.pipeline)
+        print(f"\n{self.pipeline}\n")
+        self.gst_pipe.run()
+
     def get_pipeline(self):
+        """
+        Member function to get the pipeline as str
+        """
         return self.pipeline
-    

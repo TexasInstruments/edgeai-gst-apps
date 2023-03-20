@@ -32,7 +32,7 @@ import gst_wrapper
 import utils
 import sys
 import os
-
+from fractions import Fraction
 class Input:
     """
     Class to parse and store input parameters
@@ -47,7 +47,7 @@ class Input:
         self.source = input_config['source']
         self.width = input_config['width']
         self.height = input_config['height']
-        self.fps = input_config['framerate']
+        self.fps = utils.to_fraction(input_config["framerate"])
         if 'index' in input_config:
             self.index = input_config['index']
         else:
@@ -182,7 +182,7 @@ class Output:
                          'sink_%d::widths="<%d>"   ' % (disp_id, subflow.width) + \
                          'sink_%d::heights="<%d>"  ' % (disp_id, subflow.height) + \
                           '\\\n'
-        if fps > self.fps:
+        if float(Fraction(fps)) > float(Fraction(self.fps)):
             self.fps = fps
         return disp_id
 
