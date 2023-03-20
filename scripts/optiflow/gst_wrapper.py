@@ -306,20 +306,45 @@ def get_output_str(output):
         sink = 'others'
 
     if (sink == 'display'):
-        sink_cmd = ' queue ! tiperfoverlay ! kmssink sync=false driver-name=tidss force-modesetting=true'
+        sink_cmd = ''
+        if output.overlay_performance:
+            sink_cmd += ' queue ! tiperfoverlay !'
+        sink_cmd += ' kmssink sync=false driver-name=tidss' # Add force-modesetting to trur if flickering
         if (output.connector):
                 sink_cmd += ' connector-id=%d' % output.connector
     elif (sink == 'image'):
         sink_cmd = image_enc[sink_ext] + \
                                     ' multifilesink location=' + output.sink
     elif (sink == 'video'):
-        sink_cmd = ' queue ! tiperfoverlay !' + video_enc[sink_ext] + 'filesink location=' + output.sink
+        sink_cmd = ''
+        if output.overlay_performance:
+            sink_cmd += ' queue ! tiperfoverlay !'
+        sink_cmd += video_enc[sink_ext] + 'filesink location=' + output.sink
 
     elif (sink == 'remote'):
-        sink_cmd = ' queue ! tiperfoverlay ! v4l2h264enc gop-size=30 bitrate=10000000 ! h264parse ! rtph264pay ! udpsink host=%s port=%d sync=false' % (output.host,output.port)
+        sink_cmd = ''
+        if output.overlay_performance:
+            sink_cmd += ' queue ! tiperfoverlay !'
+
+        if output.encoder == "v4l2h264enc":
+            sink_cmd += ' v4l2h264enc gop-size=%d bitrate=%d ! h264parse !' % (output.gop_size,output.bitrate)
+        else:
+            sink_cmd += ' ' + output.encoder + ' !'
+
+        if output.payloader == "mp4mux":
+            sink_cmd += ' mp4mux fragment-duration=1 !'
+        elif output.payloader == "multipartmux":
+            sink_cmd += ' multipartmux boundary=spionisto ! rndbuffersize max=65000 !'
+        else:
+            sink_cmd += ' ' + output.payloader + ' !'
+
+        sink_cmd += ' udpsink host=%s port=%d sync=false' % (output.host,output.port)
 
     elif (sink == 'others'):
-        sink_cmd = ' queue ! tiperfoverlay ! ' + output.sink
+        sink_cmd = ''
+        if output.overlay_performance:
+            sink_cmd += ' queue ! tiperfoverlay !'
+        sink_cmd += ' ' + output.sink
 
     if (output.mosaic):
         sink_cmd = '! video/x-raw,format=NV12, width=%d, height=%d ' % (output.width,output.height) + '!' + sink_cmd

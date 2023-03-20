@@ -124,6 +124,26 @@ class Output:
             self.host = output_config['host']
         else:
             self.host = '0.0.0.0'
+        if 'payloader' in output_config:
+            self.payloader = output_config['payloader']
+        else:
+            self.payloader = 'rtph264pay'
+        if 'encoder' in output_config:
+            self.encoder = output_config['encoder']
+        else:
+            self.encoder = 'v4l2h264enc'
+        if 'gop-size' in output_config:
+            self.gop_size = output_config['gop-size']
+        else:
+            self.gop_size = 30
+        if 'bitrate' in output_config:
+            self.bitrate = output_config['bitrate']
+        else:
+            self.bitrate = 10000000
+        if 'overlay-performance' in output_config:
+            self.overlay_performance = output_config['overlay-performance']
+        else:
+            self.overlay_performance = False
         self.mosaic = True
         self.id = Output.count
         self.gst_mosaic_str, self.gst_disp_str = gst_wrapper.get_output_str(self)
