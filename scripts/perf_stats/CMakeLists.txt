@@ -55,7 +55,10 @@ add_definitions(
     -DSOC_${TARGET_SOC}
 )
 
-include_directories(/usr/include/processor_sdk/vision_apps)
+if ("${TARGET_SOC}" STREQUAL "J721E" OR "${TARGET_SOC}" STREQUAL "J721S2" OR "${TARGET_SOC}" STREQUAL "J784S4" OR "${TARGET_SOC}" STREQUAL "AM62A")
+    include_directories(/usr/include/processor_sdk/vision_apps)
+endif()
+include_directories(/usr/include/edgeai-apps-utils/)
 
 set(APP_PERF_STATS_SRCS
     ti_perfstats.cpp)
@@ -64,4 +67,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib/${CMAKE_BUILD_TYPE}
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE})
 
 add_executable(${PROJECT_NAME} ${APP_PERF_STATS_SRCS})
-target_link_libraries(${PROJECT_NAME} tivision_apps pthread)
+if ("${TARGET_SOC}" STREQUAL "J721E" OR "${TARGET_SOC}" STREQUAL "J721S2" OR "${TARGET_SOC}" STREQUAL "J784S4" OR "${TARGET_SOC}" STREQUAL "AM62A")
+    target_link_libraries(${PROJECT_NAME} tivision_apps)
+endif()
+target_link_libraries(${PROJECT_NAME} edgeai-apps-utils pthread)
