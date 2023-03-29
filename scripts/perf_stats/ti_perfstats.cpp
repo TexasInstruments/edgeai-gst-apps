@@ -40,9 +40,12 @@
 extern "C" {
 
 /* Module headers. */
+#if defined(SOC_J721E) || defined(SOC_J721S2) || defined(SOC_J784S4) || defined(SOC_AM62A)
 #include <utils/app_init/include/app_init.h>
 #include <utils/perf_stats/include/app_perf_stats.h>
 #include <utils/ipc/include/app_ipc.h>
+#endif
+#include <edgeai_perf_stats_utils.h>
 
 }
 
@@ -58,7 +61,12 @@ void displayThread()
 {
 
     int32_t status=0;
+#if defined(SOC_J721E) || defined(SOC_J721S2) || defined(SOC_J784S4) || defined(SOC_AM62A)
     app_perf_stats_cpu_load_t cpu_load;
+#else
+    perfStatsCpuLoad cpu_load;
+    perfStatsCpuStatsInit(&cpu_load);
+#endif
 
 #if defined(SOC_J721E)
     /* open sysfs files for reading temperature data*/
@@ -74,6 +82,7 @@ void displayThread()
     {
         system("clear");
 
+#if defined(SOC_J721E) || defined(SOC_J721S2) || defined(SOC_J784S4) || defined(SOC_AM62A)
         printf("Summary of CPU load,\n");
         printf("====================\n\n");
 
@@ -87,9 +96,16 @@ void displayThread()
                 appPerfStatsCpuLoadPrint(cpu_id, &cpu_load);
             }
         }
+
+
         appPerfStatsHwaLoadPrintAll();
-        appPerfStatsDdrStatsPrintAll();
         appPerfStatsResetAll();
+#else
+        perfStatsCpuStatsPrint(&cpu_load);
+        perfStatsResetCpuLoadCalc(&cpu_load);
+#endif
+        perfStatsDdrStatsPrintAll();
+        perfStatsResetDdrLoadCalcAll();
 
 #if defined(SOC_J721E)
         /* Read temperature data*/
@@ -150,6 +166,7 @@ int main()
     /* Register SIGINT handler. */
     signal(SIGINT, sigHandler);
 
+#if defined(SOC_J721E) || defined(SOC_J721S2) || defined(SOC_J784S4) || defined(SOC_AM62A)
     /* Initialize the system. */
     status = appInit();
 
@@ -158,15 +175,18 @@ int main()
         perror("appInit failed");
         return status;
     }
+#endif
 
     gDispThreadId = std::thread([]{displayThread();});
 
     gDispThreadId.join();
 
+#if defined(SOC_J721E) || defined(SOC_J721S2) || defined(SOC_J784S4) || defined(SOC_AM62A)
     printf("CALLING DE-INIT.\n");
 
     /* De-Initialize the system. */
     status = appDeInit();
+#endif
 
     return status;
 }
