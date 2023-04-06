@@ -316,7 +316,22 @@ def get_output_str(output):
         sink_cmd = ' queue ! tiperfoverlay !' + video_enc[sink_ext] + 'filesink location=' + output.sink
 
     elif (sink == 'remote'):
-        sink_cmd = ' queue ! tiperfoverlay ! v4l2h264enc gop-size=30 bitrate=10000000 ! h264parse ! rtph264pay ! udpsink host=%s port=%d sync=false' % (output.host,output.port)
+        sink_cmd = ' queue ! tiperfoverlay !'
+
+        if output.encoder == "v4l2h264enc":
+            sink_cmd += ' v4l2h264enc gop-size=%d bitrate=%d ! h264parse !' % (output.gop_size,output.bitrate)
+        else:
+            sink_cmd += ' ' + output.encoder + ' !'
+
+        if output.payloader == "mp4mux":
+            sink_cmd += ' mp4mux fragment-duration=1 !'
+        elif output.payloader == "multipartmux":
+            sink_cmd += ' multipartmux boundary=spionisto ! rndbuffersize max=65000 !'
+        else:
+            sink_cmd += ' ' + output.payloader + ' !'
+
+        sink_cmd += ' udpsink host=%s port=%d sync=false' % (output.host,output.port)
+
 
     elif (sink == 'others'):
         sink_cmd = ' queue ! tiperfoverlay ! ' + output.sink
