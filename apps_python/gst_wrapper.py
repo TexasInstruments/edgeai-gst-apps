@@ -1055,19 +1055,19 @@ def get_pre_proc_elements(flow):
     layout = 0 if flow.model.data_layout == "NCHW" else 1
     tensor_fmt = "bgr" if (flow.model.reverse_channels) else "rgb"
 
-    if flow.model.data_type == np.int8:
+    if flow.model.input_tensor_types[0] == np.int8:
         data_type = 2
-    elif flow.model.data_type == np.uint8:
+    elif flow.model.input_tensor_types[0] == np.uint8:
         data_type = 3
-    elif flow.model.data_type == np.int16:
+    elif flow.model.input_tensor_types[0] == np.int16:
         data_type = 4
-    elif flow.model.data_type == np.uint16:
+    elif flow.model.input_tensor_types[0] == np.uint16:
         data_type = 5
-    elif flow.model.data_type == np.int32:
+    elif flow.model.input_tensor_types[0] == np.int32:
         data_type = 6
-    elif flow.model.data_type == np.uint32:
+    elif flow.model.input_tensor_types[0] == np.uint32:
         data_type = 7
-    elif flow.model.data_type == np.float32:
+    elif flow.model.input_tensor_types[0] == np.float32:
         data_type = 10
     else:
         print("[ERROR] Unsupported data type for input tensor")
