@@ -102,6 +102,10 @@ class EdgeAIDemo:
                     print("[WARNING] Invalid target specified for inferer. Defaulting to ARM.")
 
                 model_obj = ModelConfig(model_path,enable_tidl,core_id)
+
+                # Initialize the runtime
+                model_obj.create_runtime()
+
                 # task specific params
                 if "alpha" in model_config:
                     model_obj.alpha = model_config["alpha"]
