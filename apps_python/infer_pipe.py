@@ -103,7 +103,7 @@ class InferPipe:
                 self.sub_flow.model.crop[0],
                 self.sub_flow.model.crop[1],
                 self.sub_flow.model.data_layout,
-                self.sub_flow.model.data_type,
+                self.sub_flow.model.input_tensor_types[0],
             )
             if type(input_img) == type(None):
                 break

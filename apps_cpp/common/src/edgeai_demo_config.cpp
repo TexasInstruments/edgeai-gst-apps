@@ -1667,7 +1667,7 @@ int32_t ModelInfo::initialize()
         /* Query the input information for setting the tensor type in pre process. */
         dlInfInputs = m_infererObj->getInputInfo();
         ifInfo = &dlInfInputs->at(0);
-        m_preProcCfg.inputTensorType = ifInfo->type;
+        m_preProcCfg.inputTensorTypes[0] = ifInfo->type;
 
         /* Set input data width and height based on the infererence engine
          * information. This is only used for semantic segmentation models
