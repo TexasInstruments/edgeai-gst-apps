@@ -470,7 +470,7 @@ void getPreProcElements(const PreprocessImageConfig *preProcCfg,
         string scale_0,scale_1,scale_2;
         string target;
         string out_pool_size;
-        string _data_type = to_string(preProcCfg->inputTensorType);
+        string _data_type = to_string(preProcCfg->inputTensorTypes[0]);
         elem_property = {
                         {"data-type",_data_type.c_str()},
                         {"channel-order",channelOrder.c_str()},
