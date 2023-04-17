@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#  Copyright (C) 2023 Texas Instruments Incorporated - http://www.ti.com/
+#  Copyright (C) 2022 Texas Instruments Incorporated - http://www.ti.com/
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions
@@ -61,11 +61,11 @@ while getopts ":i:d" flag; do
     esac
 done
 
-# Clone edgeai-tiovx-kernels under /opt required for custom GST plugins
+# Clone edgeai-apps-utils under /opt
 cd $install_dir
-ls | grep "edgeai-tiovx-kernels"
+ls | grep "edgeai-apps-utils"
 if [ "$?" -ne "0" ]; then
-    git clone --single-branch --branch develop https://git.ti.com/cgit/edgeai/edgeai-tiovx-kernels
+    git clone --single-branch --branch develop https://git.ti.com/cgit/edgeai/edgeai-apps-utils
     if [ "$?" -ne "0" ]; then
         cd $current_dir
         exit 1
@@ -76,7 +76,7 @@ set -e
 
 # Install if running from target else skip
 if [ `arch` == "aarch64" ]; then
-    cd edgeai-tiovx-kernels
+    cd edgeai-apps-utils
     rm -rf build
     mkdir build
     cd build
