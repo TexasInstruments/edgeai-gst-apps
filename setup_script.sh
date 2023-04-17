@@ -42,6 +42,12 @@ exit_setup()
 
 source ./scripts/detect_soc.sh
 
+# Install EdgeAI Apps Utils
+./scripts/install_apps_utils.sh $*
+if [ "$?" -ne "0" ]; then
+    exit_setup
+fi
+
 # Install DL Inferer library and its depencendy
 ./scripts/install_dl_inferer.sh $*
 if [ "$?" -ne "0" ]; then
