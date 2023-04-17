@@ -309,7 +309,7 @@ def get_output_str(output):
         sink_cmd = ''
         if output.overlay_performance:
             sink_cmd += ' queue ! tiperfoverlay !'
-        sink_cmd += ' kmssink sync=false driver-name=tidss force-modesetting=true'
+        sink_cmd += ' kmssink sync=false driver-name=tidss '
         if (output.connector):
                 sink_cmd += ' connector-id=%d' % output.connector
     elif (sink == 'image'):
@@ -349,7 +349,10 @@ def get_output_str(output):
 
     if (output.mosaic):
         sink_cmd = '! video/x-raw,format=NV12, width=%d, height=%d ' % (output.width,output.height) + '!' + sink_cmd
-        mosaic_cmd = 'tiovxmosaic target=1 src::pool-size=3 name=mosaic_%d' % (output.id) + ' \\\n'
+        mosaic_cmd = gst_element_map["mosaic"]["element"] + ' name=mosaic_%d' % (output.id)
+        if gst_element_map["mosaic"]["element"] == "tiovxmosaic":
+            mosaic_cmd += ' target=1 src::pool-size=3'
+        mosaic_cmd += ' \\\n'
     else:
         mosaic_cmd = ''
 
@@ -364,15 +367,14 @@ def get_pre_proc_str(flow):
     global preproc_target_idx
     cmd = ''
 
+    resize = flow.model.resize
+
     if (flow.model.task_type == 'classification'):
-        resize = flow.model.resize[0]
         cam_dims = (flow.input.width, flow.input.height)
         #tiovxmultiscaler dosen't support odd resolutions
         if (gst_element_map["scaler"]["element"] == "tiovxmultiscaler"):
-            resize = (((cam_dims[0]*resize//min(cam_dims)) >> 1) << 1, \
-                      ((cam_dims[1]*resize//min(cam_dims)) >> 1) << 1)
-    else:
-        resize = flow.model.resize
+            resize = (((cam_dims[0]*flow.model.resize[0]//min(cam_dims)) >> 1) << 1, \
+                      ((cam_dims[1]*flow.model.resize[0]//min(cam_dims)) >> 1) << 1)
 
     if (gst_element_map["scaler"]["element"] == "tiovxmultiscaler"):
         #tiovxmultiscaler dose not support upscaling and downscaling with scaling
@@ -414,48 +416,25 @@ def get_pre_proc_str(flow):
         cmd += 'videobox left=%d right=%d top=%d bottom=%d ! ' % \
                                                       (left, right, top, bottom)
 
-    layout = 0 if flow.model.data_layout == "NCHW"  else 1
-    tensor_fmt = "bgr" if (flow.model.reverse_channels) else "rgb"
+    if not gst_element_map["dlpreproc"]:
+        print("[ERROR] Need dlpreproc element for end-to-end pipeline")
+        sys.exit()
 
-    if   (flow.model.input_tensor_types[0] == np.int8):
-        data_type = 2
-    elif (flow.model.input_tensor_types[0] == np.uint8):
-        data_type = 3
-    elif (flow.model.input_tensor_types[0] == np.int16):
-        data_type = 4
-    elif (flow.model.input_tensor_types[0] == np.uint16):
-        data_type = 5
-    elif (flow.model.input_tensor_types[0] == np.int32):
-        data_type = 6
-    elif (flow.model.input_tensor_types[0] == np.uint32):
-        data_type = 7
-    elif (flow.model.input_tensor_types[0] == np.float32):
-        data_type = 10
-    else:
-        print("[ERROR] Unsupported data type for input tensor")
-        sys.exit(1)
-
-    cmd += 'tiovxdlpreproc data-type=%d ' % data_type + \
-           'channel-order=%d ' % layout
+    cmd += gst_element_map["dlpreproc"]["element"] + ' model=%s ' % flow.model.path
 
     target = None
-    if "target" in gst_element_map["dlpreproc"]["property"]:
-        target = gst_element_map["dlpreproc"]["property"]["target"][preproc_target_idx]
-        preproc_target_idx += 1
-        if preproc_target_idx >= len(gst_element_map["dlpreproc"]["property"]["target"]):
-            preproc_target_idx = 0
+    if "property" in gst_element_map["dlpreproc"]:
+        if "target" in gst_element_map["dlpreproc"]["property"]:
+            target = gst_element_map["dlpreproc"]["property"]["target"][preproc_target_idx]
+            preproc_target_idx += 1
+            if preproc_target_idx >= len(gst_element_map["dlpreproc"]["property"]["target"]):
+                preproc_target_idx = 0
+            cmd += 'target=%d ' % target
 
-    if target != None:
-        cmd += 'target=%d ' % target
+        if "out-pool-size" in gst_element_map["dlpreproc"]["property"]:
+            cmd += ' out-pool-size=%d ' % gst_element_map["dlpreproc"]["property"]["out-pool-size"]
 
-    if (flow.model.mean):
-        cmd += 'mean-0=%f mean-1=%f mean-2=%f ' % tuple(flow.model.mean)
-
-    if (flow.model.scale):
-        cmd += 'scale-0=%f scale-1=%f scale-2=%f ' % tuple(flow.model.scale)
-
-    cmd += 'tensor-format=%s ' % tensor_fmt + \
-           'out-pool-size=4 ! application/x-tensor-tiovx ! '
+    cmd += '! application/x-tensor-tiovx ! '
 
     split_name = flow.input.get_split_name()
     if (gst_element_map["scaler"]["element"] != "tiovxmultiscaler"):
@@ -480,11 +459,11 @@ def get_sensor_str(flow):
     if (gst_element_map["scaler"]["element"] == "tiovxmultiscaler"):
         cmd = split_name + '. ! queue ! ' + cmd
     else:
-        cmd = split_name + '. ! ' + gst_element_map["scaler"]["element"] + ' ! queue ! ' + cmd
+        cmd = split_name + '. ! queue ! ' + gst_element_map["scaler"]["element"] + ' ! ' + cmd
     return cmd
 
 def get_post_proc_str(flow):
-    cmd = 'tidlpostproc name=%s model=%s alpha=%f viz-threshold=%f top-N=%d ! ' % \
+    cmd = 'tidlpostproc name=%s model=%s alpha=%f viz-threshold=%f top-N=%d display-model=true ! ' % \
           (flow.gst_post_name, flow.model.path, flow.model.alpha, flow.model.viz_threshold, flow.model.topN)
 
     if (flow.output.mosaic):
