@@ -32,6 +32,7 @@ import gst_wrapper
 import utils
 import sys
 import os
+from gst_element_map import gst_element_map
 
 class Input:
     """
@@ -144,11 +145,14 @@ class Output:
             self.overlay_performance = output_config['overlay-performance']
         else:
             self.overlay_performance = False
-        self.mosaic = True
+        self.mosaic = False
         self.id = Output.count
-        self.gst_mosaic_str, self.gst_disp_str = gst_wrapper.get_output_str(self)
         self.subflows = []
         Output.count += 1
+
+    def set_mosaic(self):
+        self.mosaic = (gst_element_map["mosaic"]) != None
+        self.gst_mosaic_str, self.gst_disp_str = gst_wrapper.get_output_str(self)
 
     def get_disp_id(self, subflow, fps):
         """
@@ -176,12 +180,20 @@ class Output:
         disp_id = len(self.subflows)
         self.subflows.append(subflow)
         if (self.mosaic):
-            self.gst_mosaic_str = self.gst_mosaic_str + \
-                         'sink_%d::startx="<%d>"  ' % (disp_id, subflow.x_pos) + \
-                         'sink_%d::starty="<%d>"  ' % (disp_id, subflow.y_pos) + \
-                         'sink_%d::widths="<%d>"   ' % (disp_id, subflow.width) + \
-                         'sink_%d::heights="<%d>"  ' % (disp_id, subflow.height) + \
-                          '\\\n'
+            if gst_element_map["mosaic"]["element"] == "tiovxmosaic":
+                self.gst_mosaic_str = self.gst_mosaic_str + \
+                            'sink_%d::startx="<%d>" ' % (disp_id, subflow.x_pos) + \
+                            'sink_%d::starty="<%d>" ' % (disp_id, subflow.y_pos) + \
+                            'sink_%d::widths="<%d>" ' % (disp_id, subflow.width) + \
+                            'sink_%d::heights="<%d>" ' % (disp_id, subflow.height) + \
+                            '\\\n'
+            else:
+                self.gst_mosaic_str = self.gst_mosaic_str + \
+                            'sink_%d::startx=%d ' % (disp_id, subflow.x_pos) + \
+                            'sink_%d::starty=%d ' % (disp_id, subflow.y_pos) + \
+                            'sink_%d::width=%d ' % (disp_id, subflow.width) + \
+                            'sink_%d::height=%d ' % (disp_id, subflow.height) + \
+                            '\\\n'
         if fps > self.fps:
             self.fps = fps
         return disp_id
