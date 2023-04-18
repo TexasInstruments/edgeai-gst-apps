@@ -160,13 +160,17 @@ am62a:
 #==================== AM62X ====================
 am62:
     dlcolorconvert:
-        element: videoconvert
+        element: ticolorconvert
     colorconvert:
-        element: videoconvert
+        element: ticolorconvert
     scaler:
-        element: videoscale
-    dlpreproc: null
-    mosaic: null
+        element: tiscaler
+    dlpreproc:
+        element: tidlpreproc
+        property:
+            out-pool-size: 4
+    mosaic:
+        element: timosaic
     isp: null
     ldc: null
     h264dec:

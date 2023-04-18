@@ -444,7 +444,10 @@ def print_single_appsrc(pipeline, appsrc, mosaic_list, mosaic_pad_count):
                     while not pad.get_peer() and time() < t_end:  # Hack for qtdemux
                         pass
                     peer_element = pad.get_peer().get_parent()
-                    if peer_element.get_factory().get_name() == "tiovxmosaic":
+                    peer_element_factory_name = peer_element.get_factory().get_name()
+                    if (peer_element_factory_name == "tiovxmosaic"
+                        or
+                        peer_element_factory_name == "timosaic"):
                         if peer_element not in mosaic_list:
                             mosaic_list.append(peer_element)
                             mosaic_pad_count.append(0)
@@ -484,14 +487,19 @@ def print_sink_pipeline(pipeline, mosaic_prop, title=None):
 
     for mosaic in mosaic_list:
         mosaic_name = mosaic.get_name()
-        string = "%s name=%s\n" % (get_name_with_prop(mosaic), mosaic_name)
-        string += 'src::pool-size=%d ' % mosaic.srcpads[0].get_property("pool-size")
+        string = "%s name=%s " % (get_name_with_prop(mosaic), mosaic_name)
+        string += "src::pool-size=%d\n" % mosaic.srcpads[0].get_property("pool-size")
         for i, (x, y, w, h) in enumerate(mosaic_prop[mosaic_name]):
-            sink_name = "sink_%d::" % i
-            string += 'sink_%d::startx="<%d>" ' % (i, x)
-            string += 'sink_%d::starty="<%d>" ' % (i, y)
-            string += 'sink_%d::widths="<%d>" ' % (i, w)
-            string += 'sink_%d::heights="<%d>"\n' % (i, h)
+            if mosaic.get_factory().get_name() == "tiovxmosaic":
+                string += 'sink_%d::startx="<%d>" ' % (i, x)
+                string += 'sink_%d::starty="<%d>" ' % (i, y)
+                string += 'sink_%d::widths="<%d>" ' % (i, w)
+                string += 'sink_%d::heights="<%d>"\n' % (i, h)
+            else:
+                string += 'sink_%d::startx=%d ' % (i, x)
+                string += 'sink_%d::starty=%d ' % (i, y)
+                string += 'sink_%d::width=%d ' % (i, w)
+                string += 'sink_%d::height=%d\n' % (i, h)
 
         pad = mosaic.srcpads[0]
         element = pad.get_peer().get_parent()
