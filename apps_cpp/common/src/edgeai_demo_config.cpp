@@ -1235,11 +1235,17 @@ int32_t OutputInfo::appendGstPipeline()
 {
     if (m_mosaicEnabled)
     {
+        string mosaic_name = gstElementMap["mosaic"]["element"].as<string>();
+
         string background = "/tmp/"+ m_bkgndElemName;
         m_gstElementProperty = {{"name",m_mosaicElemName.c_str()},
                                 {"background",background.c_str()},
-                                {"target","1"}
                                 };
+        if (mosaic_name == "tiovxmosaic")
+        {
+            m_gstElementProperty.push_back({"target","1"});
+        }
+
         string caps = "video/x-raw,format=NV12,width=" +
                       to_string(m_width) +
                       ",height=" +
@@ -2255,15 +2261,29 @@ int32_t FlowInfo::getSinkPipeline(GstElement*       &sinkPipeline,
 
                 auto const &mosaicInfo = output->m_instIdMosaicMap.at(output->m_numMosaicSink);
                 string mosaicSinkPad = "sink_" + to_string(output->m_numMosaicSink);
+                string mosaic_name = GST_OBJECT_NAME(gst_element_get_factory(mosaic));
+
                 string prop_name;
                 prop_name = mosaicSinkPad+"::startx";
                 setMosaicProperty(mosaic,prop_name,mosaicInfo->m_posX);
                 prop_name = mosaicSinkPad+"::starty";
                 setMosaicProperty(mosaic,prop_name,mosaicInfo->m_posY);
-                prop_name = mosaicSinkPad+"::widths";
-                setMosaicProperty(mosaic,prop_name,mosaicInfo->m_width);
-                prop_name = mosaicSinkPad+"::heights";
-                setMosaicProperty(mosaic,prop_name,mosaicInfo->m_height);
+
+                if (mosaic_name == "tiovxmosaic")
+                {
+                    prop_name = mosaicSinkPad+"::widths";
+                    setMosaicProperty(mosaic,prop_name,mosaicInfo->m_width);
+                    prop_name = mosaicSinkPad+"::heights";
+                    setMosaicProperty(mosaic,prop_name,mosaicInfo->m_height);
+                }
+                else
+                {
+                    prop_name = mosaicSinkPad+"::width";
+                    setMosaicProperty(mosaic,prop_name,mosaicInfo->m_width);
+                    prop_name = mosaicSinkPad+"::height";
+                    setMosaicProperty(mosaic,prop_name,mosaicInfo->m_height);
+                }
+
                 output->m_numMosaicSink += 1;
 
                 if (!output->m_dispElementAdded)
@@ -2273,7 +2293,9 @@ int32_t FlowInfo::getSinkPipeline(GstElement*       &sinkPipeline,
                 }
                 link(output->m_mosaicElements.back(),output->m_dispElements.front());
 
-                if (output->m_overlayPerformance)
+                if (output->m_overlayPerformance
+                    &&
+                    mosaic_name == "tiovxmosaic")
                 {
                     GValue val = G_VALUE_INIT;
                     g_value_init (&val, G_TYPE_INT);

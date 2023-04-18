@@ -1022,8 +1022,11 @@ def get_output_elements(output):
         property = {
             "name": "mosaic_" + str(output.id),
             "background": background,
-            "target": 1,
         }
+
+        if gst_element_map["mosaic"]["element"] == "tiovxmosaic":
+            property["target"] = 1
+
         caps = "video/x-raw,format=NV12, width=%d, height=%d" % (
             output.width,
             output.height,
@@ -1092,17 +1095,18 @@ def get_pre_proc_elements(flow):
             )
 
         property["tensor-format"] = tensor_fmt
+  
+        if "property" in gst_element_map["dlpreproc"]:
+            if "target" in gst_element_map["dlpreproc"]["property"]:
+                property["target"] = gst_element_map["dlpreproc"]["property"]["target"][preproc_target_idx]
+                preproc_target_idx += 1
+                if preproc_target_idx >= len(gst_element_map["dlpreproc"]["property"]["target"]):
+                    preproc_target_idx = 0
 
-        if "target" in gst_element_map["dlpreproc"]["property"]:
-            property["target"] = gst_element_map["dlpreproc"]["property"]["target"][preproc_target_idx]
-            preproc_target_idx += 1
-            if preproc_target_idx >= len(gst_element_map["dlpreproc"]["property"]["target"]):
-                preproc_target_idx = 0
-
-        if "out-pool-size" in gst_element_map["dlpreproc"]["property"]:
-            property["out-pool-size"] = gst_element_map["dlpreproc"]["property"][
-                "out-pool-size"
-            ]
+            if "out-pool-size" in gst_element_map["dlpreproc"]["property"]:
+                property["out-pool-size"] = gst_element_map["dlpreproc"]["property"][
+                    "out-pool-size"
+                ]
 
         caps = "application/x-tensor-tiovx"
 
@@ -1525,25 +1529,39 @@ def get_gst_pipe(flows, outputs):
                     )
 
                     # Set Mosaic Property
-                    startx = GObject.ValueArray()
-                    startx.append(GObject.Value(GObject.TYPE_INT, mosaic_x))
-                    starty = GObject.ValueArray()
-                    starty.append(GObject.Value(GObject.TYPE_INT, mosaic_y))
-                    widths = GObject.ValueArray()
-                    widths.append(GObject.Value(GObject.TYPE_INT, mosaic_w))
-                    heights = GObject.ValueArray()
-                    heights.append(GObject.Value(GObject.TYPE_INT, mosaic_h))
+                    if gst_element_map["mosaic"]["element"] == "tiovxmosaic":
+                        startx = GObject.ValueArray()
+                        startx.append(GObject.Value(GObject.TYPE_INT, mosaic_x))
+                        starty = GObject.ValueArray()
+                        starty.append(GObject.Value(GObject.TYPE_INT, mosaic_y))
+                        widths = GObject.ValueArray()
+                        widths.append(GObject.Value(GObject.TYPE_INT, mosaic_w))
+                        heights = GObject.ValueArray()
+                        heights.append(GObject.Value(GObject.TYPE_INT, mosaic_h))
+                        Gst.ChildProxy.set_property(
+                            mosaic, "sink_%d::widths" % o.num_mosaic_sink, widths
+                        )
+                        Gst.ChildProxy.set_property(
+                            mosaic, "sink_%d::heights" % o.num_mosaic_sink, heights
+                        )
+
+                    else:
+                        startx = GObject.Value(GObject.TYPE_INT, mosaic_x)
+                        starty = GObject.Value(GObject.TYPE_INT, mosaic_y)
+                        width = GObject.Value(GObject.TYPE_INT, mosaic_w)
+                        height = GObject.Value(GObject.TYPE_INT, mosaic_h)
+                        Gst.ChildProxy.set_property(
+                            mosaic, "sink_%d::width" % o.num_mosaic_sink, width
+                        )
+                        Gst.ChildProxy.set_property(
+                            mosaic, "sink_%d::height" % o.num_mosaic_sink, height
+                        )
+
                     Gst.ChildProxy.set_property(
                         mosaic, "sink_%d::startx" % o.num_mosaic_sink, startx
                     )
                     Gst.ChildProxy.set_property(
                         mosaic, "sink_%d::starty" % o.num_mosaic_sink, starty
-                    )
-                    Gst.ChildProxy.set_property(
-                        mosaic, "sink_%d::widths" % o.num_mosaic_sink, widths
-                    )
-                    Gst.ChildProxy.set_property(
-                        mosaic, "sink_%d::heights" % o.num_mosaic_sink, heights
                     )
 
                     # Increase mosaic sink count for this output by 1
@@ -1556,7 +1574,9 @@ def get_gst_pipe(flows, outputs):
                         )
                     link_elements(o.gst_mosaic_elements[-1], o.gst_disp_elements[0])
 
-                    if (o.overlay_performance):
+                    if (o.overlay_performance
+                        and
+                        gst_element_map["mosaic"]["element"] == "tiovxmosaic"):
                         Gst.ChildProxy.set_property(mosaic, "src::pool-size", 3)
 
                 else:
