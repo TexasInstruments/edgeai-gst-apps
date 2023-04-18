@@ -208,17 +208,33 @@ namespace ti::edgeai::common
 
     void setMosaicProperty(GstElement *mosaic, string propertyName, int value)
     {
-        GValue array = G_VALUE_INIT;
-        GValue val = G_VALUE_INIT;
-        g_value_init (&array, GST_TYPE_ARRAY);
-        g_value_init (&val, G_TYPE_INT);
-        g_value_set_int (&val,value);
-        gst_value_array_append_value (&array, &val);
-        gst_child_proxy_set_property (GST_CHILD_PROXY (mosaic),
-                                      propertyName.c_str(),
-                                      &array);
-        g_value_unset (&val);
-        g_value_unset (&array);
+        string mosaic_name;
+        mosaic_name = GST_OBJECT_NAME(gst_element_get_factory(mosaic));
+
+        if (mosaic_name == "tiovxmosaic")
+        {
+            GValue array = G_VALUE_INIT;
+            GValue val = G_VALUE_INIT;
+            g_value_init (&array, GST_TYPE_ARRAY);
+            g_value_init (&val, G_TYPE_INT);
+            g_value_set_int (&val,value);
+            gst_value_array_append_value (&array, &val);
+            gst_child_proxy_set_property (GST_CHILD_PROXY (mosaic),
+                                        propertyName.c_str(),
+                                        &array);
+            g_value_unset (&val);
+            g_value_unset (&array);
+        }
+        else
+        {
+            GValue val = G_VALUE_INIT;
+            g_value_init (&val, G_TYPE_INT);
+            g_value_set_int (&val,value);
+            gst_child_proxy_set_property (GST_CHILD_PROXY (mosaic),
+                                        propertyName.c_str(),
+                                        &val);
+            g_value_unset (&val);
+        }
     }
 
     string getMosaicProperty(GstElement *mosaic)
@@ -227,7 +243,9 @@ namespace ti::edgeai::common
         string      pad_name;
         string      prop_name;
         guint       value;
+        string      mosaic_name;
 
+        mosaic_name = GST_OBJECT_NAME(gst_element_get_factory(mosaic));
 
         GValue val = G_VALUE_INIT;
         g_value_init (&val, G_TYPE_INT);
@@ -238,61 +256,116 @@ namespace ti::edgeai::common
         g_value_unset(&val);
         property_string += "src::pool-size=" +
                             to_string(value) +
-                            " ";
+                            "\n";
 
         for (guint pad = 0; pad < mosaic->numsinkpads; pad++)
         {
-            GValue array = G_VALUE_INIT;
-
             pad_name = "sink_" + to_string(pad);
 
-            prop_name = pad_name + "::startx";
-            g_value_init (&array, GST_TYPE_ARRAY);
-            gst_child_proxy_get_property(GST_CHILD_PROXY (mosaic),
-                                            prop_name.c_str(),
-                                            &array);
-            value = g_value_get_uint(gst_value_array_get_value (&array, 0));
-            g_value_unset(&array);
-            property_string += prop_name +
-                               "=\"<" +
-                               to_string(value) +
-                               ">\" ";
+            if (mosaic_name == "tiovxmosaic")
+            {
+                GValue array = G_VALUE_INIT;
 
-            prop_name = pad_name + "::starty";
-            g_value_init (&array, GST_TYPE_ARRAY);
-            gst_child_proxy_get_property(GST_CHILD_PROXY (mosaic),
-                                            prop_name.c_str(),
-                                            &array);
-            value = g_value_get_uint(gst_value_array_get_value (&array, 0));
-            g_value_unset(&array);
-            property_string += prop_name +
-                               "=\"<" +
-                               to_string(value) +
-                               ">\" ";
+                prop_name = pad_name + "::startx";
+                g_value_init (&array, GST_TYPE_ARRAY);
+                gst_child_proxy_get_property(GST_CHILD_PROXY (mosaic),
+                                                prop_name.c_str(),
+                                                &array);
+                value = g_value_get_uint(gst_value_array_get_value (&array, 0));
+                g_value_unset(&array);
+                property_string += prop_name +
+                                "=\"<" +
+                                to_string(value) +
+                                ">\" ";
 
-            prop_name = pad_name + "::widths";
-            g_value_init (&array, GST_TYPE_ARRAY);
-            gst_child_proxy_get_property(GST_CHILD_PROXY (mosaic),
-                                            prop_name.c_str(),
-                                            &array);
-            value = g_value_get_uint(gst_value_array_get_value (&array, 0));
-            g_value_unset(&array);
-            property_string += prop_name +
-                               "=\"<" +
-                               to_string(value) +
-                               ">\" ";
+                prop_name = pad_name + "::starty";
+                g_value_init (&array, GST_TYPE_ARRAY);
+                gst_child_proxy_get_property(GST_CHILD_PROXY (mosaic),
+                                                prop_name.c_str(),
+                                                &array);
+                value = g_value_get_uint(gst_value_array_get_value (&array, 0));
+                g_value_unset(&array);
+                property_string += prop_name +
+                                "=\"<" +
+                                to_string(value) +
+                                ">\" ";
 
-            prop_name = pad_name + "::heights";
-            g_value_init (&array, GST_TYPE_ARRAY);
-            gst_child_proxy_get_property(GST_CHILD_PROXY (mosaic),
-                                            prop_name.c_str(),
-                                            &array);
-            value = g_value_get_uint(gst_value_array_get_value (&array, 0));
-            g_value_unset(&array);
-            property_string += prop_name +
-                               "=\"<" +
-                               to_string(value) +
-                               ">\"\n";
+                prop_name = pad_name + "::widths";
+                g_value_init (&array, GST_TYPE_ARRAY);
+                gst_child_proxy_get_property(GST_CHILD_PROXY (mosaic),
+                                                prop_name.c_str(),
+                                                &array);
+                value = g_value_get_uint(gst_value_array_get_value (&array, 0));
+                g_value_unset(&array);
+                property_string += prop_name +
+                                "=\"<" +
+                                to_string(value) +
+                                ">\" ";
+
+                prop_name = pad_name + "::heights";
+                g_value_init (&array, GST_TYPE_ARRAY);
+                gst_child_proxy_get_property(GST_CHILD_PROXY (mosaic),
+                                                prop_name.c_str(),
+                                                &array);
+                value = g_value_get_uint(gst_value_array_get_value (&array, 0));
+                g_value_unset(&array);
+                property_string += prop_name +
+                                "=\"<" +
+                                to_string(value) +
+                                ">\"\n";
+            }
+            else
+            {
+                GValue val = G_VALUE_INIT;
+
+                prop_name = pad_name + "::startx";
+                g_value_init (&val, G_TYPE_INT);
+                gst_child_proxy_get_property(GST_CHILD_PROXY (mosaic),
+                                                prop_name.c_str(),
+                                                &val);
+                value = g_value_get_int(&val);
+                g_value_unset(&val);
+                property_string += prop_name +
+                                "=" +
+                                to_string(value) +
+                                " ";
+
+                prop_name = pad_name + "::starty";
+                g_value_init (&val, G_TYPE_INT);
+                gst_child_proxy_get_property(GST_CHILD_PROXY (mosaic),
+                                                prop_name.c_str(),
+                                                &val);
+                value = g_value_get_int(&val);
+                g_value_unset(&val);
+                property_string += prop_name +
+                                "=" +
+                                to_string(value) +
+                                " ";
+
+                prop_name = pad_name + "::width";
+                g_value_init (&val, G_TYPE_INT);
+                gst_child_proxy_get_property(GST_CHILD_PROXY (mosaic),
+                                                prop_name.c_str(),
+                                                &val);
+                value = g_value_get_int(&val);
+                g_value_unset(&val);
+                property_string += prop_name +
+                                "=" +
+                                to_string(value) +
+                                " ";
+
+                prop_name = pad_name + "::height";
+                g_value_init (&val, G_TYPE_INT);
+                gst_child_proxy_get_property(GST_CHILD_PROXY (mosaic),
+                                                prop_name.c_str(),
+                                                &val);
+                value = g_value_get_int(&val);
+                g_value_unset(&val);
+                property_string += prop_name +
+                                "=" +
+                                to_string(value) +
+                                "\n";
+            }
         }
 
         return property_string;
@@ -947,7 +1020,9 @@ namespace ti::edgeai::common
             element_name.assign(gst_element_get_name(pipelineElements[i]));
             element_type.assign(gst_element_factory_get_metadata(factory,"klass"));
 
-            if (element_factory_name == "tiovxmosaic")
+            if (element_factory_name == "tiovxmosaic"
+                ||
+                element_factory_name == "timosaic")
             {
                 while(i < pipelineElements.size() &&
                       (element_type.find("Sink")) == string::npos)
@@ -998,7 +1073,10 @@ namespace ti::edgeai::common
                         if (peer_element)
                         {
                             peerFactory = gst_element_get_factory(peer_element);
-                            if (g_str_equal("tiovxmosaic",GST_OBJECT_NAME(peerFactory)))
+                            if (g_str_equal("tiovxmosaic",GST_OBJECT_NAME(peerFactory))
+                                ||
+                                g_str_equal("timosaic",GST_OBJECT_NAME(peerFactory))
+                                )
                             {
                                 string p_element_name;
                                 p_element_name.assign(gst_element_get_name(peer_element));
@@ -1051,13 +1129,15 @@ namespace ti::edgeai::common
             factory = gst_element_get_factory(mosaicElements[i]);
             element_name.assign(gst_element_get_name(mosaicElements[i]));
 
-            if (g_str_equal("tiovxmosaic",GST_OBJECT_NAME(factory)))
+            if (g_str_equal("tiovxmosaic",GST_OBJECT_NAME(factory))
+                ||
+                g_str_equal("timosaic",GST_OBJECT_NAME(factory)))
             {
                 mosaic_string += "\n";
                 mosaic_string += _get_name_with_prop(mosaicElements[i]) +
                                 " name=" +
                                 element_name +
-                                "\n";
+                                " ";
                 mosaic_string += getMosaicProperty(mosaicElements[i]) + "! ";
             }
             else if (mosaicElements[i]->numsrcpads == 0)
