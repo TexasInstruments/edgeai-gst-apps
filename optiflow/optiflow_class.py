@@ -165,7 +165,19 @@ class OptiFlowClass:
         if self.title:
             self.pipeline = self.pipeline.replace('tiperfoverlay',
                                                   'tiperfoverlay title="%s"' % self.title)
-
     def get_pipeline(self):
+        """
+        Member function to get the pipeline as str
+        """
         return self.pipeline
     
+    def run(self):
+        """
+        Member function to run the pipeline
+        """
+        pipeline = self.pipeline.replace("\\","")
+        pipeline = pipeline.replace("\n","")
+        self.gst_pipe = gst_wrapper.GstPipe(pipeline)
+        print(f"\n{self.pipeline}\n")
+        self.gst_pipe.run()
+

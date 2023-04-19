@@ -32,14 +32,59 @@ import os
 import numpy as np
 import utils
 import sys
+import time
 from pathlib import Path
 abspath = Path(__file__).parent.absolute()
 sys.path.insert(0,os.path.join(abspath,'../apps_python'))
 from gst_element_map import gst_element_map
+import gi
+
+gi.require_version("Gst", "1.0")
+gi.require_version("GstApp", "1.0")
+from gi.repository import Gst
+
+Gst.init(None)
 
 preproc_target_idx = 0
 isp_target_idx = 0
 ldc_target_idx = 0
+
+class GstPipe:
+    """
+    Class to handle gstreamer pipeline related things
+    to gst pipeline
+    """
+
+    def __init__(self, pipeline):
+        """
+        Create a gst pipeline using gst launch string
+        Args:
+            pipeline: Gstreamer pipeline string
+        """
+        self.pipeline = Gst.parse_launch(pipeline)
+
+    def run(self):
+        """
+        Run the gst pipeline
+        """
+        bus = self.pipeline.get_bus()
+        ret = self.pipeline.set_state(Gst.State.PLAYING)
+        if ret == Gst.StateChangeReturn.FAILURE:
+            msg = self.bus.timed_pop_filtered(Gst.CLOCK_TIME_NONE, Gst.MessageType.ERROR)
+            err, debug_info = msg.parse_error()
+            print("[ERROR]", err.message)
+            sys.exit(1)
+        try:
+            while True:
+                if bus.have_pending():
+                    message = bus.pop()
+                    if message.type == Gst.MessageType.EOS or message.type == Gst.MessageType.ERROR:
+                        break
+                time.sleep(0.01)
+        except KeyboardInterrupt:
+            pass
+        finally:
+            self.pipeline.set_state(Gst.State.NULL)
 
 def get_input_str(input):
     """
@@ -234,7 +279,7 @@ def get_input_str(input):
 
     elif (source == 'raw_video'):
         source_cmd = 'multifilesrc location=' + input.source
-        source_cmd += ' loop=true stop-index=0' if input.loop else ''
+        source_cmd += ' loop=true stop-index=-1' if input.loop else ' loop=false stop-index=0'
 
         # Set caps only in case of hardware decoder
         if ((input.format == "h264" and gst_element_map["h264dec"]["element"] == "v4l2h264dec") or
