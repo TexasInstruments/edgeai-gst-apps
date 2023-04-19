@@ -13,7 +13,7 @@ export GST_TRACERS="latency(flags=element)"
 
 rm $GST_DEBUG_FILE
 
-`$EDGEAI_GST_APPS_PATH/scripts/optiflow/optiflow.py -t $1` > /dev/null 2>&1 &
+`$EDGEAI_GST_APPS_PATH/optiflow/optiflow.py -t $1` > /dev/null 2>&1 &
 
 ls $GST_DEBUG_FILE > /dev/null 2>&1
 while [ "$?" != "0" ]
