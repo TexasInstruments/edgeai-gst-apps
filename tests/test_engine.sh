@@ -267,7 +267,7 @@ for model_path in $(eval $searchcmd); do
 			test_dir="$topdir/apps_cpp/"
 			test_app=$cpp_app
     elif [[ "$test_suite" = "OPTIFLOW"* ]]; then
-            test_dir="$topdir/scripts/optiflow"
+            test_dir="$topdir/optiflow"
             test_app=$optiflow_app
 	else
 		echo "ERROR: test_suite should start with either of PY, CPP"
