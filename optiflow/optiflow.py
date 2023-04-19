@@ -43,24 +43,26 @@ def main(sys_argv):
 
     with open(args.config, 'r') as f:
         config = yaml.safe_load(f)
-    sys.stdout.flush()
-    newstdout = os.dup(1)
-    devnull = os.open(os.devnull, os.O_WRONLY)
-    os.dup2(devnull, 1)
-    os.close(devnull)
-    sys.stdout = os.fdopen(newstdout, 'w')
-    optiflow = OptiFlowClass(config)
-    pipeline = optiflow.get_pipeline()
-    del optiflow
-    gc.collect()
 
-    if (args.terminal):
+    if not args.terminal:
+        optiflow = OptiFlowClass(config)
+        optiflow.run()
+        del optiflow
+    else:
+        sys.stdout.flush()
+        newstdout = os.dup(1)
+        devnull = os.open(os.devnull, os.O_WRONLY)
+        os.dup2(devnull, 1)
+        os.close(devnull)
+        sys.stdout = os.fdopen(newstdout, 'w')
+        optiflow = OptiFlowClass(config)
+        pipeline = optiflow.get_pipeline()
+        del optiflow
+        gc.collect()
         pipeline = "gst-launch-1.0 " + pipeline
         pipeline = pipeline.replace("\\","")
         pipeline = pipeline.replace("\n","")
-
-    return pipeline
+        print(pipeline)
     
 if __name__ == '__main__':
-    pipeline = main(sys.argv)
-    print(pipeline)
+    main(sys.argv)

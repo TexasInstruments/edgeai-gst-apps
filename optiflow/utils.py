@@ -28,7 +28,6 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 import sys
 import argparse
 import yaml
@@ -37,7 +36,7 @@ import time
 import gi
 gi.require_version("Gst", "1.0")
 gi.require_version("GstApp", "1.0")
-from gi.repository import Gst, GstApp, GLib, GObject
+from gi.repository import Gst
 
 class Parser(argparse.ArgumentParser):
     def error(self, message):
@@ -58,7 +57,7 @@ def get_cmdline_args(sysv_args):
                "    ex: " + sysv_args[0] + " ../configs/app_config.yaml"
     parser.add_argument("config", help = help_str_config)
 
-    help_str_terminal = "Run Directly on Terminal\n" + "default: Disabled"
+    help_str_terminal = "Just print the pipeline (Enabling this option will not run the pipeline)\n" + "default: Disabled"
     parser.add_argument(
         "-t", "--terminal", help=help_str_terminal, action="store_true", default=False
     )
@@ -97,8 +96,6 @@ def get_format(pipeline_string):
         pipeline: Gst Pipeline
         format_name: format or tensor-format
     """
-    Gst.init(sys.argv)
-
     format = None
     
     pipeline_str = pipeline_string.strip()
