@@ -34,7 +34,7 @@ import utils
 import sys
 from pathlib import Path
 abspath = Path(__file__).parent.absolute()
-sys.path.insert(0,os.path.join(abspath,'../../apps_python'))
+sys.path.insert(0,os.path.join(abspath,'../apps_python'))
 from gst_element_map import gst_element_map
 
 preproc_target_idx = 0
@@ -440,8 +440,13 @@ def get_pre_proc_str(flow):
     if (gst_element_map["scaler"]["element"] != "tiovxmultiscaler"):
         split_name = "tee_split%d" % (flow.input.id)
 
+    target_str = ''
+    if (gst_element_map['inferer']):
+        if 'core-id' in gst_element_map['inferer']:
+            target_str = 'target=%s' % flow.model.core_number
+
     cmd =   split_name + '. ! queue ! ' + cmd + \
-            'tidlinferer target=%s model=%s ! %s.tensor ' % (flow.model.core_number, flow.model.path, flow.gst_post_name)
+            'tidlinferer %s model=%s ! %s.tensor ' % (target_str, flow.model.path, flow.gst_post_name)
 
     return cmd
 
