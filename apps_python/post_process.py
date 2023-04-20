@@ -92,6 +92,8 @@ class PostProcess:
             return PostProcessDetection(flow)
         elif flow.model.task_type == "segmentation":
             return PostProcessSegmentation(flow)
+        elif (flow.model.task_type == 'licence_plate_recognition'):
+            return PostProcessLPR(flow)
 
 
 class PostProcessClassification(PostProcess):
@@ -253,6 +255,170 @@ class PostProcessDetection(PostProcess):
 
         return frame
 
+class PostProcessLPR(PostProcess):
+    def __init__(self, flow):
+        super().__init__(flow)
+
+    def __call__(self, img, results):
+        """
+        Post process function for License Plate Recognition
+        Args:
+            img: Input frame
+            results: output of inference
+        """
+        for i, r in enumerate(results):
+            r = np.squeeze(r)
+            if r.ndim == 1:
+                r = np.expand_dims(r, 1)
+            results[i] = r
+
+        if self.model.shuffle_indices:
+            results_reordered = []
+            for i in self.model.shuffle_indices:
+                results_reordered.append(results[i])
+            results = results_reordered
+
+        if results[-1].ndim < 2:
+            results = results[:-1]
+
+        bbox = np.concatenate(results, axis=-1)
+
+        if self.model.formatter:
+            if self.model.ignore_index == None:
+                bbox_copy = copy.deepcopy(bbox)
+            else:
+                bbox_copy = copy.deepcopy(np.delete(bbox, self.model.ignore_index, 1))
+            bbox[..., self.model.formatter["dst_indices"]] = bbox_copy[
+                ..., self.model.formatter["src_indices"]
+            ]
+
+        if not self.model.normalized_detections:
+            bbox[..., (0, 2)] /= self.model.resize[0]
+            bbox[..., (1, 3)] /= self.model.resize[1]
+
+        lp_list = self.get_lp_list(bbox, img)
+
+        lp_highest_conf = 0
+        lp_coordinates_highest_conf = 0
+        for b in bbox:
+            if b[5] > self.model.viz_threshold:
+                if self.model.label_offset == 0:
+                    class_name = self.model.classnames[int(b[4])]
+                else:
+                    class_name = self.model.classnames[self.model.label_offset[int(b[4])]]
+                img, lp_coordinates, lp_conf = self.overlay_bounding_box_lpr(img, b, class_name)
+                if lp_coordinates:
+                    if lp_conf > lp_highest_conf:
+                        lp_coordinates_highest_conf = lp_coordinates
+                        lp_highest_conf = lp_conf
+
+        if lp_list and lp_coordinates_highest_conf:
+            img = self.overlay_lp(img, lp_list, lp_coordinates_highest_conf)
+
+        if self.debug:
+            self.debug.log(self.debug_str)
+            self.debug_str = ""
+
+        return img
+
+    def get_lp_list(self, bbox, frame):
+        """
+        Get License Plate number in a list
+
+        Args:
+            frame (numpy array): Input image where the overlay should be drawn
+            bbox : Bounding box co-ordinates in format [X1 Y1 X2 Y2]
+        """
+        lp_map = {}
+
+        for b in bbox:
+            if b[5] > self.model.viz_threshold:
+                if self.model.label_offset == 0:
+                    class_name = self.model.classnames[int(b[4])]
+                else:
+                    class_name = self.model.classnames[self.model.label_offset[int(b[4])]]
+                box = [
+                    int(b[0] * frame.shape[1]),
+                    int(b[1] * frame.shape[0]),
+                    int(b[2] * frame.shape[1]),
+                    int(b[3] * frame.shape[0]),
+                ]
+
+                if class_name != 'number_plate':
+                    # Considering x cordinates of each bbox
+                    bbox_center_x = (box[0])
+                    # Making map of x-cordinate and predicated class
+                    lp_map[bbox_center_x] = (class_name)
+
+        # Sort the map based on x-cordinates with respect to virtual 2D space's origin
+        lp_map = dict(sorted(lp_map.items()))
+        lp_list = []
+        
+        for bbox in lp_map.keys():
+            lp_list.append(lp_map[bbox][0])            
+
+        return lp_list
+     
+    def overlay_bounding_box_lpr(self, frame, box, class_name):
+        """
+        draw bounding box at given co-ordinates.
+
+        Args:
+            frame (numpy array): Input image where the overlay should be drawn
+            bbox : Bounding box co-ordinates in format [X1 Y1 X2 Y2]
+            class_name : Name of the class to overlay
+        """
+        lp_conf = box[5]
+        box = [
+            int(box[0] * frame.shape[1]),
+            int(box[1] * frame.shape[0]),
+            int(box[2] * frame.shape[1]),
+            int(box[3] * frame.shape[0]),
+        ]
+        box_color = (20, 220, 20)
+        text_color = (21, 0, 10)
+        # Draw Bbox
+        cv2.rectangle(frame, (box[0], box[1]), (box[2], box[3]), box_color, 2)
+
+        if class_name == 'number_plate':
+            lp_coordinates = (box[0], box[1])
+        else:
+            lp_coordinates = 0
+
+        return frame, lp_coordinates, lp_conf
+
+    def overlay_lp(self, frame, lp_list, lp_coordinates_highest_conf):
+        """
+        draw bounding box at given co-ordinates.
+
+        Args:
+            frame (numpy array): Input image where the overlay should be drawn
+            bbox : Bounding box co-ordinates in format [X1 Y1 X2 Y2]
+            class_name : Name of the class to overlay
+        """
+
+        lp = ''
+        for c in lp_list:
+            lp += c
+
+        box_color = (20, 220, 20)
+        text_color = (0, 0, 0)
+
+        cv2.rectangle(frame, \
+            (lp_coordinates_highest_conf[0], lp_coordinates_highest_conf[1] - 50), \
+            (lp_coordinates_highest_conf[0] + 400, lp_coordinates_highest_conf[1]), \
+            box_color, \
+            -1)
+
+        cv2.putText(frame, \
+            lp, \
+            (lp_coordinates_highest_conf[0],lp_coordinates_highest_conf[1]), \
+            cv2.FONT_HERSHEY_SIMPLEX, \
+            2, \
+            text_color, \
+            5)
+
+        return frame
 
 class PostProcessSegmentation(PostProcess):
     def __call__(self, img, results):

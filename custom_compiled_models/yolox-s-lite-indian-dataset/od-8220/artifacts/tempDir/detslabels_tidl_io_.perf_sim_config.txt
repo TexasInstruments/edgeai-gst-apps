@@ -1,0 +1,15 @@
+# Size of L2 SRAM Memory in KB which can be used by TIDL, Recommended value is
+# 448KB considering that 64KB of L2 shall be configured as cache. TIDL test bench
+# configures L2 cache as 64 KB, so any value higher than 448 KB would require
+# user to change the L2 cache setting in TIDL test bench
+L2MEMSIZE_KB           = 448
+# Size of L3 (MSMC) SRAM Memory in KB which can be used by TIDL
+MSMCSIZE_KB            = 7968
+#ID for a Device, TDA4VMID = 0, TIDL_TDA4AEP = 1,  TIDL_TDA4AM = 2, TIDL_TDA4AMPlus = 3
+DEVICE_NAME            = 0
+ENABLE_PERSIT_WT_ALLOC = 1
+DDRFREQ_MHZ            = 4266
+FILENAME_NET     = /home/a0504102/model-training/edgeai-modelmaker/data/projects/alpd_250_dataset/run/20230324-115040/yolox_s_lite/compilation/TDA4VM/wk/od-8220/artifacts/tempDir/detslabels_tidl_net.bin
+FILEFORMAT_NET     = -1
+DEVICE_NAME     = 0
+OUTPUT_DIR     = /home/a0504102/model-training/edgeai-modelmaker/data/projects/alpd_250_dataset/run/20230324-115040/yolox_s_lite/compilation/TDA4VM/wk/od-8220/artifacts/tempDir/detslabels_tidl_net.bin

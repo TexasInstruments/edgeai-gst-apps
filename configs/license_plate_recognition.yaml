@@ -1,0 +1,43 @@
+title: "License Plate Recognation Demo"
+log_level: 2
+inputs:
+    input0:
+        source: /dev/video2
+        format: jpeg
+        width: 1280
+        height: 720
+        framerate: 30
+
+    input1:
+        source: /opt/edgeai-gst-apps/custom_compiled_models/indian-lp-selected/%04d.jpg
+        width: 1280
+        height: 720
+        index: 0
+        framerate: 1
+        loop: True
+models:
+    model0:
+        model_path: /opt/model_zoo/TVM-OD-5120-ssdLite-mobDet-DSP-coco-320x320
+        viz_threshold: 0.6
+
+    model1:
+        model_path: /opt/edgeai-gst-apps/custom_compiled_models/yolox-s-lite-indian-dataset/od-8220
+        viz_threshold: 0.3
+outputs:
+    output0:
+        sink: kmssink
+        width: 1920
+        height: 1080
+    output1:
+        sink: /opt/edge_ai_apps/data/output/videos/output_video0.mkv
+        width: 1920
+        height: 1080
+    output2:
+        sink: fakesink
+        width: 1280
+        height: 720
+        port: 8081
+        host: 0.0.0.0
+
+flows:
+    flow0: [input1,model1,output0,[320,180,1280,720]]

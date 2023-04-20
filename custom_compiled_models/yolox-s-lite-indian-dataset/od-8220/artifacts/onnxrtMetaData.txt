@@ -1,0 +1,7 @@
+numGraphNodes=263
+0:subGraphName=detslabels
+0:numInputs=1
+0:numOutputs=2
+0:inputIdx=0
+0:inDataNames=inputNet_IN
+0:outDataNames=labels,dets

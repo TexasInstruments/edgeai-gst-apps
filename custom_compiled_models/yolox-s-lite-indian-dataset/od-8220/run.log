@@ -1,0 +1,378 @@
+
+INFO:20230324-131017: running - od-8220
+INFO:20230324-131017: pipeline_config - {'task_type': 'detection', 'dataset_category': 'coco', 'calibration_dataset': <edgeai_benchmark.datasets.modelmaker_datasets.ModelMakerDetectionDataset object at 0x7f7117a41190>, 'input_dataset': <edgeai_benchmark.datasets.modelmaker_datasets.ModelMakerDetectionDataset object at 0x7f7166d9bed0>, 'preprocess': <edgeai_benchmark.preprocess.PreProcessTransforms object at 0x7f7166d9bf10>, 'session': <edgeai_benchmark.sessions.onnxrt_session.ONNXRTSession object at 0x7f7166d9bdd0>, 'postprocess': <edgeai_benchmark.postprocess.PostProcessTransforms object at 0x7f7117942750>, 'metric': {'label_offset_pred': 0}, 'model_info': {'metric_reference': {'accuracy_ap[.5:.95]%': None}, 'model_shortlist': 10}}
+INFO:20230324-131017: import  - od-8220 - this may take some time...yolox is meta arch name 
+yolox
+Number of OD backbone nodes = 192 
+Size of odBackboneNodeIds = 192 
+
+Preliminary subgraphs created = 1 
+Final number of subgraphs created are : 1, - Offloaded Nodes - 263, Total Nodes - 263 
+TIDL Meta PipeLine (Proto) File  : /home/a0504102/model-training/edgeai-modelmaker/data/projects/alpd_250_dataset/run/20230324-115040/yolox_s_lite/compilation/TDA4VM/wk/od-8220/model/model.prototxt  
+yolox
+yolox
+Warning : Requested Output Data Convert Layer is not Added to the network, It is currently not Optimal
+Warning : Requested Output Data Convert Layer is not Added to the network, It is currently not Optimal
+
+ ************** Frame index 1 : Running float import ************* 
+INFORMATION: [TIDL_ResizeLayer] Resize_98 Any resize ratio which is power of 2 and greater than 4 will be placed by combination of 4x4 resize layer and 2x2 resize layer. For example a 8x8 resize will be replaced by 4x4 resize followed by 2x2 resize.
+INFORMATION: [TIDL_ResizeLayer] Resize_114 Any resize ratio which is power of 2 and greater than 4 will be placed by combination of 4x4 resize layer and 2x2 resize layer. For example a 8x8 resize will be replaced by 4x4 resize followed by 2x2 resize.
+****************************************************
+**          2 WARNINGS          0 ERRORS          **
+****************************************************
+The soft limit is 2048
+The hard limit is 2048
+MEM: Init ... !!!
+MEM: Init ... Done !!!
+ 0.0s:  VX_ZONE_INIT:Enabled
+ 0.3s:  VX_ZONE_ERROR:Enabled
+ 0.4s:  VX_ZONE_WARNING:Enabled
+ 0.2100s:  VX_ZONE_INIT:[tivxInit:184] Initialization Done !!!
+
+**********  Frame Index 1 : Running float inference **********
+
+**********  Frame Index 2 : Running float inference **********
+
+**********  Frame Index 3 : Running float inference **********
+
+**********  Frame Index 4 : Running float inference **********
+
+**********  Frame Index 5 : Running float inference **********
+
+**********  Frame Index 6 : Running float inference **********
+
+**********  Frame Index 7 : Running float inference **********
+
+**********  Frame Index 8 : Running float inference **********
+
+**********  Frame Index 9 : Running float inference **********
+
+**********  Frame Index 10 : Running fixed point mode for calibration **********
+
+~~~~~Running TIDL in PC emulation mode to collect Activations range for each layer~~~~~
+
+Processing config file #0 : /home/a0504102/model-training/edgeai-modelmaker/data/projects/alpd_250_dataset/run/20230324-115040/yolox_s_lite/compilation/TDA4VM/wk/od-8220/artifacts/tempDir/detslabels_tidl_io_.qunat_stats_config.txt 
+ Freeing memory for user provided Net
+ ----------------------- TIDL Process with REF_ONLY FLOW ------------------------
+
+#    0 . .. T   44693.56  .... ..... ... .... .....
+#    1 . .. T   44462.58  .... ..... ... .... .....
+#    2 . .. T   44734.29  .... ..... ... .... .....
+#    3 . .. T   44979.33  .... ..... ... .... .....
+#    4 . .. T   45153.31  .... ..... ... .... .....
+#    5 . .. T   45113.46  .... ..... ... .... .....
+#    6 . .. T   44664.80  .... ..... ... .... .....
+#    7 . .. T   44509.39  .... ..... ... .... .....
+#    8 . .. T   44543.37  .... ..... ... .... .....
+#    9 . .. T   44608.66  .... ..... ... .... .....
+~~~~~Running TIDL in PC emulation mode to collect Activations range for each layer~~~~~
+
+Processing config file #0 : /home/a0504102/model-training/edgeai-modelmaker/data/projects/alpd_250_dataset/run/20230324-115040/yolox_s_lite/compilation/TDA4VM/wk/od-8220/artifacts/tempDir/detslabels_tidl_io_.qunat_stats_config.txt 
+ Freeing memory for user provided Net
+ ----------------------- TIDL Process with REF_ONLY FLOW ------------------------
+
+#    0 . .. T   27080.15  .... ..... ... .... .....
+#    1 . .. T   27166.85  .... ..... ... .... .....
+#    2 . .. T   26997.84  .... ..... ... .... .....
+#    3 . .. T   27196.20  .... ..... ... .... .....
+#    4 . .. T   27250.74  .... ..... ... .... .....
+#    5 . .. T   27276.75  .... ..... ... .... .....
+#    6 . .. T   27088.52  .... ..... ... .... .....
+#    7 . .. T   27047.35  .... ..... ... .... .....
+#    8 . .. T   27652.64  .... ..... ... .... .....
+#    9 . .. T   27865.86  .... ..... ... .... .....
+ 
+ 
+ *****************   Calibration iteration number 0 completed ************************ 
+ 
+ 
+ 
+
+~~~~~Running TIDL in PC emulation mode to collect Activations range for each layer~~~~~
+
+Processing config file #0 : /home/a0504102/model-training/edgeai-modelmaker/data/projects/alpd_250_dataset/run/20230324-115040/yolox_s_lite/compilation/TDA4VM/wk/od-8220/artifacts/tempDir/detslabels_tidl_io_.qunat_stats_config.txt 
+ Freeing memory for user provided Net
+ ----------------------- TIDL Process with REF_ONLY FLOW ------------------------
+
+#    0 . .. T   27506.05  .... ..... ... .... .....
+#    1 . .. T   27848.32  .... ..... ... .... .....
+#    2 . .. T   27097.08  .... ..... ... .... .....
+#    3 . .. T   27010.35  .... ..... ... .... .....
+#    4 . .. T   27008.72  .... ..... ... .... .....
+#    5 . .. T   26960.52  .... ..... ... .... .....
+#    6 . .. T   26998.00  .... ..... ... .... .....
+#    7 . .. T   26974.83  .... ..... ... .... .....
+#    8 . .. T   26945.93  .... ..... ... .... .....
+#    9 . .. T   26931.80  .... ..... ... .... .....
+ 
+ 
+ *****************   Calibration iteration number 1 completed ************************ 
+ 
+ 
+ 
+
+~~~~~Running TIDL in PC emulation mode to collect Activations range for each layer~~~~~
+
+Processing config file #0 : /home/a0504102/model-training/edgeai-modelmaker/data/projects/alpd_250_dataset/run/20230324-115040/yolox_s_lite/compilation/TDA4VM/wk/od-8220/artifacts/tempDir/detslabels_tidl_io_.qunat_stats_config.txt 
+ Freeing memory for user provided Net
+ ----------------------- TIDL Process with REF_ONLY FLOW ------------------------
+
+#    0 . .. T   26950.12  .... ..... ... .... .....
+#    1 . .. T   27333.22  .... ..... ... .... .....
+#    2 . .. T   27055.96  .... ..... ... .... .....
+#    3 . .. T   27199.78  .... ..... ... .... .....
+#    4 . .. T   27053.58  .... ..... ... .... .....
+#    5 . .. T   27128.19  .... ..... ... .... .....
+#    6 . .. T   27008.20  .... ..... ... .... .....
+#    7 . .. T   27318.77  .... ..... ... .... .....
+#    8 . .. T   27152.50  .... ..... ... .... .....
+#    9 . .. T   27143.23  .... ..... ... .... .....
+ 
+ 
+ *****************   Calibration iteration number 2 completed ************************ 
+ 
+ 
+ 
+
+~~~~~Running TIDL in PC emulation mode to collect Activations range for each layer~~~~~
+
+Processing config file #0 : /home/a0504102/model-training/edgeai-modelmaker/data/projects/alpd_250_dataset/run/20230324-115040/yolox_s_lite/compilation/TDA4VM/wk/od-8220/artifacts/tempDir/detslabels_tidl_io_.qunat_stats_config.txt 
+ Freeing memory for user provided Net
+ ----------------------- TIDL Process with REF_ONLY FLOW ------------------------
+
+#    0 . .. T   26909.49  .... ..... ... .... .....
+#    1 . .. T   27129.70  .... ..... ... .... .....
+#    2 . .. T   26986.81  .... ..... ... .... .....
+#    3 . .. T   27057.13  .... ..... ... .... .....
+#    4 . .. T   26990.96  .... ..... ... .... .....
+#    5 . .. T   27054.12  .... ..... ... .... .....
+#    6 . .. T   27319.09  .... ..... ... .... .....
+#    7 . .. T   27029.04  .... ..... ... .... .....
+#    8 . .. T   26986.29  .... ..... ... .... .....
+#    9 . .. T   27084.73  .... ..... ... .... .....
+ 
+ 
+ *****************   Calibration iteration number 3 completed ************************ 
+ 
+ 
+ 
+
+~~~~~Running TIDL in PC emulation mode to collect Activations range for each layer~~~~~
+
+Processing config file #0 : /home/a0504102/model-training/edgeai-modelmaker/data/projects/alpd_250_dataset/run/20230324-115040/yolox_s_lite/compilation/TDA4VM/wk/od-8220/artifacts/tempDir/detslabels_tidl_io_.qunat_stats_config.txt 
+ Freeing memory for user provided Net
+ ----------------------- TIDL Process with REF_ONLY FLOW ------------------------
+
+#    0 . .. T   26941.05  .... ..... ... .... .....
+#    1 . .. T   27024.52  .... ..... ... .... .....
+#    2 . .. T   27098.39  .... ..... ... .... .....
+#    3 . .. T   27342.37  .... ..... ... .... .....
+#    4 . .. T   27266.94  .... ..... ... .... .....
+#    5 . .. T   27026.46  .... ..... ... .... .....
+#    6 . .. T   26979.00  .... ..... ... .... .....
+#    7 . .. T   26991.70  .... ..... ... .... .....
+#    8 . .. T   26933.29  .... ..... ... .... .....
+#    9 . .. T   26996.28  .... ..... ... .... .....
+ 
+ 
+ *****************   Calibration iteration number 4 completed ************************ 
+ 
+ 
+ 
+
+~~~~~Running TIDL in PC emulation mode to collect Activations range for each layer~~~~~
+
+Processing config file #0 : /home/a0504102/model-training/edgeai-modelmaker/data/projects/alpd_250_dataset/run/20230324-115040/yolox_s_lite/compilation/TDA4VM/wk/od-8220/artifacts/tempDir/detslabels_tidl_io_.qunat_stats_config.txt 
+ Freeing memory for user provided Net
+ ----------------------- TIDL Process with REF_ONLY FLOW ------------------------
+
+#    0 . .. T   27084.79  .... ..... ... .... .....
+#    1 . .. T   27011.61  .... ..... ... .... .....
+#    2 . .. T   27081.09  .... ..... ... .... .....
+#    3 . .. T   26994.65  .... ..... ... .... .....
+#    4 . .. T   27133.35  .... ..... ... .... .....
+#    5 . .. T   27021.21  .... ..... ... .... .....
+#    6 . .. T   27047.32  .... ..... ... .... .....
+#    7 . .. T   27021.88  .... ..... ... .... .....
+#    8 . .. T   27013.31  .... ..... ... .... .....
+#    9 . .. T   27026.35  .... ..... ... .... .....
+ 
+ 
+ *****************   Calibration iteration number 5 completed ************************ 
+ 
+ 
+ 
+
+~~~~~Running TIDL in PC emulation mode to collect Activations range for each layer~~~~~
+
+Processing config file #0 : /home/a0504102/model-training/edgeai-modelmaker/data/projects/alpd_250_dataset/run/20230324-115040/yolox_s_lite/compilation/TDA4VM/wk/od-8220/artifacts/tempDir/detslabels_tidl_io_.qunat_stats_config.txt 
+ Freeing memory for user provided Net
+ ----------------------- TIDL Process with REF_ONLY FLOW ------------------------
+
+#    0 . .. T   27138.90  .... ..... ... .... .....
+#    1 . .. T   26990.73  .... ..... ... .... .....
+#    2 . .. T   26972.10  .... ..... ... .... .....
+#    3 . .. T   26964.23  .... ..... ... .... .....
+#    4 . .. T   27013.43  .... ..... ... .... .....
+#    5 . .. T   26997.83  .... ..... ... .... .....
+#    6 . .. T   26969.08  .... ..... ... .... .....
+#    7 . .. T   27289.20  .... ..... ... .... .....
+#    8 . .. T   27069.65  .... ..... ... .... .....
+#    9 . .. T   27015.55  .... ..... ... .... .....
+ 
+ 
+ *****************   Calibration iteration number 6 completed ************************ 
+ 
+ 
+ 
+
+~~~~~Running TIDL in PC emulation mode to collect Activations range for each layer~~~~~
+
+Processing config file #0 : /home/a0504102/model-training/edgeai-modelmaker/data/projects/alpd_250_dataset/run/20230324-115040/yolox_s_lite/compilation/TDA4VM/wk/od-8220/artifacts/tempDir/detslabels_tidl_io_.qunat_stats_config.txt 
+ Freeing memory for user provided Net
+ ----------------------- TIDL Process with REF_ONLY FLOW ------------------------
+
+#    0 . .. T   26954.52  .... ..... ... .... .....
+#    1 . .. T   27108.81  .... ..... ... .... .....
+#    2 . .. T   26947.32  .... ..... ... .... .....
+#    3 . .. T   26949.42  .... ..... ... .... .....
+#    4 . .. T   27001.30  .... ..... ... .... .....
+#    5 . .. T   26978.97  .... ..... ... .... .....
+#    6 . .. T   26946.11  .... ..... ... .... .....
+#    7 . .. T   26987.19  .... ..... ... .... .....
+#    8 . .. T   27023.90  .... ..... ... .... .....
+#    9 . .. T   27023.81  .... ..... ... .... .....
+ 
+ 
+ *****************   Calibration iteration number 7 completed ************************ 
+ 
+ 
+ 
+
+~~~~~Running TIDL in PC emulation mode to collect Activations range for each layer~~~~~
+
+Processing config file #0 : /home/a0504102/model-training/edgeai-modelmaker/data/projects/alpd_250_dataset/run/20230324-115040/yolox_s_lite/compilation/TDA4VM/wk/od-8220/artifacts/tempDir/detslabels_tidl_io_.qunat_stats_config.txt 
+ Freeing memory for user provided Net
+ ----------------------- TIDL Process with REF_ONLY FLOW ------------------------
+
+#    0 . .. T   27078.61  .... ..... ... .... .....
+#    1 . .. T   26952.11  .... ..... ... .... .....
+#    2 . .. T   26992.80  .... ..... ... .... .....
+#    3 . .. T   26947.45  .... ..... ... .... .....
+#    4 . .. T   27030.09  .... ..... ... .... .....
+#    5 . .. T   27047.50  .... ..... ... .... .....
+#    6 . .. T   27370.23  .... ..... ... .... .....
+#    7 . .. T   27101.03  .... ..... ... .... .....
+#    8 . .. T   26981.72  .... ..... ... .... .....
+#    9 . .. T   26955.23  .... ..... ... .... .....
+ 
+ 
+ *****************   Calibration iteration number 8 completed ************************ 
+ 
+ 
+ 
+
+~~~~~Running TIDL in PC emulation mode to collect Activations range for each layer~~~~~
+
+Processing config file #0 : /home/a0504102/model-training/edgeai-modelmaker/data/projects/alpd_250_dataset/run/20230324-115040/yolox_s_lite/compilation/TDA4VM/wk/od-8220/artifacts/tempDir/detslabels_tidl_io_.qunat_stats_config.txt 
+ Freeing memory for user provided Net
+ ----------------------- TIDL Process with REF_ONLY FLOW ------------------------
+
+#    0 . .. T   27027.82  .... ..... ... .... .....
+#    1 . .. T   26998.38  .... ..... ... .... .....
+#    2 . .. T   27093.46  .... ..... ... .... .....
+#    3 . .. T   27056.66  .... ..... ... .... .....
+#    4 . .. T   26951.76  .... ..... ... .... .....
+#    5 . .. T   26938.94  .... ..... ... .... .....
+#    6 . .. T   26933.22  .... ..... ... .... .....
+#    7 . .. T   26969.91  .... ..... ... .... .....
+#    8 . .. T   26969.97  .... ..... ... .... .....
+#    9 . .. T   26910.43  .... ..... ... .... .....
+ 
+ 
+ *****************   Calibration iteration number 9 completed ************************ 
+ 
+ 
+ 
+
+------------------ Network Compiler Traces -----------------------------
+successful Memory allocation
+INFORMATION: [TIDL_ResizeLayer] Resize_98 Any resize ratio which is power of 2 and greater than 4 will be placed by combination of 4x4 resize layer and 2x2 resize layer. For example a 8x8 resize will be replaced by 4x4 resize followed by 2x2 resize.
+INFORMATION: [TIDL_ResizeLayer] Resize_114 Any resize ratio which is power of 2 and greater than 4 will be placed by combination of 4x4 resize layer and 2x2 resize layer. For example a 8x8 resize will be replaced by 4x4 resize followed by 2x2 resize.
+****************************************************
+**          2 WARNINGS          0 ERRORS          **
+****************************************************
+
+INFO:20230324-141053: import completed  - od-8220 - 3635 sec
+INFO:20230324-141053: infer  - od-8220 - this may take some time...
+infer : od-8220                                             |   0%|          || 0/51 [00:00<?, ?it/s]
+infer : od-8220                                             |          |     0% 0/51| [< ]
+infer : od-8220                                             |   2%|1         || 1/51 [00:10<08:24, 10.09s/it]
+infer : od-8220                                             |   4%|3         || 2/51 [00:20<08:12, 10.05s/it]
+infer : od-8220                                             |   8%|7         || 4/51 [00:40<07:50, 10.01s/it]
+infer : od-8220                                             |   8%|7         || 4/51 [01:00<07:50, 10.01s/it]
+infer : od-8220                                             |  12%|#1        || 6/51 [01:00<07:30, 10.01s/it]
+infer : od-8220                                             |  12%|#1        || 6/51 [01:20<07:30, 10.01s/it]
+infer : od-8220                                             |  16%|#5        || 8/51 [01:20<07:10, 10.01s/it]
+infer : od-8220                                             |  20%|#9        || 10/51 [01:40<06:49, 10.00s/it]
+infer : od-8220                                             |  24%|##3       || 12/51 [01:58<06:22,  9.81s/it]
+infer : od-8220                                             |  24%|##3       || 12/51 [02:10<06:22,  9.81s/it]
+infer : od-8220                                             |  24%|##3       || 12/51 [02:10<06:22,  9.81s/it]
+infer : od-8220                                             |  27%|##7       || 14/51 [02:17<05:58,  9.68s/it]
+infer : od-8220                                             |  27%|##7       || 14/51 [02:30<05:58,  9.68s/it]
+infer : od-8220                                             |  27%|##7       || 14/51 [02:30<05:58,  9.68s/it]
+infer : od-8220                                             |  31%|###1      || 16/51 [02:36<05:36,  9.60s/it]
+infer : od-8220                                             |  31%|###1      || 16/51 [02:50<05:36,  9.60s/it]
+infer : od-8220                                             |  31%|###1      || 16/51 [02:50<05:36,  9.60s/it]
+infer : od-8220                                             |  35%|###5      || 18/51 [02:55<05:15,  9.55s/it]
+infer : od-8220                                             |  35%|###5      || 18/51 [03:10<05:15,  9.55s/it]
+infer : od-8220                                             |  35%|###5      || 18/51 [03:10<05:15,  9.55s/it]
+infer : od-8220                                             |  39%|###9      || 20/51 [03:14<04:54,  9.51s/it]
+infer : od-8220                                             |  39%|###9      || 20/51 [03:30<04:54,  9.51s/it]
+infer : od-8220                                             |  39%|###9      || 20/51 [03:30<04:54,  9.51s/it]
+infer : od-8220                                             |  43%|####3     || 22/51 [03:33<04:35,  9.51s/it]
+infer : od-8220                                             |  43%|####3     || 22/51 [03:50<04:35,  9.51s/it]
+infer : od-8220                                             |  43%|####3     || 22/51 [03:50<04:35,  9.51s/it]
+infer : od-8220                                             |  47%|####7     || 24/51 [03:52<04:16,  9.51s/it]
+infer : od-8220                                             |  47%|####7     || 24/51 [04:10<04:16,  9.51s/it]
+infer : od-8220                                             |  47%|####7     || 24/51 [04:10<04:16,  9.51s/it]
+infer : od-8220                                             |  51%|#####     || 26/51 [04:11<03:57,  9.49s/it]
+infer : od-8220                                             |  51%|#####     || 26/51 [04:30<03:57,  9.49s/it]
+infer : od-8220                                             |  51%|#####     || 26/51 [04:30<03:57,  9.49s/it]
+infer : od-8220                                             |  55%|#####4    || 28/51 [04:30<03:37,  9.47s/it]
+infer : od-8220                                             |  59%|#####8    || 30/51 [04:49<03:18,  9.46s/it]
+infer : od-8220                                             |  59%|#####8    || 30/51 [05:00<03:18,  9.46s/it]
+infer : od-8220                                             |  59%|#####8    || 30/51 [05:00<03:18,  9.46s/it]
+infer : od-8220                                             |  63%|######2   || 32/51 [05:07<02:59,  9.46s/it]
+infer : od-8220                                             |  63%|######2   || 32/51 [05:20<02:59,  9.46s/it]
+infer : od-8220                                             |  63%|######2   || 32/51 [05:20<02:59,  9.46s/it]
+infer : od-8220                                             |  67%|######6   || 34/51 [05:26<02:40,  9.45s/it]
+infer : od-8220                                             |  67%|######6   || 34/51 [05:40<02:40,  9.45s/it]
+infer : od-8220                                             |  67%|######6   || 34/51 [05:40<02:40,  9.45s/it]
+infer : od-8220                                             |  71%|#######   || 36/51 [05:45<02:21,  9.45s/it]
+infer : od-8220                                             |  71%|#######   || 36/51 [06:00<02:21,  9.45s/it]
+infer : od-8220                                             |  71%|#######   || 36/51 [06:00<02:21,  9.45s/it]
+infer : od-8220                                             |  75%|#######4  || 38/51 [06:04<02:02,  9.44s/it]
+infer : od-8220                                             |  75%|#######4  || 38/51 [06:20<02:02,  9.44s/it]
+infer : od-8220                                             |  75%|#######4  || 38/51 [06:20<02:02,  9.44s/it]
+infer : od-8220                                             |  78%|#######8  || 40/51 [06:23<01:43,  9.44s/it]
+infer : od-8220                                             |  78%|#######8  || 40/51 [06:40<01:43,  9.44s/it]
+infer : od-8220                                             |  78%|#######8  || 40/51 [06:40<01:43,  9.44s/it]
+infer : od-8220                                             |  82%|########2 || 42/51 [06:42<01:24,  9.43s/it]
+infer : od-8220                                             |  82%|########2 || 42/51 [07:00<01:24,  9.43s/it]
+infer : od-8220                                             |  82%|########2 || 42/51 [07:00<01:24,  9.43s/it]
+infer : od-8220                                             |  86%|########6 || 44/51 [07:01<01:06,  9.43s/it]
+infer : od-8220                                             |  90%|######### || 46/51 [07:19<00:47,  9.43s/it]
+infer : od-8220                                             |  90%|######### || 46/51 [07:30<00:47,  9.43s/it]
+infer : od-8220                                             |  90%|######### || 46/51 [07:30<00:47,  9.43s/it]
+infer : od-8220                                             |  94%|#########4|| 48/51 [07:38<00:28,  9.44s/it]
+infer : od-8220                                             |  94%|#########4|| 48/51 [07:50<00:28,  9.44s/it]
+infer : od-8220                                             |  94%|#########4|| 48/51 [07:50<00:28,  9.44s/it]
+infer : od-8220                                             |  98%|#########8|| 50/51 [07:57<00:09,  9.43s/it]
+infer : od-8220                                             | 100%|##########|| 51/51 [08:07<00:00,  9.55s/it]
+
+INFO:20230324-141900: infer completed  - od-8220 - 487 sec
+
+SUCCESS:20230324-141900: benchmark results - {'infer_path': 'od-8220', 'accuracy_ap[.5:.95]%': 33.46601, 'accuracy_ap50%': 62.14363, 'num_subgraphs': 1, 'infer_time_core_ms': 9410.619534, 'infer_time_subgraph_ms': 9410.445747, 'ddr_transfer_mb': 0.0, 'perfsim_time_ms': 0.0, 'perfsim_ddr_transfer_mb': 0.0, 'perfsim_gmacs': 0.0}
+
+SUCCESS: ModelMaker - Compilation completed.

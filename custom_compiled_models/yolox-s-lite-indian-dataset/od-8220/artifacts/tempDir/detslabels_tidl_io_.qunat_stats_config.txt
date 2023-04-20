@@ -1,0 +1,13 @@
+inFileFormat    = 1
+numFrames   = 10
+postProcType   = 0
+postProcDataId   = 0
+quantRangeUpdateFactor   = -1.000000
+inData   = /home/a0504102/model-training/edgeai-modelmaker/data/projects/alpd_250_dataset/run/20230324-115040/yolox_s_lite/compilation/TDA4VM/wk/od-8220/artifacts/tempDir/detslabels_calib_raw_data.bin
+outData   = "/home/a0504102/model-training/edgeai-modelmaker/data/projects/alpd_250_dataset/run/20230324-115040/yolox_s_lite/compilation/TDA4VM/wk/od-8220/artifacts/tempDir/detslabels_tidl_io__stats_tool_out.bin"
+netBinFile     = /home/a0504102/model-training/edgeai-modelmaker/data/projects/alpd_250_dataset/run/20230324-115040/yolox_s_lite/compilation/TDA4VM/wk/od-8220/artifacts/tempDir/detslabels_tidl_net.bin
+ioConfigFile        = /home/a0504102/model-training/edgeai-modelmaker/data/projects/alpd_250_dataset/run/20230324-115040/yolox_s_lite/compilation/TDA4VM/wk/od-8220/artifacts/tempDir/detslabels_tidl_io_1.bin
+flowCtrl        = 35
+writeTraceLevel        = 0
+debugTraceLevel        = 0
+traceDumpBaseName        = "/home/a0504102/model-training/edgeai-modelmaker/data/projects/alpd_250_dataset/run/20230324-115040/yolox_s_lite/compilation/TDA4VM/wk/od-8220/artifacts/tempDir/detslabels_tidl_io_
