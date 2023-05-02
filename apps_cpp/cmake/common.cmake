@@ -125,6 +125,7 @@ include_directories(${PROJECT_SOURCE_DIR}
                     SYSTEM ${TARGET_FS}/usr/local/include
                     SYSTEM ${TARGET_FS}/usr/include/gstreamer-1.0
                     SYSTEM ${TARGET_FS}/usr/include/glib-2.0
+                    SYSTEM ${TARGET_FS}/usr/lib/glib-2.0/include
                     SYSTEM ${TARGET_FS}/usr/lib/aarch64-linux-gnu/glib-2.0/include
                     SYSTEM ${TARGET_FS}/usr/include/opencv4/
                     SYSTEM ${TARGET_FS}/usr/include/processor_sdk/vision_apps
