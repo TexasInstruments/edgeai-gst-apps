@@ -129,6 +129,7 @@ include_directories(${PROJECT_SOURCE_DIR}
                     SYSTEM ${TARGET_FS}/usr/lib/aarch64-linux-gnu/glib-2.0/include
                     SYSTEM ${TARGET_FS}/usr/include/opencv4/
                     SYSTEM ${TARGET_FS}/usr/include/processor_sdk/vision_apps
+                    SYSTEM ${TARGET_FS}/usr/include/processor_sdk/app_utils
                     SYSTEM ${TARGET_FS}/usr/include/edgeai_dl_inferer
                     SYSTEM ${DLPACK_INSTALL_DIR}/include
                     )
