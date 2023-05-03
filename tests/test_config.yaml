@@ -5,11 +5,12 @@ title: "Test Demo"
 log_level: 2
 inputs:
     input:
-        source: <source>
+        source: /opt/edgeai-test-data/videos/video_0000_h264.h264
         width: 1280
         height: 720
         framerate: 30
-        format: <format>
+        format: h264
+        loop: True
         index: 0
         subdev-id: 0
         sen-id: ""
@@ -24,9 +25,10 @@ models:
         alpha: 0.4
 outputs:
     output:
-        sink: <sink>
+        sink: kmssink
         width: 1920
         height: 1080
+        overlay-performance: True
 
 flows:
     flow0: [input,dl_model,output,[320,180,1280,720]]
