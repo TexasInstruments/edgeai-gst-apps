@@ -163,11 +163,7 @@ run_single_test() {
 
 	if [ "$parse_script" != "null" ]; then
 		cd $topdir/tests/
-        if grep -q "OPTIFLOW" <<< "$test_name"; then
-            parse_command="$parse_script $stdout"
-		else
-            parse_command="$parse_script $test_name $stdout $stderr $test_status $cpuload"
-        fi
+		parse_command="$parse_script $stdout"
 		debug "Running $BRIGHTWHITE$parse_command$NOCOLOR"
 
 		$parse_command
