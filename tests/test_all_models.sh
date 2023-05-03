@@ -31,10 +31,6 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 topdir=$EDGEAI_GST_APPS_PATH
-usb_camera=`ls /dev/v4l/by-path/*usb*video-index0 | head -1 | xargs readlink -f`
-usb_fmt=jpeg
-usb_width=1280
-usb_height=720
 
 BRIGHTWHITE='\033[0;37;1m'
 RED='\033[0;31m'
@@ -42,76 +38,69 @@ GREEN='\033[0;32m'
 NOCOLOR='\033[0m'
 
 ####################################################################################################
-
 export TEST_ENGINE_DEBUG=1
+timeout=45
 config_file="$topdir/tests/test_config.yaml"
-parse_script="$topdir/tests/parse_perf_data.py"
-timeout=120
+parse_script="$topdir/tests/parse_log_data.py"
 filter=""
+measure_cpuload="false"
 
 ####################################################################################################
 cleanup() {
 	echo
 	echo "[Ctrl-C] Killing the script..."
-	ps -eaf | grep "[g]en_performance_data.sh" | awk -F" " '{print $2}' | xargs kill -9
+	ps -eaf | grep "[t]est_all_models.sh" | awk -F" " '{print $2}' | xargs kill -9
 }
+
+####################################################################################################
+usage() {
+	echo "./test_all_models.sh --all  | --python | --cpp | --optiflow"
+	echo "./test_all_models.sh --help | -h - To display this"
+}
+
+####################################################################################################
+test_suite_array=()
+
+if [ -z "$*" ]; then
+	test_suite_array+=("OPTIFLOW-TEST" "PYTHON-TEST" "CPP-TEST");
+else
+	while [[ $# -gt 0 ]]
+	do
+	case $1 in
+		"--python")
+			test_suite_array+=("PYTHON-TEST")
+			shift
+			;;
+		"--cpp")
+			test_suite_array+=("CPP-TEST")
+			shift
+			;;
+		"--optiflow")
+			test_suite_array+=("OPTIFLOW-TEST")
+			shift
+			;;
+		"--all")
+			test_suite_array+=("OPTIFLOW-TEST" "PYTHON-TEST" "CPP-TEST")
+			shift
+			;;
+		"--help" | "-h")
+			usage
+			exit 0
+			;;
+		*)
+			echo "Inavlid argument $1"
+			usage
+			exit 1
+			;;
+	esac
+	done
+fi
+####################################################################################################
 
 # TODO: The trap is not reliable currently, need to be fixed
 trap cleanup SIGINT
 
-# Setup the source and sink in the test config YAML file
-sed -i "s@source:.*@source: $usb_camera@" $config_file
-sed -i "s@format:.*@format: $usb_fmt@" $config_file
-sed -i "1,/width:.*/s//width: $usb_width/" $config_file
-sed -i "1,/height:.*/s//height: $usb_height/" $config_file
-sed -i "s@sink:.*@sink: kmssink@" $config_file
-
-for test_suite in "PY-PERF-USBCAM" "CPP-PERF-USBCAM"; do
-	cd $(dirname $0)
-	cat > "performance_$test_suite.rst" <<- EOF
-		+----------------+-------+-----------+--------------+-----------------+------------------+----------------+-------------------+
-		| Inference type | Model | Framerate | CPU Load (%) | Total time (ms) | Pre-Process (ms) | Inference (ms) | Post-Process (ms) |
-		+================+=======+===========+==============+=================+==================+================+===================+
-	EOF
-
-	./test_engine.sh $test_suite $config_file $timeout $parse_script "$filter"
+set -x
+for test_suite in "${test_suite_array[@]}"; do
+	./test_engine.sh $test_suite $config_file $timeout $parse_script "$filter" $measure_cpuload
 done
-
-# Merge the table to show the performance of each model one after other
-# into a single table
-cat > performance.rst <<- EOF
-	+----------------+-------+-------------+-----------+--------------+----------------+------------------+
-	| Inference type | Model | Application | Framerate | CPU Load (%) |Total time (ms) | Inference (ms)   |
-	+================+=======+=============+===========+==============+================+==================+
-EOF
-
-for model_path in $(find $MODEL_ZOO_PATH -maxdepth 1 -mindepth 1 -type d | sort); do
-	model=`echo $model_path | cut -d'/' -f6`
-
-	for test_suite in "PY-PERF-USBCAM" "CPP-PERF-USBCAM"; do
-
-		if [[ "$test_suite" = "PY"* ]]; then
-			app="Python"
-		elif [[ "$test_suite" = "CPP"* ]]; then
-			app="C++"
-		else
-			echo "Invalid test_suite $test_suite"
-			exit 1
-		fi
-
-		entry=`grep $model performance_$test_suite.rst`
-		if [ "$entry" == "" ]; then
-			printf "$RED WARN: No performance data from $app app for $model $NOCOLOR\n"
-			continue
-		fi
-
-		lhs=`echo $entry | cut -d '|' -f1-3`
-		rhs=`echo $entry | cut -d '|' -f4-`
-		echo "$lhs| $app |$rhs" >> performance.rst
-		echo "+----------------+-------+-------------+-----------+-----------------+------------------+----------------+-------------------+" >> performance.rst
-		echo "+----------------+-------+-------------+-----------+--------------+----------------+------------------+----------------+-------------------+" >> performance.rst
-	done
-done
-
-#kill using following command
-#ps -eaf | grep "[g]en_performance_data.sh" | awk -F" " '{print $2}' | xargs kill -9
