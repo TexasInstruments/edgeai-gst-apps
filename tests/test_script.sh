@@ -85,8 +85,11 @@ if [[ "$test_suite" = "PY"* ]]; then
 elif [[ "$test_suite" = "CPP"* ]]; then
     test_dir="$topdir/apps_cpp/"
     app="cpp"
+elif [[ "$test_suite" = "OPTIFLOW"* ]]; then
+    test_dir="$topdir/optiflow/"
+    app="optiflow"
 else
-    echo "[PROMPT]: FAIL - Test suite should start with PY or CPP."
+    echo "[PROMPT]: FAIL - Test suite should start with PY or CPP or OPTIFLOW."
     exit 1
 fi
 if [ ! -f "$yaml" ]; then  
