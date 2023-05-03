@@ -147,11 +147,7 @@ run_single_test() {
 	fi
 
     # Run the app with the timeout and force kill the test 4 after seconds
-    if grep -q "OPTIFLOW" <<< "$test_name"; then
-        timeout -s INT -k $(($timeout + 4)) $timeout `$test_command` >> $stdout 2> $stderr
-    else
-	    timeout -s INT -k $(($timeout + 4)) $timeout $test_command >> $stdout 2> $stderr
-    fi
+	timeout -s INT -k $(($timeout + 4)) $timeout $test_command >> $stdout 2> $stderr
 	test_status=$?
 
 	if [ "$measure_cpuload" == "true" ]; then
@@ -285,7 +281,7 @@ for model_path in $(eval $searchcmd); do
 	# This way, logs will not be overwritten
 	tname="$test_suite"_"$model"
     if [[ "$test_suite" = "OPTIFLOW"* ]]; then
-        command="$test_app -t $config_file"
+        command="$test_app $config_file"
 	else
 	    command="$test_app -n -v $config_file"
     fi
