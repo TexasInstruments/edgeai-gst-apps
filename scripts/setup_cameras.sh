@@ -73,7 +73,7 @@ setup_imx390(){
         ln -snf $CAM_DEV $CAM_DEV_NAME
         ln -snf $CAM_SUBDEV $CAM_SUBDEV_NAME
 
-        echo -r "${GREEN}IMX390 Camera $i detected${NOCOLOR}"
+        echo -e "${GREEN}IMX390 Camera $i detected${NOCOLOR}"
         echo "    device = $CAM_DEV_NAME"
         echo "    name = imx390"
         echo "    format = $IMX390_CAM_FMT"

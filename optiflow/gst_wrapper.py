@@ -207,7 +207,6 @@ def get_input_str(input):
                 sen_name = "SENSOR_OV2312_UB953_LI"
                 format_msb = 9
            
-            #TODO - Take sensor name and subdev as params
             source_cmd += ' tiovxisp sensor-name=%s' % sen_name + \
                           ' dcc-isp-file=/opt/imaging/%s/dcc_viss.bin'% \
                             input.sen_id + \
@@ -216,8 +215,7 @@ def get_input_str(input):
                           ' sink_0::dcc-2a-file=/opt/imaging/%s/dcc_2a.bin' % \
                             input.sen_id
             if (input.format.startswith('rggb')):
-                source_cmd += ' sink_0::device=/dev/v4l-subdev%d' % \
-                              input.subdev_id
+                source_cmd += ' sink_0::device=%s' % input.subdev_id
             
             global isp_target_idx
             if "property" in gst_element_map["isp"]:

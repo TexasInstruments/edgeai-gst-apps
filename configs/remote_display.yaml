@@ -6,7 +6,7 @@ title: "Remote Display"
 log_level: 2
 inputs:
     input0:
-        source: /dev/video2
+        source: /dev/video-usb-cam0
         format: jpeg
         width: 1280
         height: 720

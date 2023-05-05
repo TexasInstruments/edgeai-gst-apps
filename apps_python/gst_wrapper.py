@@ -1280,8 +1280,7 @@ def get_gst_pipe(flows, outputs):
                 dcc_2a_file = "/opt/imaging/%s/dcc_2a.bin" % f.input.sen_id
                 Gst.ChildProxy.set_property(elem, "sink_0::dcc-2a-file", dcc_2a_file)
                 if not f.input.format.startswith("bggi"):
-                    device = "/dev/v4l-subdev%d" % f.input.subdev_id
-                    Gst.ChildProxy.set_property(elem, "sink_0::device", device)
+                    Gst.ChildProxy.set_property(elem, "sink_0::device", f.input.subdev_id)
 
         # Get format of last input element after caps negotiation
         input_format = get_format(gst_player, f.input.gst_inp_elements)

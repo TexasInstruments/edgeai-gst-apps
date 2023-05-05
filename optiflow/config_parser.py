@@ -72,7 +72,7 @@ class Input:
         if 'subdev-id' in input_config:
             self.subdev_id = input_config['subdev-id']
         else:
-            self.subdev_id = 2
+            self.subdev_id = "/dev/v4l-subdev2"
         if 'ldc' in input_config:
             self.ldc = input_config['ldc']
         else:
