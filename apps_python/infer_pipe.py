@@ -89,7 +89,8 @@ class InferPipe:
         """
         Waiting for exit, to be called by parent thread
         """
-        self.pipeline_thread.join()
+        while self.pipeline_thread.is_alive():
+            self.pipeline_thread.join(1)
 
     def pipeline(self):
         """
@@ -128,6 +129,5 @@ class InferPipe:
             self.gst_pipe.push_frame(out_frame, self.gst_post_out)
             # Increment frame count
             self.sub_flow.report.report_frame()
-
         self.stop_thread = False
         self.gst_pipe.send_eos(self.gst_post_out)
