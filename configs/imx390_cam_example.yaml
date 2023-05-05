@@ -6,11 +6,11 @@ inputs:
     # should be applied in uenv.txt based on the number and type of the cameras
     # connected
     input0:
-        source: /dev/video2
+        source: /dev/video-imx390-cam0
+        subdev-id: /dev/v4l-imx390-subdev0
         width: 1936
         height: 1100
         format: rggb12
-        subdev-id: 2
         framerate: 30
         sen-id: imx390
         ldc: True

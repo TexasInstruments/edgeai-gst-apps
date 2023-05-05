@@ -4,7 +4,7 @@ inputs:
     # ov5640 should be connected to MIPI connector
     # k3-j721e-sk-csi2-ov5640.dtbo should be applied in uenv.txt
     input0:
-        source: /dev/video2
+        source: /dev/video-ov5640-cam0
         width: 1280
         height: 720
         format: auto

@@ -5,11 +5,11 @@ inputs:
     # rpiV2 camera should be connected to CAM1 rpi header on SK
     # k3-j721e-sk-rpi-cam-imx219.dtbo should be applied in uenv.txt
     input0:
-        source: /dev/video2
+        source: /dev/video-rpi-cam0
+        subdev-id: /dev/v4l-rpi-subdev0
         width: 1920
         height: 1080
         format: rggb
-        subdev-id: 2
         framerate: 30
 models:
     model0:
