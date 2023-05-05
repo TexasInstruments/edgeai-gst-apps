@@ -28,7 +28,7 @@ inputs:
     #
     input0:
         # USB Camera Source
-        source: /dev/video1
+        source: /dev/video-usb-cam0
 
         # Data format supported by camera (optional)
         # Allowed values
@@ -55,8 +55,8 @@ inputs:
 
         # v4l2 device id of the sensor, need for controlling sensor parameters
         # like exposure, gain etc...
-        # Ex: 2 id device entry is /dev/v4l-subdev2
-        subdev-id: 2
+        # Ex: /dev/v4l-rpi-subdev0
+        subdev-id: /dev/v4l-rpi-subdev0
 
     input1:
         # Raw Video Source

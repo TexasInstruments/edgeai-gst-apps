@@ -136,7 +136,7 @@ InputInfo::InputInfo(const YAML::Node &node)
 
     if (node["subdev-id"])
     {
-        m_subdev_id = node["subdev-id"].as<int32_t>();
+        m_subdev_id = node["subdev-id"].as<string>();
     }
 
     if (node["ldc"])
@@ -834,8 +834,7 @@ int32_t InputInfo::getSrcPipelines(vector<GstElement *>    &srcPipelines,
             {
                 //Dont do this for bggi format i.e ov2313
                 g_value_init (&val, G_TYPE_STRING);
-                string device = "/dev/v4l-subdev"+to_string(m_subdev_id);
-                g_value_set_string (&val,device.c_str());
+                g_value_set_string (&val,m_subdev_id.c_str());
                 gst_child_proxy_set_property (GST_CHILD_PROXY(m_inputElements[i]),
                                               "sink_0::device",
                                               &val);

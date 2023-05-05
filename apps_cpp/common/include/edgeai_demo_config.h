@@ -272,7 +272,7 @@ namespace ti::edgeai::common
             string                              m_pattern{"ball"};
 
             /** v4l subdev id of sensor. */
-            int32_t                             m_subdev_id{2};
+            string                              m_subdev_id{"/dev/v4l-subdev2"};
 
             /** Frame rate. */
             string                              m_framerate{};

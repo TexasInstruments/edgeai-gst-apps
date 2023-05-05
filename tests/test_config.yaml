@@ -12,7 +12,7 @@ inputs:
         format: h264
         loop: True
         index: 0
-        subdev-id: 0
+        subdev-id: /dev/v4l-subdev2
         sen-id: ""
         ldc: False
 
