@@ -30,6 +30,9 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+GREEN='\033[0;32m'
+NOCOLOR='\033[0m'
+
 setup_imx390(){
     IMX390_CAM_FMT='[fmt:SRGGB12_1X12/1936x1100 field: none]'               
 
@@ -62,11 +65,19 @@ setup_imx390(){
         UB960_FMT_STR="${UB960_FMT_STR}${UB960_PAD}/0 -> 4/${UB960_PAD} [1]"
         CSI2RX_FMT_STR="${CSI2RX_FMT_STR}0/${UB960_PAD} -> $(($UB960_PAD+1))/0 [1]"
 
-        echo "IMX390 Camera $i detected"
-        echo "    device = "`media-ctl -d $media_id -p -e "$CSI2RX_CONTEXT_NAME" | grep video | awk '{print $4}'`
+        CAM_DEV=`media-ctl -d $media_id -p -e "$CSI2RX_CONTEXT_NAME" | grep video | awk '{print $4}'`
+        CAM_DEV_NAME=/dev/video-imx390-cam$i
+
+        CAM_SUBDEV_NAME=/dev/v4l-imx390-subdev$i
+
+        ln -snf $CAM_DEV $CAM_DEV_NAME
+        ln -snf $CAM_SUBDEV $CAM_SUBDEV_NAME
+
+        echo -r "${GREEN}IMX390 Camera $i detected${NOCOLOR}"
+        echo "    device = $CAM_DEV_NAME"
         echo "    name = imx390"
         echo "    format = $IMX390_CAM_FMT"
-        echo "    subdev_id = $CAM_SUBDEV"
+        echo "    subdev_id = $CAM_SUBDEV_NAME"
         echo "    isp_required = yes"
         echo "    ldc_required = yes"
 
@@ -127,12 +138,23 @@ setup_ov2312(){
         UB960_FMT_STR="${UB960_FMT_STR}${UB960_PAD}/0 -> 4/$(($UB960_PAD * 2)) [1], ${UB960_PAD}/1 -> 4/$(($UB960_PAD * 2  + 1)) [1]"
         CSI2RX_FMT_STR="${CSI2RX_FMT_STR}0/$(($UB960_PAD * 2)) -> $(($UB960_PAD * 2 + 1))/0 [1], 0/$(($UB960_PAD * 2 + 1)) -> $(($UB960_PAD * 2 + 2))/0 [1]"
 
-        echo "OV2312 Camera $i detected"
-        echo "    device IR = "`media-ctl -d $media_id -p -e "$CSI2RX_CONTEXT_NAME_IR" | grep video | awk '{print $4}'`
-        echo "    device RGB = "`media-ctl -d $media_id -p -e "$CSI2RX_CONTEXT_NAME_RGB" | grep video | awk '{print $4}'`
+        IR_CAM_DEV=`media-ctl -d $media_id -p -e "$CSI2RX_CONTEXT_NAME_IR" | grep video | awk '{print $4}'`
+        RGB_CAM_DEV=`media-ctl -d $media_id -p -e "$CSI2RX_CONTEXT_NAME_RGB" | grep video | awk '{print $4}'`
+        IR_CAM_DEV_NAME=/dev/video-ov2312-ir-cam$i
+        RGB_CAM_DEV_NAME=/dev/video-ov2312-rgb-cam$i
+
+        CAM_SUBDEV_NAME=/dev/v4l-ov2312-subdev$i
+
+        ln -snf $IR_CAM_DEV $IR_CAM_DEV_NAME
+        ln -snf $RGB_CAM_DEV $RGB_CAM_DEV_NAME
+        ln -snf $CAM_SUBDEV $CAM_SUBDEV_NAME
+
+        echo -e "${GREEN}OV2312 Camera $i detected${NOCOLOR}"
+        echo "    device IR = $IR_CAM_DEV_NAME"
+        echo "    device RGB = $RGB_CAM_DEV_NAME"
         echo "    name = ov2312"
         echo "    format = $OV2312_CAM_FMT"
-        echo "    subdev_id = $CAM_SUBDEV"
+        echo "    subdev_id = $CAM_SUBDEV_NAME"
         echo "    isp_required = yes"
         echo "    ldc_required = no"
 
@@ -162,6 +184,7 @@ setup_ov2312(){
 
 setup_imx219(){
     IMX219_CAM_FMT='[fmt:SRGGB8_1X8/1920x1080]'
+    count=0
     for media_id in {0..1}; do
     for name in `media-ctl -d $media_id -p | grep entity | grep imx219 | cut -d ' ' -f 5`; do
         CAM_SUBDEV=`media-ctl -d $media_id -p -e "imx219 $name" | grep v4l-subdev | awk '{print $4}'`
@@ -171,18 +194,28 @@ setup_imx219(){
         CSI2RX_NAME=`media-ctl -d $media_id -p -e "$CSI_BRIDGE_NAME" | grep "ticsi2rx\"" | cut -d "\"" -f 2`
         CSI2RX_CONTEXT_NAME="$CSI2RX_NAME context 0"
 
-        echo "CSI Camera $media_id detected"
-        echo "    device = "`media-ctl -d $media_id -p -e "$CSI2RX_CONTEXT_NAME" | grep video | awk '{print $4}'`
+        CAM_DEV=`media-ctl -d $media_id -p -e "$CSI2RX_CONTEXT_NAME" | grep video | awk '{print $4}'`
+        CAM_DEV_NAME=/dev/video-rpi-cam$count
+
+        CAM_SUBDEV_NAME=/dev/v4l-rpi-subdev$count
+
+        ln -snf $CAM_DEV $CAM_DEV_NAME
+        ln -snf $CAM_SUBDEV $CAM_SUBDEV_NAME
+
+        echo -e "${GREEN}CSI Camera $media_id detected${NOCOLOR}"
+        echo "    device = $CAM_DEV_NAME"
         echo "    name = imx219"
         echo "    format = $IMX219_CAM_FMT"
-        echo "    subdev_id = $CAM_SUBDEV"
+        echo "    subdev_id = $CAM_SUBDEV_NAME"
         echo "    isp_required = yes"
+        count=$(($count + 1))
     done
     done
 }
 
 setup_ov5640(){
     OV5640_CAM_FMT='[fmt:UYVY8_1X16/1280x720@1/30]'
+    count=0
     for media_id in {0..1}; do
     for name in `media-ctl -d $media_id -p | grep entity | grep ov5640 | cut -d ' ' -f 5`; do
         CAM_SUBDEV=`media-ctl -d $media_id -p -e "ov5640 $name" | grep v4l-subdev | awk '{print $4}'`
@@ -192,12 +225,21 @@ setup_ov5640(){
         CSI2RX_NAME=`media-ctl -d $media_id -p -e "$CSI_BRIDGE_NAME" | grep "ticsi2rx\"" | cut -d "\"" -f 2`
         CSI2RX_CONTEXT_NAME="$CSI2RX_NAME context 0"
 
-        echo "CSI Camera $media_id detected"
-        echo "    device = "`media-ctl -d $media_id -p -e "$CSI2RX_CONTEXT_NAME" | grep video | awk '{print $4}'`
+        CAM_DEV=`media-ctl -d $media_id -p -e "$CSI2RX_CONTEXT_NAME" | grep video | awk '{print $4}'`
+        CAM_DEV_NAME=/dev/video-ov5640-cam$count
+
+        CAM_SUBDEV_NAME=/dev/v4l-ov5640-subdev$count
+
+        ln -snf $CAM_DEV $CAM_DEV_NAME
+        ln -snf $CAM_SUBDEV $CAM_SUBDEV_NAME
+
+        echo -e "${GREEN}CSI Camera $media_id detected${NOCOLOR}"
+        echo "    device = $CAM_DEV_NAME"
         echo "    name = ov5640"
         echo "    format = $OV5640_CAM_FMT"
-        echo "    subdev_id = $CAM_SUBDEV"
+        echo "    subdev_id = $CAM_SUBDEV_NAME"
         echo "    isp_required = no"
+        count=$(($count + 1))
     done
     done
 }
@@ -210,8 +252,10 @@ setup_USB_camera(){
         for i in ${USB_CAM_ARR[@]}
         do
             USB_CAM_DEV=`readlink -f $i`
-            echo "USB Camera $count detected"
-            echo "    device = "$USB_CAM_DEV
+            USB_CAM_NAME=/dev/video-usb-cam$count
+            ln -snf $USB_CAM_DEV $USB_CAM_NAME
+            echo -e "${GREEN}USB Camera $count detected${NOCOLOR}"
+            echo "    device = $USB_CAM_NAME"
             echo "    format = jpeg"
             count=$(($count + 1))
         done
