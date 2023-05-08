@@ -33,14 +33,57 @@
 GREEN='\033[0;32m'
 NOCOLOR='\033[0m'
 
+
+declare -A ALL_UB960_FMT_STR
+declare -A ALL_CSI2RX_FMT_STR
+
+setup_routes(){
+
+    OV2312_CAM_FMT='[fmt:SBGGI10_1X10/1600x1300 field: none]'
+    IMX390_CAM_FMT='[fmt:SRGGB12_1X12/1936x1100 field: none]'
+
+    for i in "${!ALL_UB960_FMT_STR[@]}"
+    do
+        id="$(cut -d',' -f1 <<<"$i")"
+        name="$(cut -d',' -f2 <<<"$i")"
+        # UB960 ROUTING & FORMATS
+        media-ctl -d $id -R "'$name' [${ALL_UB960_FMT_STR[$i]}]"
+
+        for name in `media-ctl -d $id -p | grep entity | grep ov2312 | cut -d ' ' -f 5`; do
+            UB953_NAME=`media-ctl -d $id -p -e "ov2312 $name" | grep ub953 | cut -d "\"" -f 2`
+            UB960_NAME=`media-ctl -d $id -p -e "$UB953_NAME" | grep ub960 | cut -d "\"" -f 2`
+            UB960_PAD=`media-ctl -d $id -p -e "$UB953_NAME" | grep ub960 | cut -d : -f 2 | awk '{print $1}'`
+            media-ctl -d $id -V "'$UB960_NAME':$UB960_PAD/0 $OV2312_CAM_FMT"
+            media-ctl -d $id -V "'$UB960_NAME':$UB960_PAD/1 $OV2312_CAM_FMT"
+        done
+
+        for name in `media-ctl -d $id -p | grep entity | grep imx390 | cut -d ' ' -f 5`; do
+            UB953_NAME=`media-ctl -d $id -p -e "imx390 $name" | grep ub953 | cut -d "\"" -f 2`
+            UB960_NAME=`media-ctl -d $id -p -e "$UB953_NAME" | grep ub960 | cut -d "\"" -f 2`
+            UB960_PAD=`media-ctl -d $id -p -e "$UB953_NAME" | grep ub960 | cut -d : -f 2 | awk '{print $1}'`
+            media-ctl -d $id -V "'$UB960_NAME':$UB960_PAD $IMX390_CAM_FMT"
+        done
+
+    done
+
+    # CSI2RX ROUTING
+    for i in "${!ALL_CSI2RX_FMT_STR[@]}"
+    do
+        id="$(cut -d',' -f1 <<<"$i")"
+        name="$(cut -d',' -f2 <<<"$i")"
+        media-ctl -d $id -R "'$name' [${ALL_CSI2RX_FMT_STR[$i]}]"
+    done
+
+}
+
 setup_imx390(){
     IMX390_CAM_FMT='[fmt:SRGGB12_1X12/1936x1100 field: none]'               
 
     i=0
     for media_id in {0..1}; do
     # UB953 FORMATS
-    UB960_FMT_STR="["
-    CSI2RX_FMT_STR="["
+    UB960_FMT_STR=""
+    CSI2RX_FMT_STR=""
     for name in `media-ctl -d $media_id -p | grep entity | grep imx390 | cut -d ' ' -f 5`; do
 
         CAM_SUBDEV=`media-ctl -d $media_id -p -e "imx390 $name" | grep v4l-subdev | awk '{print $4}'`
@@ -56,15 +99,32 @@ setup_imx390(){
 
         CSI2RX_NAME=`media-ctl -d $media_id -p -e "$CSI_BRIDGE_NAME" | grep "ticsi2rx\"" | cut -d "\"" -f 2`
 
-        CSI2RX_CONTEXT_NAME="$CSI2RX_NAME context $UB960_PAD"
-
-        if [ "$UB960_FMT_STR" != "[" ]; then
-                UB960_FMT_STR="${UB960_FMT_STR}, "
-                CSI2RX_FMT_STR="${CSI2RX_FMT_STR}, "
+        LAST_PAD=`echo ${ALL_UB960_FMT_STR[$media_id,$UB960_NAME]} | rev | cut -d'/' -f 1 | rev`
+        LAST_PAD=${LAST_PAD:0:1}
+        if [[ "$LAST_PAD" == "" ]] ; then
+            NEXT_PAD=$UB960_PAD
+        else
+            NEXT_PAD=$(($LAST_PAD+1))
         fi
-        UB960_FMT_STR="${UB960_FMT_STR}${UB960_PAD}/0 -> 4/${UB960_PAD} [1]"
-        CSI2RX_FMT_STR="${CSI2RX_FMT_STR}0/${UB960_PAD} -> $(($UB960_PAD+1))/0 [1]"
 
+        CSI2RX_CONTEXT_NAME="$CSI2RX_NAME context $NEXT_PAD"
+
+        UB960_FMT_STR="${UB960_PAD}/0 -> 4/$(($NEXT_PAD)) [1]"
+        CSI2RX_FMT_STR="0/${NEXT_PAD} -> $(($NEXT_PAD+1))/0 [1]"
+
+        # Append UB960 Routes
+        if [[ -v "ALL_UB960_FMT_STR[$media_id,$UB960_NAME]" ]] ; then
+            ALL_UB960_FMT_STR[$media_id,$UB960_NAME]="${ALL_UB960_FMT_STR[$media_id,$UB960_NAME]}, $UB960_FMT_STR"
+        else
+            ALL_UB960_FMT_STR[$media_id,$UB960_NAME]="$UB960_FMT_STR"
+        fi
+
+        # Append CSIRX Routes
+        if [[ -v "ALL_CSI2RX_FMT_STR[$media_id,$CSI2RX_NAME]" ]] ; then
+            ALL_CSI2RX_FMT_STR[$media_id,$CSI2RX_NAME]="${ALL_CSI2RX_FMT_STR[$media_id,$CSI2RX_NAME]}, $CSI2RX_FMT_STR"
+        else
+            ALL_CSI2RX_FMT_STR[$media_id,$CSI2RX_NAME]="$CSI2RX_FMT_STR"
+        fi
         CAM_DEV=`media-ctl -d $media_id -p -e "$CSI2RX_CONTEXT_NAME" | grep video | awk '{print $4}'`
         CAM_DEV_NAME=/dev/video-imx390-cam$i
 
@@ -83,24 +143,6 @@ setup_imx390(){
 
         ((i++))
     done
-
-    UB960_FMT_STR="${UB960_FMT_STR}]"
-    CSI2RX_FMT_STR="${CSI2RX_FMT_STR}]"
-
-    media-ctl -d $media_id -p | grep entity | grep imx390 -q
-    if [ "$?" == "0" ]; then
-    # UB960 ROUTING & FORMATS
-    media-ctl -d $media_id -R "'$UB960_NAME' $UB960_FMT_STR"
-    for name in `media-ctl -d $media_id -p | grep entity | grep imx390 | cut -d ' ' -f 5`; do
-        UB953_NAME=`media-ctl -d $media_id -p -e "imx390 $name" | grep ub953 | cut -d "\"" -f 2`
-        UB960_NAME=`media-ctl -d $media_id -p -e "$UB953_NAME" | grep ub960 | cut -d "\"" -f 2`
-        UB960_PAD=`media-ctl -d $media_id -p -e "$UB953_NAME" | grep ub960 | cut -d : -f 2 | awk '{print $1}'`
-        media-ctl -d $media_id -V "'$UB960_NAME':$UB960_PAD $IMX390_CAM_FMT"
-    done
-
-    # CSI2RX ROUTING
-    media-ctl -d $media_id -R "'$CSI2RX_NAME' $CSI2RX_FMT_STR"
-    fi
     done
 }
 
@@ -110,8 +152,8 @@ setup_ov2312(){
     i=0
     for media_id in {0..1}; do
     # UB953 FORMATS
-    UB960_FMT_STR="["
-    CSI2RX_FMT_STR="["
+    UB960_FMT_STR=""
+    CSI2RX_FMT_STR=""
     for name in `media-ctl -d $media_id -p | grep entity | grep ov2312 | cut -d ' ' -f 5`; do
 
         CAM_SUBDEV=`media-ctl -d $media_id -p -e "ov2312 $name" | grep v4l-subdev | awk '{print $4}'`
@@ -131,12 +173,21 @@ setup_ov2312(){
         CSI2RX_CONTEXT_NAME_IR="$CSI2RX_NAME context $(($UB960_PAD*2))"
         CSI2RX_CONTEXT_NAME_RGB="$CSI2RX_NAME context $(($UB960_PAD*2 + 1))"
 
-        if [ "$UB960_FMT_STR" != "[" ]; then
-                UB960_FMT_STR="${UB960_FMT_STR}, "
-                CSI2RX_FMT_STR="${CSI2RX_FMT_STR}, "
+        UB960_FMT_STR="${UB960_PAD}/0 -> 4/$(($UB960_PAD * 2)) [1], ${UB960_PAD}/1 -> 4/$(($UB960_PAD * 2  + 1)) [1]"
+        CSI2RX_FMT_STR="0/$(($UB960_PAD * 2)) -> $(($UB960_PAD * 2 + 1))/0 [1], 0/$(($UB960_PAD * 2 + 1)) -> $(($UB960_PAD * 2 + 2))/0 [1]"
+
+        # Append UB960 Routes
+        if [[ -v "ALL_UB960_FMT_STR[$media_id,$UB960_NAME]" ]] ; then
+            ALL_UB960_FMT_STR[$media_id,$UB960_NAME]="${ALL_UB960_FMT_STR[$media_id,$UB960_NAME]}, $UB960_FMT_STR"
+        else
+            ALL_UB960_FMT_STR[$media_id,$UB960_NAME]="$UB960_FMT_STR"
         fi
-        UB960_FMT_STR="${UB960_FMT_STR}${UB960_PAD}/0 -> 4/$(($UB960_PAD * 2)) [1], ${UB960_PAD}/1 -> 4/$(($UB960_PAD * 2  + 1)) [1]"
-        CSI2RX_FMT_STR="${CSI2RX_FMT_STR}0/$(($UB960_PAD * 2)) -> $(($UB960_PAD * 2 + 1))/0 [1], 0/$(($UB960_PAD * 2 + 1)) -> $(($UB960_PAD * 2 + 2))/0 [1]"
+        # Append CSIRX Routes
+        if [[ -v "ALL_CSI2RX_FMT_STR[$media_id,$CSI2RX_NAME]" ]] ; then
+            ALL_CSI2RX_FMT_STR[$media_id,$CSI2RX_NAME]="${ALL_CSI2RX_FMT_STR[$media_id,$CSI2RX_NAME]}, $CSI2RX_FMT_STR"
+        else
+            ALL_CSI2RX_FMT_STR[$media_id,$CSI2RX_NAME]="$CSI2RX_FMT_STR"
+        fi
 
         IR_CAM_DEV=`media-ctl -d $media_id -p -e "$CSI2RX_CONTEXT_NAME_IR" | grep video | awk '{print $4}'`
         RGB_CAM_DEV=`media-ctl -d $media_id -p -e "$CSI2RX_CONTEXT_NAME_RGB" | grep video | awk '{print $4}'`
@@ -160,25 +211,6 @@ setup_ov2312(){
 
         ((i++))
     done
-
-    UB960_FMT_STR="${UB960_FMT_STR}]"
-    CSI2RX_FMT_STR="${CSI2RX_FMT_STR}]"
-
-    media-ctl -d $media_id -p | grep entity | grep ov2312 -q
-    if [ "$?" == "0" ]; then
-    # UB960 ROUTING & FORMATS
-    media-ctl -d $media_id -R "'$UB960_NAME' $UB960_FMT_STR"
-    for name in `media-ctl -d $media_id -p | grep entity | grep ov2312 | cut -d ' ' -f 5`; do
-        UB953_NAME=`media-ctl -d $media_id -p -e "ov2312 $name" | grep ub953 | cut -d "\"" -f 2`
-        UB960_NAME=`media-ctl -d $media_id -p -e "$UB953_NAME" | grep ub960 | cut -d "\"" -f 2`
-        UB960_PAD=`media-ctl -d $media_id -p -e "$UB953_NAME" | grep ub960 | cut -d : -f 2 | awk '{print $1}'`
-        media-ctl -d $media_id -V "'$UB960_NAME':$UB960_PAD/0 $OV2312_CAM_FMT"
-        media-ctl -d $media_id -V "'$UB960_NAME':$UB960_PAD/1 $OV2312_CAM_FMT"
-    done
-
-    # CSI2RX ROUTING
-    media-ctl -d $media_id -R "'$CSI2RX_NAME' $CSI2RX_FMT_STR"
-    fi
     done
 }
 
@@ -265,5 +297,6 @@ setup_USB_camera(){
 setup_USB_camera
 setup_imx219
 setup_ov5640
-setup_imx390
 setup_ov2312
+setup_imx390
+setup_routes
