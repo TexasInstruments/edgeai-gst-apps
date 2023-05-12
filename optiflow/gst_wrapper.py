@@ -304,17 +304,30 @@ def get_input_str(input):
                           ' ! video/x-raw, format=NV12 ! '
     return source_cmd
 
-def get_input_split_str(input):
+def get_input_split_str(input,flow):
     if gst_element_map["scaler"]["element"] == "tiovxmultiscaler":
+        crop_startx = (((flow.model.resize[0] - flow.model.crop[0])/2)/flow.model.resize[0]) * flow.input.width
+        crop_startx = int(crop_startx)
+        crop_starty = (((flow.model.resize[1] - flow.model.crop[1])/2)/flow.model.resize[1]) * flow.input.height
+        crop_starty = int(crop_starty)
+        crop_width = flow.input.width - (2*crop_startx)
+        crop_height = flow.input.height - (2*crop_starty)
+        src_pad = ((input.splits -1) % 4) // 2
+        if input.splits % 2 == 0:
+            input.roi_string += " src_%d::roi-startx=%d" % (src_pad,crop_startx)
+            input.roi_string += " src_%d::roi-starty=%d" % (src_pad,crop_starty)
+            input.roi_string += " src_%d::roi-width=%d" % (src_pad,crop_width)
+            input.roi_string += " src_%d::roi-height=%d" % (src_pad,crop_height)
+
         if input.split_count == 1:
             source_cmd = 'tiovxmultiscaler name=split_%d%d \\\n' % \
-                                                    (input.id, input.split_count)
+                                                   (input.id, input.split_count)
         else:
             source_cmd = 'tee name=tee_split%d \\\n' % input.id
             for i in range(input.split_count):
                 source_cmd += \
                     'tee_split%d. ! queue ! tiovxmultiscaler name=split_%d%d \\\n' % \
-                                                        (input.id, input.id, i+1)
+                                                       (input.id, input.id, i+1)
     else:
         source_cmd = 'tee name=tee_split%d \\\n' % input.id
 
@@ -411,53 +424,61 @@ def get_pre_proc_str(flow):
     cmd = ''
 
     resize = flow.model.resize
+    crop = flow.model.crop
 
-    if (flow.model.task_type == 'classification'):
-        cam_dims = (flow.input.width, flow.input.height)
-        #tiovxmultiscaler dosen't support odd resolutions
-        if (gst_element_map["scaler"]["element"] == "tiovxmultiscaler"):
-            resize = (((cam_dims[0]*flow.model.resize[0]//min(cam_dims)) >> 1) << 1, \
-                      ((cam_dims[1]*flow.model.resize[0]//min(cam_dims)) >> 1) << 1)
+    crop_startx = (((resize[0] - crop[0])/2)/resize[0]) * flow.input.width
+    crop_startx = int(crop_startx)
+    crop_starty = (((resize[1] - crop[1])/2)/resize[1]) * flow.input.height
+    crop_starty = int(crop_starty)
+    crop_width = flow.input.width - (2*crop_startx)
+    crop_height = flow.input.height - (2*crop_starty)
+
 
     if (gst_element_map["scaler"]["element"] == "tiovxmultiscaler"):
         #tiovxmultiscaler dose not support upscaling and downscaling with scaling
         #factor < 1/4, So use "videoscale" insted
-        if (float(flow.input.width)/resize[0] > 4 or \
-                                            float(flow.input.height)/resize[1] > 4):
-            width = (flow.input.width + resize[0]) // 2
-            height = (flow.input.height + resize[1]) // 2
+        if (float(crop_width)/crop[0] > 4 or \
+                                            float(crop_height)/crop[0] > 4):
+            width = (crop_width + crop[0]) // 2
+            height = (crop_height + crop[1]) // 2
             if width % 2 != 0:
                 width += 1
             if height % 2 != 0:
                 height += 1     
             cmd += 'video/x-raw, width=%d, height=%d ! tiovxmultiscaler target=1 ! ' % \
-                                                                    (width,height)
-        
-    
-        elif (flow.input.width/resize[0] < 1 or flow.input.height/resize[1] < 1):
-            cmd += 'video/x-raw, width=%d, height=%d ! videoscale ! ' % \
-                                        (flow.input.width, flow.input.height)
+                                                                  (width,height)
 
-        cmd += 'video/x-raw, width=%d, height=%d ! ' % tuple(resize)
+        elif (crop_width/crop[0] < 1 or crop_height/crop[1] < 1):
+            cmd += 'video/x-raw, width=%d, height=%d ! videoscale ! ' % \
+                                                       (crop_width, crop_height)
+
+        cmd += 'video/x-raw, width=%d, height=%d ! ' % tuple(crop)
     
+    elif (gst_element_map["scaler"]["element"] == "tiscaler"):
+        roi_string = ' roi-startx=%d roi-starty=%d roi-width=%d roi-height=%d' % \
+                                (crop_startx,crop_starty,crop_width,crop_height)
+
+        cmd += gst_element_map["scaler"]["element"] + '%s ! ' % roi_string
+        cmd += 'video/x-raw, width=%d, height=%d ! ' % tuple(crop)
+
     else:
         cmd += gst_element_map["scaler"]["element"] + \
                ' ! video/x-raw, width=%d, height=%d ! ' % tuple(resize)
-    
-    if (flow.model.task_type == 'classification'):
-        cmd += gst_element_map["dlcolorconvert"]["element"]
-        if "property" in gst_element_map["dlcolorconvert"]:
-            if "out-pool-size" in gst_element_map["dlcolorconvert"]["property"]:
-                cmd += ' out-pool-size=%d' % gst_element_map["dlcolorconvert"]["property"]["out-pool-size"]
-        
-        cmd += ' ! video/x-raw, format=RGB ! '
-        
-        left = (resize[0] - flow.model.crop[0])//2
-        right = resize[0] - flow.model.crop[0] - left
-        top = (resize[1] - flow.model.crop[1])//2
-        bottom = resize[1] - flow.model.crop[1] - top
-        cmd += 'videobox left=%d right=%d top=%d bottom=%d ! ' % \
-                                                      (left, right, top, bottom)
+
+        if (flow.model.task_type == 'classification'):
+            cmd += gst_element_map["dlcolorconvert"]["element"]
+            if "property" in gst_element_map["dlcolorconvert"]:
+                if "out-pool-size" in gst_element_map["dlcolorconvert"]["property"]:
+                    cmd += ' out-pool-size=%d' % gst_element_map["dlcolorconvert"]["property"]["out-pool-size"]
+
+            cmd += ' ! video/x-raw, format=RGB ! '
+
+            left = (resize[0] - flow.model.crop[0])//2
+            right = resize[0] - flow.model.crop[0] - left
+            top = (resize[1] - flow.model.crop[1])//2
+            bottom = resize[1] - flow.model.crop[1] - top
+            cmd += 'videobox left=%d right=%d top=%d bottom=%d ! ' % \
+                                                        (left, right, top, bottom)
 
     if not gst_element_map["dlpreproc"]:
         print("[ERROR] Need dlpreproc element for end-to-end pipeline")
@@ -479,7 +500,8 @@ def get_pre_proc_str(flow):
 
     cmd += '! application/x-tensor-tiovx ! '
 
-    split_name = flow.input.get_split_name()
+    split_name = flow.input.get_split_name(flow)
+
     if (gst_element_map["scaler"]["element"] != "tiovxmultiscaler"):
         split_name = "tee_split%d" % (flow.input.id)
 
@@ -499,7 +521,7 @@ def get_sensor_str(flow):
     Args:
         flow: flow configuration
     """
-    split_name = flow.input.get_split_name()
+    split_name = flow.input.get_split_name(flow)
     if (gst_element_map["scaler"]["element"] != "tiovxmultiscaler"):
         split_name = "tee_split%d" % (flow.input.id)
 
@@ -534,6 +556,14 @@ def get_gst_str(flows, outputs):
         if (f.input.input_format != "NV12"):
             src_str += gst_element_map["dlcolorconvert"]["element"] + \
                        " ! video/x-raw,format=NV12 ! "
+
+        if len(f.input.roi_strings) != f.input.split_count:
+            f.input.roi_strings.append(f.input.roi_string)
+        for i,roi_str in enumerate(f.input.roi_strings):
+            actual_string = "tiovxmultiscaler name=split_%d%d" %  (f.input.id,(i+1))
+            replacement_string = actual_string + roi_str
+            f.input.gst_split_str = f.input.gst_split_str.replace(actual_string,replacement_string)
+
         mosaic = True
         for s in f.sub_flows:
             if not s.output.mosaic:
@@ -551,7 +581,7 @@ def get_gst_str(flows, outputs):
                 #Increase Post Proce Sink Pool size
                 pass
 
-        src_str += '\\\n' + f.input.gst_split_str
+        src_str += '\\\n' + f.input.gst_split_str + '\\\n'
 
         for s in f.sub_flows:
             src_str += s.gst_pre_proc_str + '\\\n'
