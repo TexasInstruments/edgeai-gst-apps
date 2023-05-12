@@ -85,15 +85,21 @@ class Input:
         Input.count += 1
         self.split_count = 0
         self.splits = 0
+        self.roi_strings = []
+        self.roi_string = ''
         self.gst_str = gst_wrapper.get_input_str(self)
         self.input_format = utils.get_format(self.gst_str)
 
-    def get_split_name(self):
+    def get_split_name(self,flow):
+        if self.splits % 4 == 0:
+            if self.roi_string != '':
+                self.roi_strings.append(self.roi_string)
+            self.roi_string = ''
         self.splits += 1
         self.split_count = int(self.splits/4)
         if self.splits % 4:
             self.split_count += 1
-        self.gst_split_str = gst_wrapper.get_input_split_str(self)
+        self.gst_split_str = gst_wrapper.get_input_split_str(self,flow)
         return 'split_%d%d' % (self.id, self.split_count)
 
 class Output:
