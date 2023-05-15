@@ -7,20 +7,6 @@ inputs:
         width: 1280
         height: 720
         framerate: 30
-    input1:
-        source: /opt/edgeai-test-data/videos/video_0001_h264.h264
-        format: h264
-        width: 1280
-        height: 720
-        framerate: 30
-        loop: True
-    input2:
-        source: /opt/edgeai-test-data/images/%04d.jpg
-        width: 1280
-        height: 720
-        index: 0
-        framerate: 1
-        loop: True
 models:
     model0:
         model_path: /opt/model_zoo/ONR-OD-8420-yolox-s-lite-mmdet-widerface-640x640
@@ -41,4 +27,4 @@ outputs:
         height: 1080
 
 flows:
-    flow0: [input1,model0,output0,[320,180,1280,720]]
+    flow0: [input0,model0,output0,[320,180,1280,720]]
