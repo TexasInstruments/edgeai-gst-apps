@@ -113,7 +113,7 @@ def error_in_logfile(log_file):
                     print ("[LOG-PARSE] FAIL - %s" % line)
                     exit_code = 1
                     break
-                if "Deinit" in line:
+                if arm_mode or "Deinit" in line:
                     pass_flag = True
             else:
                 if "[UTILS] " in line:
@@ -137,4 +137,10 @@ def error_in_logfile(log_file):
 parser = argparse.ArgumentParser()
 parser.add_argument('path', action='store', type=str, help='The text to parse.')
 args = parser.parse_args()
+
+soc = os.getenv("SOC")
+arm_mode = False
+if soc.lower() not in ("j721e","j721s2","j784s4","am62a"):
+    arm_mode = True
+
 error_in_logfile(args.path)
