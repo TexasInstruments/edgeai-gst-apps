@@ -97,6 +97,7 @@ class InferPipe:
         """
         while self.stop_thread == False:
             # capture and pre-process
+            t_pre_pull = time()
             input_img = self.gst_pipe.pull_tensor(
                 self.gst_pre_inp,
                 self.sub_flow.input.loop,
@@ -107,10 +108,15 @@ class InferPipe:
             )
             if type(input_img) == type(None):
                 break
+            frame = self.gst_pipe.pull_frame(self.gst_sen_inp, self.sub_flow.input.loop)
+            if type(frame) == type(None):
+                break
+            t_post_pull = time()
 
             if self.pre_proc_debug:
                 self.pre_proc_debug.log(str(input_img.flatten()))
 
+            t_preproc = time()
             # Inference
             start = time()
             result = self.run_time(input_img)
@@ -121,12 +127,23 @@ class InferPipe:
                 self.infer_debug.log(str(result))
 
             # post-process
-            frame = self.gst_pipe.pull_frame(self.gst_sen_inp, self.sub_flow.input.loop)
-            if type(frame) == type(None):
-                break
+            t1=time()
             out_frame = self.post_proc(frame, result)
+            t2=time()
             self.gst_pipe.push_frame(out_frame, self.gst_post_out)
-            # Increment frame count
+            t_push = time()
+
+            # Increment frame count and print timing info
+            if self.infer_debug:
+                print('all proc took %.2f ms' % ((t_push-t_pre_pull)*1000))
+                print('pulling tensor took %.2f ms' % ((t_post_pull-t_pre_pull)*1000))
+                print('preproc took %.2f ms' % ((t_preproc-t_post_pull)*1000))
+                print('inference took %.2f ms' % ((end-start)*1000))
+                print('postproc took %.2f ms' % ((t2-t1)*1000))
+                print('compute path took %.2f ms' % ((t2-t_post_pull)*1000))
+                print('push took %.2f ms' % ((t_push-t2)*1000))
+
+
             self.sub_flow.report.report_frame()
 
         self.stop_thread = False

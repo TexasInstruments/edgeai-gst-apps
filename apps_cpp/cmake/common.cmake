@@ -95,6 +95,7 @@ endif()
 
 link_directories(${TARGET_FS}/usr/lib/aarch64-linux-gnu
                  ${TARGET_FS}/usr/lib/
+                 ${TARGET_FS}/usr/local/lib
                  )
 
 if(USE_DLR_RT)
@@ -218,6 +219,7 @@ set(SYSTEM_LINK_LIBS ${SYSTEM_LINK_LIBS}
                      pthreadpool
                      #xnn lib
                      XNNPACK
+                     zbar
 )
 endif()
 

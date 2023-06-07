@@ -78,11 +78,6 @@ if [ "$?" -ne "0" ]; then
     exit_setup
 fi
 
-# Install streamlit
-if [ `arch` == "aarch64" ]; then
-    pip3 install streamlit --disable-pip-version-check
-fi
-
 cd $current_dir
 
 ldconfig

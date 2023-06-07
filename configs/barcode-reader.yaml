@@ -1,0 +1,70 @@
+title: "Object Detection"
+log_level: 2
+inputs:
+    input0:
+        source: /dev/video2
+        format: rggb10
+        width: 1640
+        height: 1232
+        framerate: 30
+    input1:
+        source: /opt/edgeai-test-data/videos/video_0000_h264.h264
+        format: h264
+        width: 1280
+        height: 720
+        framerate: 30
+        loop: True
+    input2:
+        source: /opt/edgeai-test-data/images/%04d.jpg
+        width: 1280
+        height: 720
+        index: 0
+        framerate: 1
+        loop: True
+    input4:
+        source: /dev/video2
+        format: rggb
+        width: 1920
+        height: 1080
+        framerate: 30
+    input5:
+        source: /dev/video2
+        format: jpeg
+        width: 1920
+        height: 1080
+        framerate: 15 
+    input6:
+        source: /dev/video2
+        format: jpeg
+        width: 1280
+        height: 720
+        framerate: 30
+models:
+    model0:
+        model_path: /opt/model_zoo/barcode-modelartifacts
+        viz_threshold: 0.5
+
+outputs:
+    output0:
+        sink: kmssink
+        width: 1920
+        height: 1080
+        overlay-performance: True
+    output1:
+        sink: /opt/edgeai-test-data/output/output_video0.mkv
+        width: 1920
+        height: 1080
+    output2:
+        sink: remote
+        width: 1280
+        height: 720
+        port: 8081
+        host: 0.0.0.0
+    output3:
+        sink: /opt/edgeai-test-data/output/output_video0.mkv
+        width: 1920
+        height: 1080
+        overlay-performance: True
+flows:
+    #flow0: [input5,model0,output0,[320,180,1280,720]]
+    flow0: [input5,model0,output0]

@@ -33,6 +33,9 @@ import numpy as np
 import copy
 import debug
 
+import time
+import zbar
+
 np.set_printoptions(threshold=np.inf, linewidth=np.inf)
 
 
@@ -161,6 +164,8 @@ class PostProcessClassification(PostProcess):
 class PostProcessDetection(PostProcess):
     def __init__(self, flow):
         super().__init__(flow)
+        self.zbar_scanner = zbar.ImageScanner()
+        self.zbar_scanner.parse_config('enable')
 
     def __call__(self, img, results):
         """
@@ -199,19 +204,57 @@ class PostProcessDetection(PostProcess):
             bbox[..., (0, 2)] /= self.model.resize[0]
             bbox[..., (1, 3)] /= self.model.resize[1]
 
-        for b in bbox:
+
+        for i,b in enumerate(bbox):
             if b[5] > self.model.viz_threshold:
+                img_copy = img.copy()
                 if type(self.model.label_offset) == dict:
                     class_name = self.model.classnames[self.model.label_offset[int(b[4])]]
                 else:
                     class_name = self.model.classnames[self.model.label_offset + int(b[4])]
                 img = self.overlay_bounding_box(img, b, class_name)
 
+                extra_pixels = 20
+                box = [
+                    max(0,int(b[0] * img.shape[1] - extra_pixels)), #x1
+                    max(0,int(b[1] * img.shape[0] - extra_pixels)), #y1
+                    min(img.shape[1],int(b[2] * img.shape[1] + extra_pixels)), #x2
+                    min(img.shape[0],int(b[3] * img.shape[0] + extra_pixels)), #y2
+                ]
+
+                subimg = img_copy[box[1]:box[3],box[0]:box[2]]
+                text = self.scan_codes(subimg)
+                if len(text) > 0:
+                    write_text = text[0] if len(text[0]) < 20 else text[0][:20]+'...'
+                    # print(write_text)
+                    cv2.putText(
+                        img,
+                        write_text,
+                        (int((box[2] + box[0]) / 2), int((box[3] + box[1]) / 2)),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        0.5,
+                        (0, 0, 0),
+                    )
+
         if self.debug:
             self.debug.log(self.debug_str)
             self.debug_str = ""
 
         return img
+    
+    def scan_codes(self, img):
+
+        h,w,c = img.shape
+        if h<=0 or w<=0: return ""
+        if c==3:
+            img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+        zbar_img = zbar.Image(w,h,'Y800', img.tobytes())
+        self.zbar_scanner.scan(zbar_img)
+        found_text = []
+        for sym in zbar_img:
+            found_text.append(sym.data)
+
+        return found_text
 
     def overlay_bounding_box(self, frame, box, class_name):
         """
@@ -234,18 +277,11 @@ class PostProcessDetection(PostProcess):
         cv2.rectangle(
             frame,
             (int((box[2] + box[0]) / 2) - 5, int((box[3] + box[1]) / 2) + 5),
-            (int((box[2] + box[0]) / 2) + 160, int((box[3] + box[1]) / 2) - 15),
+            (int((box[2] + box[0]) / 2) + 180, int((box[3] + box[1]) / 2) - 15),
             box_color,
             -1,
         )
-        cv2.putText(
-            frame,
-            class_name,
-            (int((box[2] + box[0]) / 2), int((box[3] + box[1]) / 2)),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            0.5,
-            text_color,
-        )
+
 
         if self.debug:
             self.debug_str += class_name

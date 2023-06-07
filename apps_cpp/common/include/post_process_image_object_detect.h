@@ -35,6 +35,7 @@
 
 /* Module headers. */
 #include <common/include/post_process_image.h>
+#include <zbar.h>
 
 /**
  * \defgroup group_edgeai_cpp_apps_obj_detect Object Detection post-processing
@@ -82,6 +83,7 @@ namespace ti::edgeai::common
 
             /** Multiplicative factor to be applied to Y co-ordinates. */
             float                   m_scaleY{1.0f};
+            zbar::ImageScanner      scanner;
 
         private:
             /**
