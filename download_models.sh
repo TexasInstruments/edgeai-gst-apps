@@ -47,6 +47,7 @@ elif [ "$SOC" == "am62a" ]
 then
 	URLs="ftp://swubn03.india.englab.ti.com/work/edge_ai/models_zoo/am62a/"
 elif [ "$SOC" == "am62" ] || [ "$SOC" == "arm" ]
+then
 	URLs="ftp://swubn03.india.englab.ti.com/work/edge_ai/models_zoo/arm/"
 else
 	echo "ERROR: "$SOC" not supported"
