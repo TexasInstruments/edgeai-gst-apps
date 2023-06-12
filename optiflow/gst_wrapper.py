@@ -365,7 +365,7 @@ def get_output_str(output):
         sink_cmd = ''
         if output.overlay_performance:
             sink_cmd += ' queue ! tiperfoverlay !'
-        sink_cmd += ' kmssink sync=false driver-name=tidss '
+        sink_cmd += ' kmssink sync=false driver-name=tidss plane-properties="plane-props,zpos=1" '
         if (output.connector):
                 sink_cmd += ' connector-id=%d' % output.connector
     elif (sink == 'image'):
