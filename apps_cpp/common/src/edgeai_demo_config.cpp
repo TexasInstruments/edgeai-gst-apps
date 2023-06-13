@@ -1316,8 +1316,13 @@ int32_t OutputInfo::appendGstPipeline()
     {
         for(unsigned i=0;i<gVideoEncMap[sinkExt].size();i++)
         {
+            string encoder_extra_ctrl = "controls"
+                                        ", frame_level_rate_control_enable=1"
+                                        ", video_bitrate=" + to_string(m_bitrate) +
+                                        ", video_gop_size=" + to_string(m_gopSize);
             if (gVideoEncMap[sinkExt][i] == "v4l2h264enc")
-                m_gstElementProperty = {{"bitrate",to_string(m_bitrate).c_str()}};
+                m_gstElementProperty = {{"extra-controls",encoder_extra_ctrl.c_str()}};
+
             makeElement(m_dispElements,
                         gVideoEncMap[sinkExt][i].c_str(),
                         m_gstElementProperty,
@@ -1331,8 +1336,11 @@ int32_t OutputInfo::appendGstPipeline()
     }
     else if (sinkType == "remote")
     {
-        m_gstElementProperty = {{"gop-size",to_string(m_gopSize).c_str()},
-                                {"bitrate",to_string(m_bitrate).c_str()}};
+        string encoder_extra_ctrl = "controls"
+                                    ", frame_level_rate_control_enable=1"
+                                    ", video_bitrate=" + to_string(m_bitrate) +
+                                    ", video_gop_size=" + to_string(m_gopSize);
+        m_gstElementProperty = {{"extra-controls",encoder_extra_ctrl.c_str()}};
 
         makeElement(m_dispElements,"v4l2h264enc",m_gstElementProperty,NULL);
         makeElement(m_dispElements,"h264parse",m_gstElementProperty,NULL);
