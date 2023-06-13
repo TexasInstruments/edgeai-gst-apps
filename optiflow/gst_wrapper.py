@@ -340,9 +340,9 @@ def get_output_str(output):
         output: output configuration
     """
     image_enc = {'.jpg':' jpegenc ! '}
-    video_enc = {'.mov':' v4l2h264enc bitrate=10000000 ! h264parse ! qtmux ! ', \
-                 '.mp4':' v4l2h264enc bitrate=10000000 ! h264parse ! mp4mux ! ', \
-                 '.mkv':' v4l2h264enc bitrate=10000000 ! h264parse ! matroskamux ! '}
+    video_enc = {'.mov':' v4l2h264enc ! h264parse ! qtmux ! ', \
+                 '.mp4':' v4l2h264enc ! h264parse ! mp4mux ! ', \
+                 '.mkv':' v4l2h264enc ! h264parse ! matroskamux ! '}
 
     sink_ext = os.path.splitext(output.sink)[1]
     status = 0
@@ -375,7 +375,17 @@ def get_output_str(output):
         sink_cmd = ''
         if output.overlay_performance:
             sink_cmd += ' queue ! tiperfoverlay !'
-        sink_cmd += video_enc[sink_ext] + 'filesink location=' + output.sink
+
+        encoder = video_enc[sink_ext]
+        prop_str = "video_bitrate=%d, video_gop_size=%d" \
+                                              % (output.bitrate,output.gop_size)
+        enc_extra_ctrl = "extra-controls=\"controls, " + \
+                         "frame_level_rate_control_enable=1, " + \
+                         prop_str + \
+                         "\""
+        replacement_string = "v4l2h264enc " + enc_extra_ctrl
+        encoder = encoder.replace("v4l2h264enc",replacement_string)
+        sink_cmd += encoder + 'filesink location=' + output.sink
 
     elif (sink == 'remote'):
         sink_cmd = ''
@@ -383,7 +393,13 @@ def get_output_str(output):
             sink_cmd += ' queue ! tiperfoverlay !'
 
         if output.encoder == "v4l2h264enc":
-            sink_cmd += ' v4l2h264enc gop-size=%d bitrate=%d ! h264parse !' % (output.gop_size,output.bitrate)
+            prop_str = "video_bitrate=%d, video_gop_size=%d" \
+                                              % (output.bitrate,output.gop_size)
+            enc_extra_ctrl = "extra-controls=\"controls, " + \
+                            "frame_level_rate_control_enable=1, " + \
+                            prop_str + \
+                            "\""
+            sink_cmd += ' v4l2h264enc ' + enc_extra_ctrl + ' ! h264parse !'
         else:
             sink_cmd += ' ' + output.encoder + ' !'
 

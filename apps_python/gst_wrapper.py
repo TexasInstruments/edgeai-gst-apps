@@ -902,19 +902,23 @@ def get_output_elements(output):
     """
     image_enc = {".jpg": "jpegenc"}
 
+    prop_str = "video_bitrate=%d, video_gop_size=%d" \
+                                              % (output.bitrate,output.gop_size)
+    enc_extra_ctrl = "controls, frame_level_rate_control_enable=1, " + prop_str
+
     video_enc = {
         ".mov": [
-            ["v4l2h264enc", {"bitrate": output.bitrate}],
+            ["v4l2h264enc", {"extra-controls": enc_extra_ctrl}],
             ["h264parse", None],
             ["qtmux", None],
         ],
         ".mp4": [
-            ["v4l2h264enc", {"bitrate": output.bitrate}],
+            ["v4l2h264enc", {"extra-controls": enc_extra_ctrl}],
             ["h264parse", None],
             ["mp4mux", None],
         ],
         ".mkv": [
-            ["v4l2h264enc", {"bitrate": output.bitrate}],
+            ["v4l2h264enc", {"extra-controls": enc_extra_ctrl}],
             ["h264parse", None],
             ["matroskamux", None],
         ],
@@ -971,7 +975,7 @@ def get_output_elements(output):
     elif sink == "remote":
         property = {}
         if output.encoder == "v4l2h264enc":
-            property = {"gop-size": output.gop_size, "bitrate": output.bitrate}
+            property = {"extra-controls": enc_extra_ctrl}
 
         sink_elements += make_element(output.encoder, property=property)
 
