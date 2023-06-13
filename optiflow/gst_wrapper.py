@@ -340,9 +340,9 @@ def get_output_str(output):
         output: output configuration
     """
     image_enc = {'.jpg':' jpegenc ! '}
-    video_enc = {'.mov':' v4l2h264enc bitrate=10000000 ! h264parse ! qtmux ! ', \
-                 '.mp4':' v4l2h264enc bitrate=10000000 ! h264parse ! mp4mux ! ', \
-                 '.mkv':' v4l2h264enc bitrate=10000000 ! h264parse ! matroskamux ! '}
+    video_enc = {'.mov':' v4l2h264enc ! h264parse ! qtmux ! ', \
+                 '.mp4':' v4l2h264enc ! h264parse ! mp4mux ! ', \
+                 '.mkv':' v4l2h264enc ! h264parse ! matroskamux ! '}
 
     sink_ext = os.path.splitext(output.sink)[1]
     status = 0
@@ -375,7 +375,13 @@ def get_output_str(output):
         sink_cmd = ''
         if output.overlay_performance:
             sink_cmd += ' queue ! tiperfoverlay !'
-        sink_cmd += video_enc[sink_ext] + 'filesink location=' + output.sink
+
+        encode_str = video_enc[sink_ext]
+        if utils.prop_exist("v4l2h264enc", "bitrate"):
+            replacement_string = 'v4l2h264enc bitrate=%d' % output.bitrate
+            encode_str = encode_str.replace('v4l2h264enc',replacement_string)
+
+        sink_cmd += encode_str + 'filesink location=' + output.sink
 
     elif (sink == 'remote'):
         sink_cmd = ''
@@ -383,7 +389,12 @@ def get_output_str(output):
             sink_cmd += ' queue ! tiperfoverlay !'
 
         if output.encoder == "v4l2h264enc":
-            sink_cmd += ' v4l2h264enc gop-size=%d bitrate=%d ! h264parse !' % (output.gop_size,output.bitrate)
+            sink_cmd += ' v4l2h264enc'
+            if utils.prop_exist("v4l2h264enc", "bitrate"):
+                sink_cmd += ' bitrate=%d' % output.bitrate
+            if utils.prop_exist("v4l2h264enc", "gop-size"):
+                sink_cmd += ' gop-size=%d' % output.gop_size
+            sink_cmd += '! h264parse !'
         else:
             sink_cmd += ' ' + output.encoder + ' !'
 

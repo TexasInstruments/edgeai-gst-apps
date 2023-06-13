@@ -65,6 +65,13 @@ def get_cmdline_args(sysv_args):
     args = parser.parse_args()
     return args
 
+def prop_exist(element_name, prop_name):
+    for i in Gst.ElementFactory.make(element_name, None).list_properties():
+        print(i.name,prop_name)
+        if i.name == prop_name:
+            return True
+    return False
+
 def get_format_string(element, pad_name):
     """
     Returns format of element as string
