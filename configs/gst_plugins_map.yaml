@@ -40,8 +40,6 @@ j721e:
         element: v4l2h265dec
     h264enc:
         element: v4l2h264enc
-        property:
-            bitrate: 10000000
     h265enc: null
     inferer:
         target: dsp
@@ -76,8 +74,6 @@ j721s2:
         element: v4l2h265dec
     h264enc:
         element: v4l2h264enc
-        property:
-            bitrate: 10000000
     h265enc:
         element: v4l2h265enc
     inferer:
@@ -117,8 +113,6 @@ j784s4:
         element: v4l2h265dec
     h264enc:
         element: v4l2h264enc
-        property:
-            bitrate: 10000000
     h265enc:
         element: v4l2h265enc
     inferer:
