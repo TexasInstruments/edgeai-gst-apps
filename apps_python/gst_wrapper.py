@@ -17,6 +17,8 @@ preproc_target_idx = 0
 isp_target_idx = 0
 ldc_target_idx = 0
 
+
+
 class GstPipe:
     """
     Class to handle gstreamer pipeline related things
@@ -825,7 +827,14 @@ def get_scaler_elements(flow, is_multi_src):
         element = make_element(
             gst_element_map["scaler"],
             property={"name": flow.gst_scaler_name},
+
         )
+
+        #print(element[0].get_factory().get_name())
+        #global multiscaler_var 
+        #multiscaler_var = element[0]
+        
+        
         pipe += element
         sensor_list += make_element("queue", caps=sensor_scaler_caps)
         dl_list = get_dl_scaler_elements(flow, is_multi_src)
@@ -1619,4 +1628,15 @@ def get_gst_pipe(flows, outputs):
 
                     sink_player = add_and_link(o.gst_disp_elements, player=sink_player)
                     link_elements(s.gst_post_proc_elements[-1], o.gst_disp_elements[0])
+    """
+    Gst.ChildProxy.set_property(multiscaler_var, "src_1::roi-startx", 280)
+    Gst.ChildProxy.set_property(multiscaler_var, "src_1::roi-starty", 0)
+    Gst.ChildProxy.set_property(multiscaler_var, "src_1::roi-width", 720)
+    Gst.ChildProxy.set_property(multiscaler_var, "src_1::roi-height", 720)
+
+    Gst.ChildProxy.set_property(multiscaler_var, "src_0::roi-startx", 280)
+    Gst.ChildProxy.set_property(multiscaler_var, "src_0::roi-starty", 0)
+    Gst.ChildProxy.set_property(multiscaler_var, "src_0::roi-width", 720)
+    Gst.ChildProxy.set_property(multiscaler_var, "src_0::roi-height", 720)
+    """
     return src_players, sink_player

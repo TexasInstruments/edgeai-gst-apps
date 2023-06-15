@@ -1,0 +1,51 @@
+title: "Defect Detection"
+log_level: 2
+inputs:
+    input0:
+        source: /dev/video8
+        format: jpeg
+        width: 1280
+        height: 720
+        framerate: 30
+    input1:
+        source: /dev/video2
+        width: 1920
+        height: 1080
+        format: rggb
+        subdev-id: 2
+        framerate: 30
+    input2:
+        source: /opt/edgeai-test-data/videos/defect_detection_test.h264
+        format: h264
+        width: 1280
+        height: 720
+        framerate: 30
+        loop: True
+    
+models:                                                                           
+    model0:             
+        model_path: /opt/model_zoo/defect-detection_yolox-nano-lite
+        viz_threshold: 0.6 
+        
+outputs:
+    output0:
+        sink: kmssink
+        width: 1920
+        height: 1080
+        overlay-performance: True
+    output1:
+        sink: /opt/edgeai-test-data/output/defect_detection_USB_0.mkv
+        width: 1920
+        height: 1080
+        overlay-performance: True
+    output2:
+        sink: remote
+        width: 1280
+        height: 720
+        port: 8081
+        host: 0.0.0.0
+        
+
+flows:
+    flow0: [input1,model0,output0,[320,140,1280,720]]
+    
