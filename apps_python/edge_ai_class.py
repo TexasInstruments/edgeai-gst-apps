@@ -92,7 +92,6 @@ class EdgeAIDemo:
                 enable_tidl = False
                 core_id = 1
                 if (gst_element_map['inferer']['target'] == 'dsp'):
-                #if (False):
                     enable_tidl = True
                     if 'core-id' in gst_element_map['inferer']:
                         core_id = gst_element_map['inferer']['core-id'][EdgeAIDemo.C7_CORE_ID_INDEX]
@@ -200,7 +199,6 @@ class EdgeAIDemo:
                 o.bg_pipe.start()
                 o.bg_pipe.push_frame(o.title_frame, o.gst_bkgnd_sink)
                 o.bg_pipe.free()
-	
 
         self.gst_pipe.start()
         for i in self.infer_pipes:

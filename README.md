@@ -4,20 +4,18 @@
 This repo adds a vision based defect detection support.
 
 ## Table of content
-- [Defect Detection using Vision based Edge AI](#defect-detection-using-vision-based-edge-ai)
-  - [Table of content](#table-of-content)
-  - [About Defect Detection Demo](#about-defect-detection-demo)
-  - [Supported Devices](#supported-devices)
-  - [EVM Setup](#evm-setup)
-  - [Demo Setup and Running](#demo-setup-and-running)
-  - [Result](#result)
-  - [How It's Made](#how-its-made)
-  - [Resources](#resources)
+- [About Defect Detection Demo](#about-defect-detection-demo)
+- [Supported Devices](#supported-devices)
+- [EVM Setup](#evm-setup)
+- [Demo Setup and Running](#demo-setup-and-running)
+- [Result](#result)
+- [How It's Made](#how-its-made)
+- [Resources](#resources)
 
 ## About Defect Detection Demo
 This is a demo using **[AM62A](https://www.ti.com/tool/SK-AM62A-LP)** to run a vision based artificial intelligent model for defect detection for manufacturing applications. The model tests the produced units as they move on a conveyer belt, to recognized the accepted and the defected units. The demo is equipped with an object tracker to provide accurate coordinates of the units for sorting and filtering process. A live video is displayed on the screen with green and red boxes overlaid on the accepted and defected units respectively. The screen also includes a graphical dashboard showing live statistics bout total products, defect percentage, production rate, and a histogram of the types of defect. This demo is built based on the the edgeai-gst-apps. It runs on Python only for this current version.
 
-This demo runs a custom trained YOLOX-nano neural network[^1] on the **[AM62A](https://www.ti.com/tool/SK-AM62A-LP)** and performs object detection on imagery to find 
+This demo runs a custom trained YOLOX-nano neural network[^1] on the **[AM62A](https://www.ti.com/tool/SK-AM62A-LP)** and performs object detection on imagery to find dfd
 
 ![](./doc/defect-detection-demo-setup.gif)
 

@@ -103,7 +103,6 @@ class PostProcess:
 class PostProcessClassification(PostProcess):
     def __init__(self, flow):
         super().__init__(flow)
-        
 
     def __call__(self, img, results):
         """
