@@ -34,16 +34,16 @@ class ObjectTracker:
     """
     Track objects in real time as they are detected by an AI model object detection model.
     """
-    # Constnts
+    # Constants
     # Portion fo the upper and lower edges of the frame to be ignored to make sure that complete objects are within the frame. This should be changed depending on objects size's relative to the frame. 
     IGNOR_RANGE_Y = 0.1
     # Portions of left and right edges of the frame to be ignored. This is a temporary measure. This constant should be deleted after cropping is implemented.
     IGNOR_RANGE_X = 0.2
     # Number of times the object is detected before it is counted.
     DETECTED_THRESHOLD = 6
-    # Number of times the object is misserd before it is deleted from the tracked list of objects.
+    # Number of times the object is miss-read before it is deleted from the tracked list of objects.
     NOT_DETECTED_THRESHOLD = 5
-    # Number of times the object chages it is class before it is actually changes in the tracked list.
+    # Number of times the object changes it is class before it is actually changes in the tracked list.
     CHANGE_CLASS_THRESHOLD = 4
     
 
@@ -58,9 +58,9 @@ class ObjectTracker:
         """
         Performs the main tracking algorithm. Update, add, delete objects in the tracked_list. Add detected objects to object_count
         Parameters:
-            bbox (List): lis of bounding boxes each as a numpy array definind bounding box coordinates and class name.
+            bbox (List): list of bounding boxes each as a numpy array defining bounding box coordinates and class name.
         Returns:
-        int: Index of the nearst object in object_list to the input o, if no object is found to be close to o, return -1
+        int: Index of the nearest object in object_list to the input o, if no object is found to be close to o, return -1
         """
 
         # define objects in the current frame
@@ -69,9 +69,9 @@ class ObjectTracker:
         # clean up the objects in the current frame.
         for b in bbox:
             temp_object = DetectedObject(b, self.model)
-            # ignor upper and lower edge of the frame to make sure only complete objects are included.
+            # ignore upper and lower edge of the frame to make sure only complete objects are included.
             if temp_object.y_center > ObjectTracker.IGNOR_RANGE_Y and temp_object.y_center < (1- ObjectTracker.IGNOR_RANGE_Y):
-                # ignor left and right  parts this is just a workaround of the crop
+                # ignore left and right  parts this is just a workaround of the crop
                 if temp_object.x_center > ObjectTracker.IGNOR_RANGE_X and temp_object.x_center < (1- ObjectTracker.IGNOR_RANGE_X):
                     current_frame_objects.append(temp_object)     
         
@@ -80,7 +80,7 @@ class ObjectTracker:
             # sort objects in current frame based on y_center
             current_frame_objects.sort(key=lambda x:x.y_center)
 
-            # find index of nearst objects in the area lower than the tracked object
+            # find index of nearest objects in the area lower than the tracked object
             ind = self.find_nearest(self.tracked_list[i], current_frame_objects)
 
             # if objects founds
@@ -109,7 +109,7 @@ class ObjectTracker:
                 self.tracked_list[i].not_detected += 1
                 self.tracked_list[i].change_class = 0
         
-        # filter out objects not detected more than thershold
+        # filter out objects not detected more than threshold
         filtered_tracked_list = list(filter(lambda o:o.not_detected < ObjectTracker.NOT_DETECTED_THRESHOLD, self.tracked_list))
 
         # add rest of objects in the current frame and not related to an existed object in the tracked list
@@ -131,13 +131,13 @@ class ObjectTracker:
 
     def find_nearest(self, o, object_list):
         """
-        Find nearest object in frame_list to the object in o and redturn its index 
+        Find nearest object in frame_list to the object in o and return its index 
         if no objects found return -1
         Parameters:
             o (DetectedObject): Current tracked object
             object_list (list[DetectedObject]): List of objects in the current frame.
         Returns:
-        int: Index of the nearst object in object_list to the input o, if no object is found to be close to o, return -1
+        int: Index of the nearest object in object_list to the input o, if no object is found to be close to o, return -1
         """
          
         index_list = []
@@ -153,71 +153,15 @@ class ObjectTracker:
         
         return nearest_index
 
-    def remove_overlap(self, objects_list):
-        # sort base on box area
-        objects_list.sort(key=lambda x:x.get_area())
-        to_delete = []
-        
-        for i in range(len(objects_list)-1):
-            for j in range(i+1,len(objects_list)):
-                if self.is_overlap(objects_list[i], objects_list[j]):
-                    to_delete.append(i)
-                    continue
-        
-        # delete overlapped
-        for i in range(len(to_delete)):
-            del objects_list[to_delete[i]]
-        
-        return objects_list
-
-    def is_overlap(self,s_box, b_box):
-        # Constant for over lap
-        """
-        OVERLAP_THRESHOLD = 0.8
-        overlap = False
-        # Small box has to be very small compared to big box
-        if s_box.get_area()/b_box.get_area() < 0.5:
-            dx = min(s_box.x2, b_box.x2) -  max(s_box.x1, b_box.x1)
-            dy = min(s_box.y2, b_box.y2) - max(s_box.y1, s_box.y1)
-
-            overlap_area = dx*dy
-            if overlap_area > 0:
-                if overlap_area/s_box.get_area() > OVERLAP_THRESHOLD:
-                    overlap = True
-                else:
-                    overlap = False
-        else:
-            overlap = False
-        
-        return overlap
-        """
-       
-        
-        sides_check = [0] * 4
-        if s_box.x1 > b_box.x1:
-            sides_check[0] = 1
-        if s_box.x2 < b_box.x2:
-            sides_check[1] = 1
-        if s_box.y1 > b_box.y1:
-            sides_check[2] = 1
-        if s_box.y2 < b_box.y2:
-            sides_check[3] =1
-        
-        if sum(sides_check) > 2:
-            return True
-        else:
-            return False
-    
-
 class DetectedObject:
     """
-    Hold detect object properties such as bounding box coordiantes and class id with its related usful functions.
+    Hold detect object properties such as bounding box coordinates and class id with its related useful functions.
     """
     def __init__(self, bbox, model):
         """
         Initialize detect object properties. 
         Parameters:
-            bbox (numpy array): array definind bounding box coordinates and class name.
+            bbox (numpy array): array defining bounding box coordinates and class name.
         """
         self.x1 = bbox[0]
         self.x2 = bbox[2]
@@ -239,9 +183,9 @@ class DetectedObject:
             
     def get_area(self):
         """
-        Caclculate bounding box area.
+        Calculate bounding box area.
         Returns:
-            (float or int): depending on the type of x1, x2, y1, y2, the return area can be as portion of the frame area or abolute area in pixels.
+            (float or int): depending on the type of x1, x2, y1, y2, the return area can be as portion of the frame area or absolute area in pixels.
         """
         area = (self.x2-self.x1) * (self.y2-self.y1)
         return area
@@ -258,7 +202,7 @@ class DetectedObject:
         """
         Replace coordinate of this object with input object.
         Parameters:
-            newObj (DetectedObject): new object to replace coordiantes with.
+            newObj (DetectedObject): new object to replace coordinates with.
         """
         self.x1 = newObj.x1
         self.x2 = newObj.x2
@@ -271,7 +215,7 @@ class DetectedObject:
         """
         Change coordinate from portions of frame to absolute value depending on frame dimensions.
         Parameters:
-            freame_shape (tuple): frames size (width, hieght, channels)
+            frame_shape (tuple): frames size (width, height, channels)
         """
         self.x1 = int(self.x1 * frame_shape[1])
         self.x2 = int(self.x2 * frame_shape[1])

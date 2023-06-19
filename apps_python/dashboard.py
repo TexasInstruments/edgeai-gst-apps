@@ -37,7 +37,7 @@ import math
 class Dashboard:
     """
     Create and update a graphical dashboard for object detection models. 
-    The created dashboard consists of an over view and a histogram graph. The overview contains three numbers Total produciton [Units], percentage of defects units [%], and rate of productions as [Units/Hour]. The histogram shows a graph bar of the types of detected defects.
+    The created dashboard consists of an over view and a histogram graph. The overview contains three numbers Total production [Units], percentage of defects units [%], and rate of productions as [Units/Hour]. The histogram shows a graph bar of the types of detected defects.
     """
     def __init__(self,overview, val, title):
         """
@@ -77,12 +77,12 @@ class Dashboard:
 
     def create_image(self, h,w,color):
         """
-        Create a colored image and fill it with a sinle color.
+        Create a colored image and fill it with a single color.
         Parameters:
 
-            h (int): image hieght.
+            h (int): image height.
             w (int): image width.
-            color (tuple): three integers represting the color as RGB.
+            color (tuple): three integers representing the color as RGB.
         """
         image = np.zeros((h, w, 3), np.uint8)
         image[:] = color
@@ -92,7 +92,7 @@ class Dashboard:
         """
         Overlay overview values on the dashboard.
         Parameters:
-            image (numpy array): three dimentional array representing the dashboard template.
+            image (numpy array): three dimensional array representing the dashboard template.
             overview (list): List of three integers for Total production, defect percentage, production rate.
         Returns:
             im (numpy array): the templated with overview numbers overlaid on it.
@@ -124,14 +124,14 @@ class Dashboard:
         """
         Create a histogram as a bar graph.
         Parameters:
-            h (int): hieght of the generated graph.
+            h (int): height of the generated graph.
             w (int): width of the generated graph.
             val (list): List of integers for the number of detected objects for each defected class. Its length should be equal to the number of defected classes.
             titles (list): Names of each of the defected classes. Its length should be equal to val 
         Returns:
-            numpy array: the generated graph as a three dimentional array.
+            numpy array: the generated graph as a three dimensional array.
         """
-        # color palet for the bars
+        # color palette for the bars
         bar_colors = [(255, 179, 179),
                      (255, 129, 128),
                      (255, 78, 77),
@@ -194,9 +194,9 @@ class Dashboard:
         """
         Add (concatenate) the dashboard to the left side of the frame.
         Parameters:
-            frame (numpy array): a three dimentional array representing the frame (image).
+            frame (numpy array): a three dimensional array representing the frame (image).
         Returns:
-            (numpy array): a three dimentiona array of the frame with the dashboard to the left sad of it.
+            (numpy array): a three dimensional array of the frame with the dashboard to the left sad of it.
         """
         
         frame_h = frame.shape[0]

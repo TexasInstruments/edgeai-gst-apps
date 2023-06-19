@@ -347,9 +347,9 @@ class PostProcessDefectDetection(PostProcess):
         # keep track of production rate
         self.prod_rate = 0
         # variables for production rate calculation
-        # tiem at the begining of a minut period
+        # time at the beginning of a minute period
         self.start_minute = time()
-        # total number of produced unites at a begining of a minute
+        # total number of produced unites at a beginning of a minute
         self.prod_start_minute = 0
 
     def __call__(self, img, results):
@@ -401,7 +401,7 @@ class PostProcessDefectDetection(PostProcess):
         # track objects
         self.ot.track_objects(accepted_bbox)
 
-        # caculate total objects
+        # calculate total objects
         total_objects = sum(self.ot.object_count)
 
         # calculate defect percentage
@@ -410,17 +410,17 @@ class PostProcessDefectDetection(PostProcess):
         else:
             defect_objects = 0
 
-        # caculate production rate
+        # calculate production rate
         current_time = time()
         # make sure that a minute is passed
         if (current_time - self.start_minute) > 60:
             # number of products in the past minute
             prod_minute = total_objects - self.prod_start_minute
-            # production rate in unites per hours, hense * 3600
+            # production rate in unites per hours, hens * 3600
             self.prod_rate = int((prod_minute / (current_time-self.start_minute)) * 3600)
-            # set start of the next minut at the current time.
+            # set start of the next minute at the current time.
             self.start_minute = current_time
-            # set number of products at the start of the next minut
+            # set number of products at the start of the next minute
             self.prod_start_minute = total_objects
         elif self.prod_start_minute == 0:
             self.prod_rate = total_objects
@@ -441,7 +441,7 @@ class PostProcessDefectDetection(PostProcess):
         """
         Draw bounding boxes on the frame. 
         Parameters:
-            frame (numpy array): three dimentional array for the frame.
+            frame (numpy array): three dimensional array for the frame.
             box_list (list[DetectedObject]): a list of detected objects.
         """
         for b in box_list:
