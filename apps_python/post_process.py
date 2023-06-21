@@ -130,11 +130,26 @@ class PostProcessClassification(PostProcess):
         font_size = orig_width / 1280
         N = self.model.topN
         topN_classes = np.argsort(results)[: (-1 * N) - 1 : -1]
+        title_text = "Recognized Classes (Top %d):" % N
+        font = cv2.FONT_HERSHEY_SIMPLEX
+
+        text_size, _ = cv2.getTextSize(title_text, font, font_size, 2)
+
+        bg_top_left = (0, (2 * row_size) - text_size[1] - 5)
+        bg_bottom_right = (text_size[0] + 10, (2 * row_size) + 3 + 5)
+        font_coord = (5 , 2 * row_size)
+
+        cv2.rectangle(frame,
+                      bg_top_left,
+                      bg_bottom_right,
+                      (5, 11, 120),
+                      -1)
+
         cv2.putText(
             frame,
-            "Recognized Classes (Top %d):" % N,
-            (5, 2 * row_size),
-            cv2.FONT_HERSHEY_SIMPLEX,
+            title_text,
+            font_coord,
+            font,
             font_size,
             (0, 255, 0),
             2,
@@ -142,11 +157,23 @@ class PostProcessClassification(PostProcess):
         row = 3
         for idx in topN_classes:
             class_name = self.model.classnames.get(idx + self.model.label_offset)
+
+            text_size, _ = cv2.getTextSize(class_name, font, font_size, 2)
+
+            bg_top_left = (0, (row_size * row) - text_size[1] - 5)
+            bg_bottom_right = (text_size[0] + 10, (row_size * row) + 3 + 5)
+            font_coord = (5, row_size * row)
+
+            cv2.rectangle(frame,
+                         bg_top_left,
+                         bg_bottom_right,
+                         (5, 11, 120),
+                         -1)
             cv2.putText(
                 frame,
                 class_name,
-                (5, row_size * row),
-                cv2.FONT_HERSHEY_SIMPLEX,
+                font_coord,
+                font,
                 font_size,
                 (255, 255, 0),
                 2,
