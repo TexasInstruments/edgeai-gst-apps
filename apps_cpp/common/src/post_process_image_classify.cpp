@@ -183,14 +183,23 @@ static T1 *overlayTopNClasses(T1                   *frame,
     vector<tuple<T2,int32_t>> argmax;
     float txtSize = static_cast<float>(outDataWidth)/POSTPROC_DEFAULT_WIDTH;
     int   rowSize = 40 * outDataWidth/POSTPROC_DEFAULT_WIDTH;
-    Scalar text_color(200, 200, 200);
+    Scalar text_color(255, 255, 0);
+    Scalar text_bg_color(5, 11, 120);
 
     argmax = get_topN<T2>(results, N, size);
     Mat img = Mat(outDataHeight, outDataWidth, CV_8UC3, frame);
 
     std::string title = "Recognized Classes (Top " + std::to_string(N) + "):";
-    putText(img, title.c_str(), Point(5, 2 * rowSize),
-            FONT_HERSHEY_SIMPLEX, txtSize, Scalar(0, 255, 0), 2);
+
+    Size totalTextSize = getTextSize(title, FONT_HERSHEY_SIMPLEX, txtSize, 2, nullptr);
+
+    Point bgTopleft = Point(0, (2 * rowSize) - totalTextSize.height - 5);
+    Point bgBottomRight = Point(totalTextSize.width + 10, (2 * rowSize) + 3 + 5);
+    Point fontCoord = Point(5, 2 * rowSize);
+
+    rectangle(img, bgTopleft, bgBottomRight, text_bg_color, -1);
+    putText(img, title.c_str(), fontCoord, FONT_HERSHEY_SIMPLEX, txtSize,
+            Scalar(0, 255, 0), 2);
 
 #if defined(EDGEAI_ENABLE_OUTPUT_FOR_TEST)
     string output;
@@ -209,8 +218,15 @@ static T1 *overlayTopNClasses(T1                   *frame,
             output.append(str + "\n");
 #endif // defined(EDGEAI_ENABLE_OUTPUT_FOR_TEST)
 
-            putText(img, str, Point(5, rowSize * row),
-                FONT_HERSHEY_SIMPLEX, txtSize, Scalar(255, 255, 0), 2);
+            totalTextSize = getTextSize(str, FONT_HERSHEY_SIMPLEX, txtSize, 2, nullptr);
+
+            bgTopleft = Point(0, (rowSize * row) - totalTextSize.height - 5);
+            bgBottomRight = Point(totalTextSize.width + 10, (rowSize * row) + 3 + 5);
+            fontCoord = Point(5, rowSize * row);
+
+            rectangle(img, bgTopleft, bgBottomRight, text_bg_color, -1);
+            putText(img, str, fontCoord, FONT_HERSHEY_SIMPLEX, txtSize,
+                    text_color, 2);
         }
     }
 
