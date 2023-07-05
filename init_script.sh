@@ -65,6 +65,10 @@ rm -rf ~/.cache/gstreamer-1.0/registry.aarch64.bin
 k3conf set clock 290 0 720000000 &> /dev/null
 k3conf set clock 48 0 480000000 &> /dev/null
 
+# Set primary plane z-pos to 0
+PRIMARY_PLANE_ID=`kmsprint | grep -i plane | cut -d "(" -f2 | cut -d ")" -f1`
+modetest -M tidss -w $PRIMARY_PLANE_ID:zpos:0 &> /dev/null
+
 export EDGEAI_GST_APPS_PATH=/opt/edgeai-gst-apps
 export EDGEAI_DATA_PATH=/opt/edgeai-test-data
 export OOB_DEMO_ASSETS_PATH=/opt/oob-demo-assets
