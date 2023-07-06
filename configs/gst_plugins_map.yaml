@@ -152,7 +152,7 @@ am62a:
         core-id: [1]
 
 #==================== AM62X ====================
-am62:
+am62x:
     dlcolorconvert:
         element: ticolorconvert
     colorconvert:

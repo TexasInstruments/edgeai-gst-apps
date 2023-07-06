@@ -46,7 +46,7 @@ then
 elif [ "$SOC" == "am62a" ]
 then
 	URLs="ftp://swubn03.india.englab.ti.com/work/edge_ai/models_zoo/am62a/"
-elif [ "$SOC" == "am62" ] || [ "$SOC" == "arm" ]
+elif [ "$SOC" == "am62x" ]
 then
 	URLs="ftp://swubn03.india.englab.ti.com/work/edge_ai/models_zoo/arm/"
 else
