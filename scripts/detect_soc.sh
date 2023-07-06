@@ -13,8 +13,8 @@ then
     export DEVICE_NAME=AM69A
 elif grep -q am625 /proc/device-tree/compatible
 then
-    export SOC=am62
-    export DEVICE_NAME=AM62
+    export SOC=am62x
+    export DEVICE_NAME=AM62X
 elif grep -q am62a /proc/device-tree/compatible
 then
     export SOC=am62a

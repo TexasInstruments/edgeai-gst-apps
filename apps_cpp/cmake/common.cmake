@@ -61,11 +61,11 @@ elseif ("${TARGET_SOC_LOWER}" STREQUAL "am62a")
     set(TARGET_CPU          A53)
     set(TARGET_OS           LINUX)
     set(TARGET_SOC          AM62A)
-elseif ("${TARGET_SOC_LOWER}" STREQUAL "am62")
+elseif ("${TARGET_SOC_LOWER}" STREQUAL "am62x")
     set(TARGET_PLATFORM     SITARA)
     set(TARGET_CPU          A53)
     set(TARGET_OS           LINUX)
-    set(TARGET_SOC          AM62)
+    set(TARGET_SOC          AM62X)
 else()
     message(FATAL_ERROR "SOC ${TARGET_SOC_LOWER} is not supported.")
 endif()
@@ -175,7 +175,7 @@ set(SYSTEM_LINK_LIBS
     dl
     )
 
-if(NOT ${TARGET_SOC} STREQUAL "AM62")
+if(NOT ${TARGET_SOC} STREQUAL "AM62X")
 set(SYSTEM_LINK_LIBS ${SYSTEM_LINK_LIBS} tivision_apps)
 endif()
 
