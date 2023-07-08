@@ -12,10 +12,10 @@ PERF="queue ! tiperfoverlay dump=true overlay=false location=$LOG_FILE \
 FILTER=""
 
 ################################################################################
-VIDEO_FILE_MP4_1MP=/opt/edgeai-test-data/videos/video_0000_h264.mp4
-VIDEO_FILE_H264_1MP=/opt/edgeai-test-data/videos/video_0000_h264.h264
-VIDEO_FILE_H264_2MP=/opt/edgeai-test-data/videos/video_0000_h264_2mp.h264
-VIDEO_FILE_H265_2MP=/opt/edgeai-test-data/videos/video_0000_h265_2mp.h265
+VIDEO_FILE_MP4_1MP=/opt/edgeai-test-data/videos/video0_1280_720_h264.mp4
+VIDEO_FILE_H264_1MP=/opt/edgeai-test-data/videos/video0_1280_720.h264
+VIDEO_FILE_H264_2MP=/opt/edgeai-test-data/videos/video0_1920_1088.h264
+VIDEO_FILE_H265_2MP=/opt/edgeai-test-data/videos/video0_1920_1088.h265
 
 VIDEOTESTSRC_2MP="videotestsrc pattern=4 num-buffers=600 is-live=true ! video/x-raw,format=NV12,width=1920,height=1080,framerate=30/1"
 
@@ -272,7 +272,7 @@ INFER_CL()
   echo export C7X=$C7X > /tmp/.C7X
 }
 
-MODEL_SS=/opt/model_zoo/ONR-SS-8610-deeplabv3lite-mobv2-ade20k32-512x512
+MODEL_SS=/opt/model_zoo/ONR-SS-8630-unetlite-aspp-mobv2-tv-ade20k32-512x512
 MODEL_SS_PRE_PROC_PROPS="data-type=3 channel-order=0 tensor-format=rgb out-pool-size=4"
 MODEL_SS_CAPS="video/x-raw, width=512, height=512"
 

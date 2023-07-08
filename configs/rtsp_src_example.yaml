@@ -12,13 +12,13 @@ inputs:
         loop: True
 models:
     model0:
-        model_path: /opt/model_zoo/TVM-CL-3090-mobileNetV2-tv
+        model_path: /opt/model_zoo/ONR-CL-6360-regNetx-200mf
         topN: 5
     model1:
         model_path: /opt/model_zoo/TFL-OD-2010-ssd-mobV2-coco-mlperf-300x300
         viz_threshold: 0.6
     model2:
-        model_path: /opt/model_zoo/ONR-SS-8610-deeplabv3lite-mobv2-ade20k32-512x512
+        model_path: /opt/model_zoo/ONR-SS-8630-unetlite-aspp-mobv2-tv-ade20k32-512x512
         alpha: 0.4
 outputs:
     output0:
@@ -36,5 +36,5 @@ outputs:
         height: 1080
 
 flows:
-    flow0: [input0,model0,output0,[320,180,1280,720]]
+    flow0: [input0,model0,output0,[320,150,1280,720]]
         
