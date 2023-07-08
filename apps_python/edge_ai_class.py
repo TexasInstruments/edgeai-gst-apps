@@ -36,6 +36,7 @@ from infer_pipe import InferPipe
 import utils
 import sys
 import os
+import time
 
 class EdgeAIDemo:
     """
@@ -230,6 +231,13 @@ class EdgeAIDemo:
                     % (os.environ.get("GST_DEBUG_DUMP_DOT_DIR"))
                 )
 
+    def wait_for_exit(self):
+        while (1):
+            if all(i.stop_thread for i in self.infer_pipes):
+               self.stop()
+               break
+            time.sleep(1)
+
     def stop(self):
         """
         Member function to stop the demo
@@ -238,18 +246,8 @@ class EdgeAIDemo:
         for i in self.infer_pipes:
             i.stop()
 
-        # Wait for the inference pipes to exit
-        self.wait_for_exit()
+        self.gst_pipe.free()
 
         # Hack del for model_obj is not called since refcount is not 1 here.
         for _,model_obj in self.models.items():
             del model_obj.run_time
-
-    def wait_for_exit(self):
-        """
-        Wait for the end of demo and do the clean up
-        to be called at the end of the main thread
-        """
-        for i in self.infer_pipes:
-            i.wait_for_exit()
-        self.gst_pipe.free()
