@@ -1580,7 +1580,7 @@ def get_gst_pipe(flows, outputs):
                     if (o.overlay_performance
                         and
                         gst_element_map["mosaic"]["element"] == "tiovxmosaic"):
-                        Gst.ChildProxy.set_property(mosaic, "src::pool-size", 3)
+                        Gst.ChildProxy.set_property(mosaic, "src::pool-size", 4)
 
                 else:
                     """

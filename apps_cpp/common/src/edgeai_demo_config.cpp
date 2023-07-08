@@ -2306,7 +2306,7 @@ int32_t FlowInfo::getSinkPipeline(GstElement*       &sinkPipeline,
                 {
                     GValue val = G_VALUE_INIT;
                     g_value_init (&val, G_TYPE_INT);
-                    g_value_set_int (&val,3);
+                    g_value_set_int (&val,4);
                     gst_child_proxy_set_property (GST_CHILD_PROXY (mosaic),
                                                   "src::pool-size",
                                                   &val);
