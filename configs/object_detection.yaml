@@ -8,7 +8,7 @@ inputs:
         height: 720
         framerate: 30
     input1:
-        source: /opt/edgeai-test-data/videos/video_0000_h264.h264
+        source: /opt/edgeai-test-data/videos/video0_1280_720.h264
         format: h264
         width: 1280
         height: 720
@@ -43,10 +43,10 @@ outputs:
         height: 1080
     output2:
         sink: remote
-        width: 1280
-        height: 720
+        width: 1920
+        height: 1080
         port: 8081
         host: 0.0.0.0
 
 flows:
-    flow0: [input1,model2,output0,[320,180,1280,720]]
+    flow0: [input1,model2,output0,[320,150,1280,720]]
