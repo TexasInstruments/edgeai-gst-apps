@@ -27,4 +27,4 @@ outputs:
         height: 1080
 
 flows:
-    flow0: [input0,model0,output0,[320,180,1280,720]]
+    flow0: [input0,model0,output0,[320,150,1280,720]]
