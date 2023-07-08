@@ -8,7 +8,7 @@ inputs:
         height: 720
         framerate: 30
     input1:
-        source: /opt/edgeai-test-data/videos/video_0000_h264.h264
+        source: /opt/edgeai-test-data/videos/video0_1280_720.h264
         format: h264
         width: 1280
         height: 720
@@ -47,4 +47,4 @@ outputs:
         height: 1080
 
 flows:
-    flow0: [input2,model0,output0,[320,180,1280,720]]
+    flow0: [input2,model1,output0,[320,150,1280,720]]

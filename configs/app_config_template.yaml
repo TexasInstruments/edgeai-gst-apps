@@ -60,7 +60,7 @@ inputs:
 
     input1:
         # Raw Video Source
-        source: /opt/edgeai-test-data/videos/video_0000_h264.h264
+        source: /opt/edgeai-test-data/videos/video0_1280_720.h264
 
         # Video encoding format (optional)
         # Allowed values
@@ -84,7 +84,7 @@ inputs:
 
     input2:
         # Video Source
-        source: /opt/edgeai-test-data/videos/video_0000_h264.mp4
+        source: /opt/edgeai-test-data/videos/video0_1280_720_h264.mp4
 
         # Video encoding format (optional)
         # Allowed values
