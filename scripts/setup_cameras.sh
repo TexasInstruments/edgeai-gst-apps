@@ -35,6 +35,7 @@ NOCOLOR='\033[0m'
 
 
 declare -A ALL_UB960_FMT_STR
+declare -A ALL_CDNS_FMT_STR
 declare -A ALL_CSI2RX_FMT_STR
 
 setup_routes(){
@@ -66,6 +67,35 @@ setup_routes(){
 
     done
 
+    # CDNS ROUTING
+    for i in "${!ALL_CDNS_FMT_STR[@]}"
+    do
+        id="$(cut -d',' -f1 <<<"$i")"
+        name="$(cut -d',' -f2 <<<"$i")"
+        # CDNS ROUTING & FORMATS
+        media-ctl -d $id -R "'$name' [${ALL_CDNS_FMT_STR[$i]}]"
+
+        for name in `media-ctl -d $id -p | grep entity | grep ov2312 | cut -d ' ' -f 5`; do
+            UB953_NAME=`media-ctl -d $id -p -e "ov2312 $name" | grep ub953 | cut -d "\"" -f 2`
+            UB960_NAME=`media-ctl -d $id -p -e "$UB953_NAME" | grep ub960 | cut -d "\"" -f 2`
+            UB960_PAD=`media-ctl -d $id -p -e "$UB953_NAME" | grep ub960 | cut -d : -f 2 | awk '{print $1}'`
+            CSI_PAD0=`media-ctl -d $id -p -e "$UB960_NAME" | grep $UB960_PAD/0.*[ACTIVE] | cut -d "/" -f 3 | awk '{print $1}'`
+            CSI_PAD1=`media-ctl -d $id -p -e "$UB960_NAME" | grep $UB960_PAD/1.*[ACTIVE] | cut -d "/" -f 3 | awk '{print $1}'`
+            CSI_BRIDGE_NAME=`media-ctl -d $id -p -e "$UB960_NAME" | grep csi-bridge | cut -d "\"" -f 2`
+            media-ctl -d $id -V "'$CSI_BRIDGE_NAME':0/$CSI_PAD0 $OV2312_CAM_FMT"
+            media-ctl -d $id -V "'$CSI_BRIDGE_NAME':0/$CSI_PAD1 $OV2312_CAM_FMT"
+        done
+
+        for name in `media-ctl -d $id -p | grep entity | grep imx390 | cut -d ' ' -f 5`; do
+            UB953_NAME=`media-ctl -d $id -p -e "imx390 $name" | grep ub953 | cut -d "\"" -f 2`
+            UB960_NAME=`media-ctl -d $id -p -e "$UB953_NAME" | grep ub960 | cut -d "\"" -f 2`
+            UB960_PAD=`media-ctl -d $id -p -e "$UB953_NAME" | grep ub960 | cut -d : -f 2 | awk '{print $1}'`
+            CSI_PAD=`media-ctl -d $id -p -e "$UB960_NAME" | grep $UB960_PAD/.*[ACTIVE] | cut -d "/" -f 3 | awk '{print $1}'`
+            CSI_BRIDGE_NAME=`media-ctl -d $id -p -e "$UB960_NAME" | grep csi-bridge | cut -d "\"" -f 2`
+            media-ctl -d $id -V "'$CSI_BRIDGE_NAME':0/$CSI_PAD $IMX390_CAM_FMT"
+        done
+    done
+
     # CSI2RX ROUTING
     for i in "${!ALL_CSI2RX_FMT_STR[@]}"
     do
@@ -83,6 +113,7 @@ setup_imx390(){
     for media_id in {0..1}; do
     # UB953 FORMATS
     UB960_FMT_STR=""
+    CDNS_FMT_STR=""
     CSI2RX_FMT_STR=""
     for name in `media-ctl -d $media_id -p | grep entity | grep imx390 | cut -d ' ' -f 5`; do
 
@@ -110,6 +141,7 @@ setup_imx390(){
         CSI2RX_CONTEXT_NAME="$CSI2RX_NAME context $NEXT_PAD"
 
         UB960_FMT_STR="${UB960_PAD}/0 -> 4/$(($NEXT_PAD)) [1]"
+        CDNS_FMT_STR="0/${NEXT_PAD} -> 1/$(($NEXT_PAD)) [1]"
         CSI2RX_FMT_STR="0/${NEXT_PAD} -> $(($NEXT_PAD+1))/0 [1]"
 
         # Append UB960 Routes
@@ -117,6 +149,13 @@ setup_imx390(){
             ALL_UB960_FMT_STR[$media_id,$UB960_NAME]="${ALL_UB960_FMT_STR[$media_id,$UB960_NAME]}, $UB960_FMT_STR"
         else
             ALL_UB960_FMT_STR[$media_id,$UB960_NAME]="$UB960_FMT_STR"
+        fi
+
+        # Append CDNS Routes
+        if [[ -v "ALL_CDNS_FMT_STR[$media_id,$CSI_BRIDGE_NAME]" ]] ; then
+            ALL_CDNS_FMT_STR[$media_id,$CSI_BRIDGE_NAME]="${ALL_CDNS_FMT_STR[$media_id,$CSI_BRIDGE_NAME]}, $CDNS_FMT_STR"
+        else
+            ALL_CDNS_FMT_STR[$media_id,$CSI_BRIDGE_NAME]="$CDNS_FMT_STR"
         fi
 
         # Append CSIRX Routes
@@ -153,6 +192,7 @@ setup_ov2312(){
     for media_id in {0..1}; do
     # UB953 FORMATS
     UB960_FMT_STR=""
+    CDNS_FMT_STR=""
     CSI2RX_FMT_STR=""
     for name in `media-ctl -d $media_id -p | grep entity | grep ov2312 | cut -d ' ' -f 5`; do
 
@@ -174,6 +214,8 @@ setup_ov2312(){
         CSI2RX_CONTEXT_NAME_RGB="$CSI2RX_NAME context $(($UB960_PAD*2 + 1))"
 
         UB960_FMT_STR="${UB960_PAD}/0 -> 4/$(($UB960_PAD * 2)) [1], ${UB960_PAD}/1 -> 4/$(($UB960_PAD * 2  + 1)) [1]"
+        CDNS_FMT_STR="0/$(($UB960_PAD * 2)) -> 1/$(($UB960_PAD * 2)) [1], 0/$(($UB960_PAD * 2 + 1)) -> 1/$(($UB960_PAD * 2 + 1)) [1]"
+        echo $CDNS_FMT_STR
         CSI2RX_FMT_STR="0/$(($UB960_PAD * 2)) -> $(($UB960_PAD * 2 + 1))/0 [1], 0/$(($UB960_PAD * 2 + 1)) -> $(($UB960_PAD * 2 + 2))/0 [1]"
 
         # Append UB960 Routes
@@ -181,6 +223,12 @@ setup_ov2312(){
             ALL_UB960_FMT_STR[$media_id,$UB960_NAME]="${ALL_UB960_FMT_STR[$media_id,$UB960_NAME]}, $UB960_FMT_STR"
         else
             ALL_UB960_FMT_STR[$media_id,$UB960_NAME]="$UB960_FMT_STR"
+        fi
+        # Append CDNS Routes
+        if [[ -v "ALL_CDNS_FMT_STR[$media_id,$CSI_BRIDGE_NAME]" ]] ; then
+            ALL_CDNS_FMT_STR[$media_id,$CSI_BRIDGE_NAME]="${ALL_CDNS_FMT_STR[$media_id,$CSI_BRIDGE_NAME]}, $CDNS_FMT_STR"
+        else
+            ALL_CDNS_FMT_STR[$media_id,$CSI_BRIDGE_NAME]="$CDNS_FMT_STR"
         fi
         # Append CSIRX Routes
         if [[ -v "ALL_CSI2RX_FMT_STR[$media_id,$CSI2RX_NAME]" ]] ; then
