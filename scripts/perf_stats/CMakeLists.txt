@@ -56,7 +56,8 @@ add_definitions(
 )
 
 if ("${TARGET_SOC}" STREQUAL "J721E" OR "${TARGET_SOC}" STREQUAL "J721S2" OR "${TARGET_SOC}" STREQUAL "J784S4" OR "${TARGET_SOC}" STREQUAL "AM62A")
-    include_directories(/usr/include/processor_sdk/vision_apps)
+    include_directories(/usr/include/processor_sdk/vision_apps
+                        /usr/include/processor_sdk/app_utils)
 endif()
 include_directories(/usr/include/edgeai-apps-utils/)
 
