@@ -48,6 +48,25 @@ outputs:
         sink: /opt/edgeai-test-data/output/output_image_%04d.jpg
         width: 1920
         height: 1080
+    output3:
+        sink: remote
+        width: 1920
+        height: 1080
+        port: 8081
+        host: 127.0.0.1
+        encoder: jpegenc
+        payloader: multipartmux
+        overlay-performance: True
+    output4:
+        sink: remote
+        width: 1920
+        height: 1080
+        port: 8081
+        host: 127.0.0.1
+        encoder: v4l2h264enc
+        payloader: mp4mux
+        bitrate: 1000000
+        overlay-performance: True
 
 flows:
     flow0: [input1,model0,output0,[320,150,640,360]]
