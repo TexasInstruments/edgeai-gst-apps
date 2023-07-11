@@ -14,14 +14,14 @@ inputs:
     input1:
         source: /opt/edgeai-test-data/videos/video0_1280_720.h264
         format: h264
-        width: 640
-        height: 480
+        width: 1280
+        height: 720
         framerate: 30
         loop: True
     input2:
         source: /opt/edgeai-test-data/images/%04d.jpg
-        width: 640
-        height: 480
+        width: 1280
+        height: 720
         index: 0
         framerate: 1
         loop: True
@@ -36,13 +36,27 @@ models:
         model_path: /opt/model_zoo/ONR-SS-8630-unetlite-aspp-mobv2-tv-ade20k32-512x512
         alpha: 0.4
 outputs:
+    # Jpeg encode and stream
     output0:
         sink: remote
-        width: 1280
-        height: 720
+        width: 1920
+        height: 1080
         port: 8081
-        host: 0.0.0.0
+        host: 127.0.0.1
+        encoder: jpegenc
+        payloader: multipartmux
+        overlay-performance: True
+    # mp4 encode and stream
+    output1:
+        sink: remote
+        width: 1920
+        height: 1080
+        port: 8081
+        host: 127.0.0.1
+        encoder: v4l2h264enc
+        payloader: mp4mux
+        bitrate: 1000000
         overlay-performance: True
 
 flows:
-    flow0: [input0,model1,output0]
+    flow0: [input0,model1,output0,[320,150,1280,720]]

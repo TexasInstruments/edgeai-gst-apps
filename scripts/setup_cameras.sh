@@ -215,7 +215,6 @@ setup_ov2312(){
 
         UB960_FMT_STR="${UB960_PAD}/0 -> 4/$(($UB960_PAD * 2)) [1], ${UB960_PAD}/1 -> 4/$(($UB960_PAD * 2  + 1)) [1]"
         CDNS_FMT_STR="0/$(($UB960_PAD * 2)) -> 1/$(($UB960_PAD * 2)) [1], 0/$(($UB960_PAD * 2 + 1)) -> 1/$(($UB960_PAD * 2 + 1)) [1]"
-        echo $CDNS_FMT_STR
         CSI2RX_FMT_STR="0/$(($UB960_PAD * 2)) -> $(($UB960_PAD * 2 + 1))/0 [1], 0/$(($UB960_PAD * 2 + 1)) -> $(($UB960_PAD * 2 + 2))/0 [1]"
 
         # Append UB960 Routes
