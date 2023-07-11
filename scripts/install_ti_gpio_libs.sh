@@ -106,7 +106,7 @@ fi
 ls | grep "ti-gpio-cpp"
 if [ "$?" -ne "0" ]; then
     echo "Cloning TI GPIO CPP project."
-    git clone --single-branch --branch release-1.0.0 https://github.com/TexasInstruments/ti-gpio-cpp.git
+    git clone --single-branch --branch release-1.1.0 https://github.com/TexasInstruments/ti-gpio-cpp.git
     if [ "$?" -ne "0" ]; then
         cd $current_dir
         exit 1
