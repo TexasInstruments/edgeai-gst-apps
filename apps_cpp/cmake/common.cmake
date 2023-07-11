@@ -101,7 +101,7 @@ link_directories(${TARGET_FS}/usr/lib/aarch64-linux-gnu
                  )
 
 if(USE_DLR_RT)
-link_directories(${TARGET_FS}/usr/lib/python3.8/site-packages/dlr)
+link_directories(${TARGET_FS}/usr/lib/python3.10/site-packages/dlr)
 endif()
 
 if(USE_TENSORFLOW_RT)
@@ -138,7 +138,7 @@ include_directories(${PROJECT_SOURCE_DIR}
                     )
 
 if(USE_DLR_RT)
-include_directories(${TARGET_FS}/usr/lib/python3.8/site-packages/dlr/include/)
+include_directories(${TARGET_FS}/usr/lib/python3.10/site-packages/dlr/include/)
 endif()
 
 if(USE_TENSORFLOW_RT)
