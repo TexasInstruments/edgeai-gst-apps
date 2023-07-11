@@ -40,7 +40,7 @@ cd $(dirname "$(readlink -f "$BASH_SOURCE")")
 
 source ./scripts/detect_soc.sh
 
-export PYTHONPATH=/usr/lib/python3.8/site-packages/
+export PYTHONPATH=/usr/lib/python3.10/site-packages/
 
 # Disable Neo-DLR phone-home feature
 echo '{"enable_phone_home": false}' > $PYTHONPATH/dlr/counter/ccm_config.json
@@ -53,7 +53,7 @@ rm -rf /usr/lib/libtidl_tfl_delegate.so.map
 
 # Link headers and libraries for DLR
 mkdir -p /usr/dlr/
-ln -snf /usr/lib/python3.8/site-packages/dlr/libdlr.so /usr/dlr/libdlr.so
+ln -snf /usr/lib/python3.10/site-packages/dlr/libdlr.so /usr/dlr/libdlr.so
 ln -snf /usr/dlr/libdlr.so /usr/lib/libdlr.so
 
 ldconfig
