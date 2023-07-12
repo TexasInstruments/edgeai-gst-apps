@@ -64,4 +64,4 @@ echo export LD_LIBRARY_PATH=/usr/lib:/usr/lib/aarch64-linux-gnu:/usr/lib/edgeai-
 ldconfig
 
 # Disable Neo-DLR phone-home feature
-echo '{"enable_phone_home": false}' > /usr/local/lib/python3.8/dist-packages/dlr/counter/ccm_config.json
+echo '{"enable_phone_home": false}' > /usr/local/lib/python3.10/dist-packages/dlr/counter/ccm_config.json
