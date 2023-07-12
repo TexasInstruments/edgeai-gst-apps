@@ -29,16 +29,6 @@ namespace ti::utils
         const int32_t       save_history = 16;      // Defines how many log files to keep at a time
         std::string         base_dir = "../perf_logs";
 
-#if defined(SOC_J721E)
-        /* open sysfs files for reading temperature data*/
-        FILE *cpuTempFd  = fopen("/sys/class/thermal/thermal_zone1/temp", "rb");
-        FILE *wkupTempFd = fopen("/sys/class/thermal/thermal_zone0/temp", "rb");
-        FILE *c7xTempFd  = fopen("/sys/class/thermal/thermal_zone2/temp", "rb");
-        FILE *gpuTempFd  = fopen("/sys/class/thermal/thermal_zone3/temp", "rb");
-        FILE *r5fTempFd  = fopen("/sys/class/thermal/thermal_zone4/temp", "rb");
-        uint32_t cpuTemp, wkupTemp, c7xTemp, gpuTemp, r5fTemp, ret=0;
-#endif
-
         if (sub_dir_name)
         {
             base_dir += string("/") + sub_dir_name;
@@ -58,47 +48,6 @@ namespace ti::utils
             if (NULL != fp)
             {
                 ::appPerfStatsExportAll(fp, perf_arr, 1);
-
-#if defined(SOC_J721E)
-                /* Read temperature data*/
-                ret = fscanf(cpuTempFd, "%u", &cpuTemp);
-                if (ret != 1)
-                    printf("[ERROR]Failed to read cpuTemp\n");
-                rewind(cpuTempFd);
-                fflush(cpuTempFd);
-                ret = fscanf(wkupTempFd, "%u", &wkupTemp);
-                if (ret != 1)
-                    printf("[ERROR]Failed to read wkupTemp\n");
-                rewind(wkupTempFd);
-                fflush(wkupTempFd);
-                ret = fscanf(c7xTempFd, "%u", &c7xTemp);
-                if (ret != 1)
-                    printf("[ERROR]Failed to read c7xTemp\n");
-                rewind(c7xTempFd);
-                fflush(c7xTempFd);
-                ret = fscanf(gpuTempFd, "%u", &gpuTemp);
-                if (ret != 1)
-                    printf("[ERROR]Failed to read gpuTemp\n");
-                rewind(gpuTempFd);
-                fflush(gpuTempFd);
-                ret = fscanf(r5fTempFd, "%u", &r5fTemp);
-                if (ret != 1)
-                    printf("[ERROR]Failed to read r5fTemp\n");
-                rewind(r5fTempFd);
-                fflush(r5fTempFd);
-
-                /* print temperature stats*/
-                fprintf(fp,"\n");
-                fprintf(fp,"# Temperature statistics\n");
-                fprintf(fp,"\n");
-                fprintf(fp,"ZONE      | TEMPERATURE\n");
-                fprintf(fp,"----------|--------------\n");
-                fprintf(fp,"CPU   |   %0.2f Celsius\n",float(cpuTemp)/1000);
-                fprintf(fp,"WKUP  |   %0.2f Celsius\n",float(wkupTemp)/1000);
-                fprintf(fp,"C7X   |   %0.2f Celsius\n",float(c7xTemp)/1000);
-                fprintf(fp,"GPU   |   %0.2f Celsius\n",float(gpuTemp)/1000);
-                fprintf(fp,"R5F   |   %0.2f Celsius\n",float(r5fTemp)/1000);
-#endif
                 ::appPerfStatsExportCloseFile(fp);
                 ::appPerfStatsResetAll();
             }
@@ -114,14 +63,6 @@ namespace ti::utils
             this_thread::sleep_for(chrono::milliseconds(2000));
         }
 
-#if defined(SOC_J721E)
-        /* close fds*/
-        fclose(cpuTempFd);
-        fclose(wkupTempFd);
-        fclose(c7xTempFd);
-        fclose(gpuTempFd);
-        fclose(r5fTempFd);
-#endif
 #endif
     }
 
