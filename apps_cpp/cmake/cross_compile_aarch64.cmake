@@ -48,5 +48,5 @@ set(CMAKE_CXX_COMPILER_WORKS 1)
 # https://cmake.org/cmake/help/latest/variable/CMAKE_TRY_COMPILE_PLATFORM_VARIABLES.html
 list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES CROSS_COMPILER_PATH TARGET_FS TOOLCHAIN_PREFIX)
 
-link_directories(${TARGET_FS}/usr/local/lib/python3.8/dist-packages/dlr
+link_directories(${TARGET_FS}/usr/local/lib/python3.10/dist-packages/dlr
                  )
