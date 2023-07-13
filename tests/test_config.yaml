@@ -5,9 +5,9 @@ title: "Test Demo"
 log_level: 2
 inputs:
     input:
-        source: /opt/edgeai-test-data/videos/video0_1280_720.h264
+        source: /opt/edgeai-test-data/videos/video0_1280_768.h264
         width: 1280
-        height: 720
+        height: 768
         framerate: 30
         format: h264
         loop: True

@@ -432,7 +432,7 @@ def get_output_str(output):
         sink_cmd = '! video/x-raw,format=NV12, width=%d, height=%d ' % (output.width,output.height) + '!' + sink_cmd
         mosaic_cmd = gst_element_map["mosaic"]["element"] + ' name=mosaic_%d' % (output.id)
         if gst_element_map["mosaic"]["element"] == "tiovxmosaic":
-            mosaic_cmd += ' target=1 src::pool-size=3'
+            mosaic_cmd += ' target=1 src::pool-size=4'
         mosaic_cmd += ' \\\n'
     else:
         mosaic_cmd = ''
