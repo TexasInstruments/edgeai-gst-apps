@@ -123,7 +123,6 @@ app.get('/mp4', function (req, res) {
   });
   console.log(req.params.id)
   emitter.on('data', function(data) {
-      console.log('data event received...');
       const chunk = data.length
       if(chunk > 0){
           res.write(data)

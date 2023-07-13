@@ -73,6 +73,12 @@ namespace ti::edgeai::common
                              gst_caps_from_string(propMap[i][1]),
                              NULL);
             }
+            else if (g_str_equal(propMap[i][0],"extra-controls"))
+            {
+                g_object_set(element,propMap[i][0],
+                             gst_structure_from_string(propMap[i][1],NULL),
+                             NULL);
+            }
             else if (g_str_equal(propMap[i][1],"true") ||
                      g_str_equal(propMap[i][1],"false") )
             {
@@ -759,6 +765,7 @@ namespace ti::edgeai::common
                         }
                         break;
                     }
+
                     default:
                         if (element_name == "capsfilter" && param->value_type == GST_TYPE_CAPS)
                         {
@@ -769,7 +776,19 @@ namespace ti::edgeai::common
                                 data += param->name;
                                 data += "=\"";
                                 data += gst_caps_to_string(caps);
-                                data += "; \"";
+                                data += ";\"";
+                            }
+                        }
+                        else if (param->value_type == GST_TYPE_STRUCTURE)
+                        {
+                            const GstStructure *st = gst_value_get_structure (&value);
+                            if (st != NULL)
+                            {
+                                data += " ";
+                                data += param->name;
+                                data += "=\"";
+                                data += gst_structure_to_string(st);
+                                data += "\"";
                             }
                         }
 

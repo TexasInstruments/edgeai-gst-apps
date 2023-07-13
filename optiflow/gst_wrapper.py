@@ -339,10 +339,9 @@ def get_output_str(output):
     Args:
         output: output configuration
     """
-    image_enc = {'.jpg':' jpegenc ! '}
-    video_enc = {'.mov':' v4l2h264enc ! h264parse ! qtmux ! ', \
-                 '.mp4':' v4l2h264enc ! h264parse ! mp4mux ! ', \
-                 '.mkv':' v4l2h264enc ! h264parse ! matroskamux ! '}
+    video_enc = {'.mov':' ! h264parse ! qtmux ! ', \
+                 '.mp4':' ! h264parse ! mp4mux ! ', \
+                 '.mkv':' ! h264parse ! matroskamux ! '}
 
     sink_ext = os.path.splitext(output.sink)[1]
     status = 0
@@ -354,7 +353,7 @@ def get_output_str(output):
                                     not os.path.dirname(output.sink)):
         if (sink_ext in video_enc):
             sink = 'video'
-        elif (sink_ext in image_enc):
+        elif (sink_ext == ".jpg"):
             sink = 'image'
         else:
             sink = 'others'
@@ -369,49 +368,59 @@ def get_output_str(output):
         if (output.connector):
                 sink_cmd += ' connector-id=%d' % output.connector
     elif (sink == 'image'):
-        sink_cmd = image_enc[sink_ext] + \
+        sink_cmd = ' ' + gst_element_map["jpegenc"]["element"] + ' !' + \
                                     ' multifilesink location=' + output.sink
     elif (sink == 'video'):
         sink_cmd = ''
         if output.overlay_performance:
             sink_cmd += ' queue ! tiperfoverlay !'
 
-        encoder = video_enc[sink_ext]
-        prop_str = "video_bitrate=%d, video_gop_size=%d" \
-                                              % (output.bitrate,output.gop_size)
-        enc_extra_ctrl = "extra-controls=\"controls, " + \
-                         "frame_level_rate_control_enable=1, " + \
-                         prop_str + \
-                         "\""
-        replacement_string = "v4l2h264enc " + enc_extra_ctrl
-        encoder = encoder.replace("v4l2h264enc",replacement_string)
-        sink_cmd += encoder + 'filesink location=' + output.sink
+        sink_cmd += ' ' + gst_element_map["h264enc"]["element"]
 
-    elif (sink == 'remote'):
-        sink_cmd = ''
-        if output.overlay_performance:
-            sink_cmd += ' queue ! tiperfoverlay !'
-
-        if output.encoder == "v4l2h264enc":
+        if (gst_element_map["h264enc"]["element"] == "v4l2h264enc"):
             prop_str = "video_bitrate=%d, video_gop_size=%d" \
                                               % (output.bitrate,output.gop_size)
             enc_extra_ctrl = "extra-controls=\"controls, " + \
                             "frame_level_rate_control_enable=1, " + \
                             prop_str + \
                             "\""
-            sink_cmd += ' v4l2h264enc ' + enc_extra_ctrl + ' ! h264parse !'
-        else:
-            sink_cmd += ' ' + output.encoder + ' !'
+            sink_cmd += ' ' + enc_extra_ctrl
 
-        if output.payloader == "mp4mux":
-            sink_cmd += ' mp4mux fragment-duration=1 !'
-        elif output.payloader == "multipartmux":
-            sink_cmd += ' multipartmux boundary=spionisto ! rndbuffersize max=65000 !'
+        sink_cmd += video_enc[sink_ext] + 'filesink location=' + output.sink
+
+    elif (sink == 'remote'):
+        sink_cmd = ''
+        if output.overlay_performance:
+            sink_cmd += ' queue ! tiperfoverlay !'
+
+        if output.encoding == "mp4" or output.encoding == "h264":
+
+            sink_cmd += ' ' + gst_element_map["h264enc"]["element"]
+
+            if (gst_element_map["h264enc"]["element"] == "v4l2h264enc"):
+                prop_str = "video_bitrate=%d, video_gop_size=%d" \
+                                              % (output.bitrate,output.gop_size)
+                enc_extra_ctrl = "extra-controls=\"controls, " + \
+                                "frame_level_rate_control_enable=1, " + \
+                                prop_str + \
+                                "\""
+                sink_cmd +=  ' ' + enc_extra_ctrl
+
+            sink_cmd += ' ! h264parse !'
+
+            if output.encoding == "mp4":
+                sink_cmd += ' mp4mux fragment-duration=1 !'
+            elif output.encoding == "h264":
+                sink_cmd += ' rtph264pay !'
+
+        elif output.encoding == "jpeg":
+            sink_cmd += ' ' + gst_element_map["jpegenc"]["element"] + ' ! multipartmux boundary=spionisto ! rndbuffersize max=65000 !'
+
         else:
-            sink_cmd += ' ' + output.payloader + ' !'
+            print("[ERROR] Wrong encoding [%s] defined for remote output.", output.encoding)
+            sys.exit()
 
         sink_cmd += ' udpsink host=%s port=%d sync=false' % (output.host,output.port)
-
 
     elif (sink == 'others'):
         sink_cmd = ''

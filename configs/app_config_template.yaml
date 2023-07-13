@@ -194,25 +194,26 @@ models:
 # Application output configuration. This is a list of outputs
 # enumerated starting with 0.
 outputs:
+    # Allowed sink for the output. Allowed values
+    # - kmssink                 [Display]
+    # - <some_path>/*%Nd*.jpg   [Image]
+    # - <some_path>/*.mkv       [Video]
+    # - <some_path>/*.mp4       [Video]
+    # - <some_path>/*.mov       [Video]
+    # - remote                  [Remote]
+    #
+    #ex:- ../c/d/output_image%02d.jpg
+    #     /a/b/c/d/output_image%02d.png
+    #     /a/b/c/d/output_video.mkv
+    #     /a/b/c/d/output_video.mp4
+    #     /a/b/c/d/output_video.mov
+    #
+    # The paths to images and videos can be absolute or relative to the directoty
+    # the application is launched from.
+    #
+    # Default is kmssink
     output0:
-        # Allowed sink for the output. Allowed values
-        # - kmssink                 [Display]
-        # - <some_path>/*%Nd*.jpg   [Image]
-        # - <some_path>/*%Nd*.png   [Image]
-        # - <some_path>/*.mkv       [Video]
-        # - <some_path>/*.mp4       [Video]
-        # - <some_path>/*.mov       [Video]
-        #
-        #ex:- ../c/d/output_image%02d.jpg
-        #     /a/b/c/d/output_image%02d.png
-        #     /a/b/c/d/output_video.mkv
-        #     /a/b/c/d/output_video.mp4
-        #     /a/b/c/d/output_video.mov
-        #
-        # The paths to images and videos can be absolute or relative to the directoty
-        # the application is launched from.
-        #
-        # Default is kmssink
+        # Display
         sink: kmssink
 
         # Output display width
@@ -229,24 +230,7 @@ outputs:
         connector: 0
 
     output1:
-        # Allowed sink for the output. Allowed values
-        # - kmssink                 [Display]
-        # - <some_path>/*%Nd*.jpg   [Image]
-        # - <some_path>/*%Nd*.png   [Image]
-        # - <some_path>/*.mkv       [Video]
-        # - <some_path>/*.mp4       [Video]
-        # - <some_path>/*.mov       [Video]
-        #
-        #ex:- ../c/d/output_image%02d.jpg
-        #     /a/b/c/d/output_image%02d.png
-        #     /a/b/c/d/output_video.mkv
-        #     /a/b/c/d/output_video.mp4
-        #     /a/b/c/d/output_video.mov
-        #
-        # The paths to images and videos can be absolute or relative to the directoty
-        # the application is launched from.
-        #
-        # Default is kmssink
+        # Save as video
         sink: /opt/edgeai-test-data/output/output_video.mkv
 
         # Output display width
@@ -257,25 +241,9 @@ outputs:
 
         #Bitrate of encoder (optional)(Default=10000000)
         bitrate: 10000000
+
     output2:
-        # Allowed sink for the output. Allowed values
-        # - kmssink                 [Display]
-        # - <some_path>/*%Nd*.jpg   [Image]
-        # - <some_path>/*%Nd*.png   [Image]
-        # - <some_path>/*.mkv       [Video]
-        # - <some_path>/*.mp4       [Video]
-        # - <some_path>/*.mov       [Video]
-        #
-        #ex:- ../c/d/output_image%02d.jpg
-        #     /a/b/c/d/output_image%02d.png
-        #     /a/b/c/d/output_video.mkv
-        #     /a/b/c/d/output_video.mp4
-        #     /a/b/c/d/output_video.mov
-        #
-        # The paths to images and videos can be absolute or relative to the directoty
-        # the application is launched from.
-        #
-        # Default is kmssink
+        # Save as image
         sink: /opt/edgeai-test-data/output/output_image_%04d.jpg
 
         # Output display width
@@ -283,8 +251,9 @@ outputs:
 
         # Output display height
         height: 1080
+
     output3:
-        # Sink for display on browser
+        # Encode and stream over network
         sink: remote
 
         # Output display width
@@ -299,22 +268,14 @@ outputs:
         #IP group to send the packets to(optional)(Default=0.0.0.0)
         host: 127.0.0.1
 
-        #Encoder to be used
+        #Encoding to be used
         # Ex:
-        # - v4l2h264enc
-        # - jpegenc
+        # - jpeg
+        # - mp4
+        # - h264
         #
-        # Optional - (Default=v4l2h264enc)
-        encoder: v4l2h264enc
-
-        #Payloader or Mux to be added after encode
-        # Ex:
-        # - rtph264pay
-        # - mp4mux
-        # - multipartmux
-        #
-        # Optional - (Default=rtph264pay)
-        payloader: rtph264pay
+        # Optional - (Default=h264)
+        encoding: jpeg
         
         #Bitrate of encoder (optional)(Default=10000000)
         bitrate: 10000000
