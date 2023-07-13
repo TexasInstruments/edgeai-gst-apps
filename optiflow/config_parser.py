@@ -87,6 +87,7 @@ class Input:
         self.splits = 0
         self.roi_strings = []
         self.roi_string = ''
+        self.msc_target_string = ''
         self.gst_str = gst_wrapper.get_input_str(self)
         self.input_format = utils.get_format(self.gst_str)
 

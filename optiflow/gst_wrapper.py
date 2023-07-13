@@ -48,6 +48,7 @@ Gst.init(None)
 preproc_target_idx = 0
 isp_target_idx = 0
 ldc_target_idx = 0
+msc_target_idx = 0
 
 class GstPipe:
     """
@@ -305,6 +306,9 @@ def get_input_str(input):
     return source_cmd
 
 def get_input_split_str(input,flow):
+
+    global msc_target_idx
+
     if gst_element_map["scaler"]["element"] == "tiovxmultiscaler":
         crop_startx = (((flow.model.resize[0] - flow.model.crop[0])/2)/flow.model.resize[0]) * flow.input.width
         crop_startx = int(crop_startx)
@@ -319,15 +323,27 @@ def get_input_split_str(input,flow):
             input.roi_string += " src_%d::roi-width=%d" % (src_pad,crop_width)
             input.roi_string += " src_%d::roi-height=%d" % (src_pad,crop_height)
 
+        # Load-balancing the msc targets
+        if input.msc_target_string == '':
+            if "property" in gst_element_map["scaler"]:
+                if "target" in gst_element_map["scaler"]["property"]:
+                    target = gst_element_map["scaler"]["property"]["target"][msc_target_idx]
+                    msc_target_idx += 1
+                    if msc_target_idx >= len(gst_element_map["scaler"]["property"]["target"]):
+                        msc_target_idx = 0
+                    input.msc_target_string = 'target=%d' % target
+
         if input.split_count == 1:
-            source_cmd = 'tiovxmultiscaler name=split_%d%d \\\n' % \
+            source_cmd = 'tiovxmultiscaler name=split_%d%d ' % \
                                                    (input.id, input.split_count)
+            source_cmd += input.msc_target_string + ' \\\n'
         else:
             source_cmd = 'tee name=tee_split%d \\\n' % input.id
             for i in range(input.split_count):
                 source_cmd += \
-                    'tee_split%d. ! queue ! tiovxmultiscaler name=split_%d%d \\\n' % \
+                    'tee_split%d. ! queue ! tiovxmultiscaler name=split_%d%d ' % \
                                                        (input.id, input.id, i+1)
+                source_cmd += input.msc_target_string + ' \\\n'
     else:
         source_cmd = 'tee name=tee_split%d \\\n' % input.id
 
@@ -470,7 +486,7 @@ def get_pre_proc_str(flow):
                 width += 1
             if height % 2 != 0:
                 height += 1     
-            cmd += 'video/x-raw, width=%d, height=%d ! tiovxmultiscaler target=1 ! ' % \
+            cmd += 'video/x-raw, width=%d, height=%d ! tiovxmultiscaler ! ' % \
                                                                   (width,height)
 
         elif (crop_width/crop[0] < 1 or crop_height/crop[1] < 1):
@@ -530,6 +546,28 @@ def get_pre_proc_str(flow):
     if (gst_element_map["scaler"]["element"] != "tiovxmultiscaler"):
         split_name = "tee_split%d" % (flow.input.id)
 
+    '''
+        set secondary msc target if present
+        secondary multiscaler target will always be complimentary of primary.
+        For ex: msc_targets=[0,1,2,3]
+            If primary msc target is 0, secondary will be 1
+            If primary msc target is 1, secondary will be 2
+            ..and so on
+    '''
+    if 'tiovxmultiscaler' in cmd:
+        input_target = None
+        for i in flow.input.gst_split_str.split("!"):
+            if 'tiovxmultiscaler' in i:
+                for j in i.split(" "):
+                    if 'target' in j:
+                        input_target = int(j.split("=")[-1].strip())
+        if (input_target != None):
+            msc_targets = gst_element_map["scaler"]["property"]["target"]
+            target_idx = len(msc_targets) - msc_targets.index(input_target) - 1
+            replacement_string = 'tiovxmultiscaler target=%d' % msc_targets[target_idx]
+            cmd = cmd.replace('tiovxmultiscaler' , replacement_string )
+
+    # Set dl_inferer core number
     target_str = ''
     if (gst_element_map['inferer']):
         if 'core-id' in gst_element_map['inferer']:
