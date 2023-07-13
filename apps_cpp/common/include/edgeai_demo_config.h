@@ -447,10 +447,10 @@ namespace ti::edgeai::common
              */
             int32_t                         m_port{8081};
 
-            /** Payloader for remote sink.
+            /** Encoding type for remote sink.
              * This field is ignored for sinks other than remote
              */
-            string                          m_payloader{"rtph264pay"};
+            string                          m_encoding{"h264"};
 
             /** gop size for encoder.
              */

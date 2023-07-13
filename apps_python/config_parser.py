@@ -101,14 +101,10 @@ class Output:
             self.host = output_config["host"]
         else:
             self.host = "0.0.0.0"
-        if "payloader" in output_config:
-            self.payloader = output_config["payloader"]
+        if 'encoding' in output_config:
+            self.encoding = output_config['encoding']
         else:
-            self.payloader = "rtph264pay"
-        if "encoder" in output_config:
-            self.encoder = output_config["encoder"]
-        else:
-            self.encoder = "v4l2h264enc"
+            self.encoding = 'h264'
         if "gop-size" in output_config:
             self.gop_size = output_config["gop-size"]
         else:

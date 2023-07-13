@@ -39,24 +39,22 @@ outputs:
     # Jpeg encode and stream
     output0:
         sink: remote
-        width: 1920
-        height: 1080
+        width: 1280
+        height: 720
         port: 8081
         host: 127.0.0.1
-        encoder: jpegenc
-        payloader: multipartmux
+        encoding: jpeg
         overlay-performance: True
     # mp4 encode and stream
     output1:
         sink: remote
-        width: 1920
-        height: 1080
+        width: 1280
+        height: 720
         port: 8081
         host: 127.0.0.1
-        encoder: v4l2h264enc
-        payloader: mp4mux
+        encoding: mp4
         bitrate: 1000000
         overlay-performance: True
 
 flows:
-    flow0: [input0,model1,output0,[320,150,1280,720]]
+    flow0: [input1,model1,output0]
