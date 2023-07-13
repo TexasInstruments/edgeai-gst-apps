@@ -534,7 +534,7 @@ def get_input_elements(input):
         video_dec["h264"].append(
             [gst_element_map["h264dec"]["element"], property, None]
         )
-        property = {"pool-size": 8}
+        property = {"pool-size": 12}
         caps = "video/x-raw, format=NV12"
         video_dec["h264"].append(["tiovxmemalloc", property, caps])
     else:
@@ -549,7 +549,7 @@ def get_input_elements(input):
         video_dec["h265"].append(
             [gst_element_map["h265dec"]["element"], property, None]
         )
-        property = {"pool-size": 8}
+        property = {"pool-size": 12}
         caps = "video/x-raw, format=NV12"
         video_dec["h265"].append(["tiovxmemalloc", property, caps])
     else:
@@ -757,7 +757,6 @@ def get_input_elements(input):
             caps_string = "video/x-" + input.format
             caps_string += ",width=%d,height=%d,framerate=%s" % (input.width,input.height,input.fps)
             property["caps"] = Gst.caps_from_string(caps_string)
-
         element = make_element("multifilesrc", property=property)
         input_element_list += element
         for i in video_dec[input.format]:

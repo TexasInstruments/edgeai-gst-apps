@@ -12,12 +12,12 @@ PERF="queue ! tiperfoverlay dump=true overlay=false location=$LOG_FILE \
 FILTER=""
 
 ################################################################################
-VIDEO_FILE_MP4_1MP=/opt/edgeai-test-data/videos/video0_1280_720_h264.mp4
-VIDEO_FILE_H264_1MP=/opt/edgeai-test-data/videos/video0_1280_720.h264
+VIDEO_FILE_MP4_1MP=/opt/edgeai-test-data/videos/video0_1280_768_h264.mp4
+VIDEO_FILE_H264_1MP=/opt/edgeai-test-data/videos/video0_1280_768.h264
 VIDEO_FILE_H264_2MP=/opt/edgeai-test-data/videos/video0_1920_1088.h264
 VIDEO_FILE_H265_2MP=/opt/edgeai-test-data/videos/video0_1920_1088.h265
 
-VIDEOTESTSRC_2MP="videotestsrc pattern=4 num-buffers=600 is-live=true ! video/x-raw,format=NV12,width=1920,height=1080,framerate=30/1"
+VIDEOTESTSRC_2MP="videotestsrc pattern=4 num-buffers=600 is-live=true ! video/x-raw,format=NV12,width=1920,height=1088,framerate=30/1"
 
 if [ "$SOC" == "j721e" ]
 then
@@ -43,7 +43,7 @@ VIDEO_H264_2MP()
   cp $VIDEO_FILE_H264_2MP $VIDEO_FILE_H264_2MP$1
   echo "multifilesrc location=$VIDEO_FILE_H264_2MP$1"
   echo "stop-index=$LOOP_COUNT"
-  echo "caps=\"video/x-h264, width=1920, height=1080\" !"
+  echo "caps=\"video/x-h264, width=1920, height=1088\" !"
   echo "h264parse ! ${H264_DECODE[$DEC_TARGET]} $DMABUF_IMPORT !"
   echo "video/x-raw,format=NV12"
   DEC_TARGET=$((($DEC_TARGET + 1) % $NUM_DEC))

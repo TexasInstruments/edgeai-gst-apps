@@ -486,7 +486,7 @@ int32_t InputInfo::addGstPipeline(vector<vector<GstElement*>>   &preProcElementV
                                 m_gstElementProperty,
                                 NULL);
 
-                    m_gstElementProperty = {{"pool-size","8"}};
+                    m_gstElementProperty = {{"pool-size","12"}};
                     string caps = "video/x-raw, format=NV12";
                     makeElement(m_inputElements,
                                 "tiovxmemalloc",
@@ -544,7 +544,7 @@ int32_t InputInfo::addGstPipeline(vector<vector<GstElement*>>   &preProcElementV
                                 m_gstElementProperty,
                                 NULL);
 
-                    m_gstElementProperty = {{"pool-size","8"}};
+                    m_gstElementProperty = {{"pool-size","12"}};
                     string caps = "video/x-raw, format=NV12";
                     makeElement(m_inputElements,
                                 "tiovxmemalloc",
@@ -580,7 +580,7 @@ int32_t InputInfo::addGstPipeline(vector<vector<GstElement*>>   &preProcElementV
                                 m_gstElementProperty,
                                 NULL);
 
-                    m_gstElementProperty = {{"pool-size","8"}};
+                    m_gstElementProperty = {{"pool-size","12"}};
                     string caps = "video/x-raw, format=NV12";
                     makeElement(m_inputElements,
                                 "tiovxmemalloc",
@@ -630,7 +630,7 @@ int32_t InputInfo::addGstPipeline(vector<vector<GstElement*>>   &preProcElementV
                                 m_gstElementProperty,
                                 NULL);
 
-                    m_gstElementProperty = {{"pool-size","8"}};
+                    m_gstElementProperty = {{"pool-size","12"}};
                     string caps = "video/x-raw, format=NV12";
                     makeElement(m_inputElements,
                                 "tiovxmemalloc",

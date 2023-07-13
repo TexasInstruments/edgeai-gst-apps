@@ -60,7 +60,7 @@ inputs:
 
     input1:
         # Raw Video Source
-        source: /opt/edgeai-test-data/videos/video0_1280_720.h264
+        source: /opt/edgeai-test-data/videos/video0_1280_768.h264
 
         # Video encoding format (optional)
         # Allowed values
@@ -73,7 +73,7 @@ inputs:
         width: 1280
 
         # Input data height
-        height: 720
+        height: 768
 
         # Frame rate
         # Default is 30 for camera and 1 for image
@@ -84,7 +84,7 @@ inputs:
 
     input2:
         # Video Source
-        source: /opt/edgeai-test-data/videos/video0_1280_720_h264.mp4
+        source: /opt/edgeai-test-data/videos/video0_1280_768_h264.mp4
 
         # Video encoding format (optional)
         # Allowed values
@@ -97,7 +97,7 @@ inputs:
         width: 1280
 
         # Input data height
-        height: 720
+        height: 768
 
         # Frame rate
         # Default is 30 for camera and 1 for image
