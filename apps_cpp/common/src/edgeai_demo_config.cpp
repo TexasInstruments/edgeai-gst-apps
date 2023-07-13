@@ -81,18 +81,11 @@ static map<string, vector<string>> gVideoDecMap =
     {"auto", {"decodebin"}}
 };
 
-    
-
-static map<string, string> gImageEncMap =
-{
-    {".jpg", "jpegenc"}
-};
-
 static map<string, vector<string>> gVideoEncMap =
 {
-    {".mov", {"v4l2h264enc","h264parse","qtmux"}},
-    {".mp4", {"v4l2h264enc","h264parse","mp4mux"}},
-    {".mkv", {"v4l2h264enc","h264parse","matroskamux"}}
+    {".mov", {"h264parse","qtmux"}},
+    {".mp4", {"h264parse","mp4mux"}},
+    {".mkv", {"h264parse","matroskamux"}}
 };
 
 int32_t InputInfo::m_numInstances = 0;
@@ -1211,9 +1204,9 @@ OutputInfo::OutputInfo(const YAML::Node    &node,
     {
         m_port = node["port"].as<int32_t>();
     }
-    if (node["payloader"])
+    if (node["encoding"])
     {
-        m_payloader = node["payloader"].as<string>();
+        m_encoding = node["encoding"].as<string>();
     }
     if (node["gop-size"])
     {
@@ -1270,7 +1263,7 @@ int32_t OutputInfo::appendGstPipeline()
     {
         sinkType = "video";
     }
-    else if (gImageEncMap.find(sinkExt) != gImageEncMap.end())
+    else if (sinkExt == ".jpg")
     {
         sinkType = "image";
     }
@@ -1305,7 +1298,10 @@ int32_t OutputInfo::appendGstPipeline()
 
     else if (sinkType == "image")
     {
-        makeElement(m_dispElements,gImageEncMap[sinkExt].c_str(),m_gstElementProperty,NULL);
+        makeElement(m_dispElements,
+                    gstElementMap["jpegenc"]["element"].as<string>().c_str(),
+                    m_gstElementProperty,
+                    NULL);
 
         m_gstElementProperty = {{"location",m_sink.c_str()},
                                 {"name",name.c_str()}};
@@ -1314,15 +1310,23 @@ int32_t OutputInfo::appendGstPipeline()
 
     else if (sinkType == "video")
     {
+        string h264enc = gstElementMap["h264enc"]["element"].as<string>();
+        string encoder_extra_ctrl = "";
+
+        if (h264enc == "v4l2h264enc")
+        {
+            encoder_extra_ctrl = "controls"
+                                 ",frame_level_rate_control_enable=1"
+                                 ",video_bitrate=" + to_string(m_bitrate) +
+                                 ",video_gop_size=" + to_string(m_gopSize);
+
+            m_gstElementProperty = {{"extra-controls",encoder_extra_ctrl.c_str()}};
+        }
+
+        makeElement(m_dispElements,h264enc.c_str(),m_gstElementProperty,NULL);
+
         for(unsigned i=0;i<gVideoEncMap[sinkExt].size();i++)
         {
-            string encoder_extra_ctrl = "controls"
-                                        ", frame_level_rate_control_enable=1"
-                                        ", video_bitrate=" + to_string(m_bitrate) +
-                                        ", video_gop_size=" + to_string(m_gopSize);
-            if (gVideoEncMap[sinkExt][i] == "v4l2h264enc")
-                m_gstElementProperty = {{"extra-controls",encoder_extra_ctrl.c_str()}};
-
             makeElement(m_dispElements,
                         gVideoEncMap[sinkExt][i].c_str(),
                         m_gstElementProperty,
@@ -1336,21 +1340,55 @@ int32_t OutputInfo::appendGstPipeline()
     }
     else if (sinkType == "remote")
     {
-        string encoder_extra_ctrl = "controls"
-                                    ", frame_level_rate_control_enable=1"
-                                    ", video_bitrate=" + to_string(m_bitrate) +
-                                    ", video_gop_size=" + to_string(m_gopSize);
-        m_gstElementProperty = {{"extra-controls",encoder_extra_ctrl.c_str()}};
+        string h264enc = "";
+        string encoder_extra_ctrl = "";
+        string jpegenc = "";
 
-        makeElement(m_dispElements,"v4l2h264enc",m_gstElementProperty,NULL);
-        makeElement(m_dispElements,"h264parse",m_gstElementProperty,NULL);
-
-        if (m_payloader == "mp4mux")
+        if (m_encoding == "mp4" || m_encoding == "h264")
         {
-            m_gstElementProperty = {{"fragment-duration","1"}};
+            h264enc = gstElementMap["h264enc"]["element"].as<string>();
+            if (h264enc == "v4l2h264enc")
+            {
+                encoder_extra_ctrl = "controls"
+                                    ",frame_level_rate_control_enable=1"
+                                    ",video_bitrate=" + to_string(m_bitrate) +
+                                    ",video_gop_size=" + to_string(m_gopSize);
+
+                m_gstElementProperty = {{"extra-controls",encoder_extra_ctrl.c_str()}};
+            }
+
+            makeElement(m_dispElements,h264enc.c_str(),m_gstElementProperty,NULL);
+            makeElement(m_dispElements,"h264parse",m_gstElementProperty,NULL);
+
+            if (m_encoding == "mp4")
+            {
+                m_gstElementProperty = {{"fragment-duration","1"}};
+                makeElement(m_dispElements,"mp4mux",m_gstElementProperty,NULL);
+            }
+            else if (m_encoding == "h264")
+            {
+                makeElement(m_dispElements,"rtph264pay",m_gstElementProperty,NULL);
+            }
+
         }
 
-        makeElement(m_dispElements,m_payloader.c_str(),m_gstElementProperty,NULL);
+        else if (m_encoding == "jpeg")
+        {
+            jpegenc = gstElementMap["jpegenc"]["element"].as<string>();
+            makeElement(m_dispElements,jpegenc.c_str(),m_gstElementProperty,NULL);
+
+            m_gstElementProperty = {{"boundary","spionisto"}};
+            makeElement(m_dispElements,"multipartmux",m_gstElementProperty,NULL);
+
+            m_gstElementProperty = {{"max","65000"}};
+            makeElement(m_dispElements,"rndbuffersize",m_gstElementProperty,NULL);
+        }
+
+        else
+        {
+            LOG_ERROR("Wrong encoding [%s] defined for remote output.\n", m_encoding.c_str());
+            throw runtime_error("Failed to create Gstreamer Pipeline.");
+        }
 
         m_gstElementProperty = {{"sync","false"},
                                 {"host",m_host.c_str()},

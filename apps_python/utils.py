@@ -315,6 +315,9 @@ def get_name_with_prop(element):
                     if GObject.GType.is_a(i.value_type, GObject.GEnum):
                         element_prop += " " + i.name + "="
                         element_prop += str(int(element.get_property(i.name)))
+                    elif GObject.GType.is_a(i.value_type, GObject.TYPE_BOXED):
+                        element_prop += " " + i.name + "="
+                        element_prop += "\"" + Gst.Structure.to_string(element.get_property(i.name)) + "\""
                     elif is_appropriate_value_type(i):
                         element_prop += " " + i.name + "="
                         element_prop += str(element.get_property(i.name))

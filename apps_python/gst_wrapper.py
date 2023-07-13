@@ -900,25 +900,21 @@ def get_output_elements(output):
     Args:
         output: output configuration
     """
-    image_enc = {".jpg": "jpegenc"}
 
-    prop_str = "video_bitrate=%d, video_gop_size=%d" \
+    prop_str = "video_bitrate=%d,video_gop_size=%d" \
                                               % (output.bitrate,output.gop_size)
-    enc_extra_ctrl = "controls, frame_level_rate_control_enable=1, " + prop_str
+    enc_extra_ctrl = "controls,frame_level_rate_control_enable=1," + prop_str
 
     video_enc = {
         ".mov": [
-            ["v4l2h264enc", {"extra-controls": enc_extra_ctrl}],
             ["h264parse", None],
             ["qtmux", None],
         ],
         ".mp4": [
-            ["v4l2h264enc", {"extra-controls": enc_extra_ctrl}],
             ["h264parse", None],
             ["mp4mux", None],
         ],
         ".mkv": [
-            ["v4l2h264enc", {"extra-controls": enc_extra_ctrl}],
             ["h264parse", None],
             ["matroskamux", None],
         ],
@@ -944,7 +940,7 @@ def get_output_elements(output):
     ):
         if sink_ext in video_enc:
             sink = "video"
-        elif sink_ext in image_enc:
+        elif sink_ext == ".jpg":
             sink = "image"
         else:
             sink = "others"
@@ -960,38 +956,56 @@ def get_output_elements(output):
         sink_elements += make_element("kmssink", property=property)
 
     elif sink == "image":
-        sink_elements += make_element(image_enc[sink_ext])
+        sink_elements += make_element(gst_element_map["jpegenc"])
         sink_elements += make_element(
             "multifilesink", property={"location": output.sink, "name": sink_name}
         )
 
     elif sink == "video":
+        property = {}
+        if (gst_element_map["h264enc"]["element"] == "v4l2h264enc"):
+            property = {"extra-controls": Gst.Structure.from_string(enc_extra_ctrl)[0]}
+
+        sink_elements += make_element(gst_element_map["h264enc"], property=property)
+
         for i in video_enc[sink_ext]:
             sink_elements += make_element(i[0], property=i[1])
-        sink_elements += make_element(
-            "filesink", property={"location": output.sink, "name": sink_name}
-        )
+
+        property={"location": output.sink, "name": sink_name}
+        sink_elements += make_element("filesink", property=property)
 
     elif sink == "remote":
         property = {}
-        if output.encoder == "v4l2h264enc":
-            property = {"extra-controls": enc_extra_ctrl}
 
-        sink_elements += make_element(output.encoder, property=property)
+        # MP4 or H264 encoding
+        if output.encoding == "mp4" or output.encoding == "h264":
+            if (gst_element_map["h264enc"]["element"] == "v4l2h264enc"):
+                property = {"extra-controls": Gst.Structure.from_string(enc_extra_ctrl)[0]}
 
-        if output.encoder == "v4l2h264enc":
+            sink_elements += make_element(gst_element_map["h264enc"], property=property)
+
             sink_elements += make_element("h264parse")
 
-        if output.payloader == "mp4mux":
-            property = {"fragment-duration":1}
-        elif output.payloader == "multipartmux":
+            if output.encoding == "mp4":
+                property = {"fragment-duration":1}
+                sink_elements += make_element("mp4mux", property=property)
+            elif output.encoding == "h264":
+                sink_elements += make_element("rtph264pay")
+
+        # Jpeg encoding
+        elif output.encoding == "jpeg":
+
+            sink_elements += make_element(gst_element_map["jpegenc"])
+
             property = {"boundary":"spionisto"}
+            sink_elements += make_element("multipartmux",property=property)
 
-        sink_elements += make_element(output.payloader, property=property)
-
-        if output.payloader == "multipartmux":
             property = {"max":65000}
             sink_elements += make_element("rndbuffersize", property=property)
+
+        else:
+            print("[ERROR] Wrong encoding [%s] defined for remote output.", output.encoding)
+            sys.exit()
 
         property = {
             "host": output.host,

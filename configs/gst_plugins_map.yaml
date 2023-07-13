@@ -41,6 +41,8 @@ j721e:
     h264enc:
         element: v4l2h264enc
     h265enc: null
+    jpegenc:
+        element: jpegenc
     inferer:
         target: dsp
         core-id: [1]
@@ -76,6 +78,8 @@ j721s2:
         element: v4l2h264enc
     h265enc:
         element: v4l2h265enc
+    jpegenc:
+        element: jpegenc
     inferer:
         target: dsp
         core-id: [1]
@@ -115,6 +119,8 @@ j784s4:
         element: v4l2h264enc
     h265enc:
         element: v4l2h265enc
+    jpegenc:
+        element: jpegenc
     inferer:
         target: dsp
         core-id: [1,2,3,4]
@@ -147,6 +153,8 @@ am62a:
         element: v4l2h264enc
     h265enc:
         element: v4l2h265enc
+    jpegenc:
+        element: jpegenc
     inferer:
         target: dsp
         core-id: [1]
@@ -175,6 +183,8 @@ am62x:
         element: v4l2h264enc
     h265enc:
         element: v4l2h265enc
+    jpegenc:
+        element: jpegenc
     inferer:
         target: arm
 #==================== ARM-ONLY ====================
@@ -197,5 +207,7 @@ arm:
         element: v4l2h264enc
     h265enc:
         element: v4l2h265enc
+    jpegenc:
+        element: jpegenc
     inferer:
         target: arm
