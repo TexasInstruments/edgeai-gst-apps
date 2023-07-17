@@ -113,10 +113,10 @@ class Output:
             self.bitrate = output_config["bitrate"]
         else:
             self.bitrate = 10000000
-        if "overlay-performance" in output_config:
-            self.overlay_performance = output_config["overlay-performance"]
+        if "overlay-perf-type" in output_config:
+            self.overlay_perf_type = output_config["overlay-perf-type"]
         else:
-            self.overlay_performance = False
+            self.overlay_perf_type = None
         self.mosaic = False
         self.id = Output.count
         self.gst_bkgnd_sink = None
@@ -142,7 +142,7 @@ class Output:
                 self.gst_mosaic_elements,
                 self.gst_disp_elements,
             ) = gst_wrapper.get_output_elements(self)
-            if self.overlay_performance:
+            if self.overlay_perf_type != None:
                 self.title_frame = create_title_frame(None, self.width, self.height)
             else:
                 self.title_frame = create_title_frame(self.title, self.width, self.height)

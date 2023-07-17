@@ -378,8 +378,8 @@ def get_output_str(output):
 
     if (sink == 'display'):
         sink_cmd = ''
-        if output.overlay_performance:
-            sink_cmd += ' queue ! tiperfoverlay !'
+        if output.overlay_perf_type != None:
+            sink_cmd += ' queue ! tiperfoverlay overlay-type=%s !' % output.overlay_perf_type
         sink_cmd += ' kmssink sync=false driver-name=tidss'
         if (output.connector):
                 sink_cmd += ' connector-id=%d' % output.connector
@@ -388,8 +388,8 @@ def get_output_str(output):
                                     ' multifilesink location=' + output.sink
     elif (sink == 'video'):
         sink_cmd = ''
-        if output.overlay_performance:
-            sink_cmd += ' queue ! tiperfoverlay !'
+        if output.overlay_perf_type != None:
+            sink_cmd += ' queue ! tiperfoverlay overlay-type=%s !' % output.overlay_perf_type
 
         sink_cmd += ' ' + gst_element_map["h264enc"]["element"]
 
@@ -406,8 +406,8 @@ def get_output_str(output):
 
     elif (sink == 'remote'):
         sink_cmd = ''
-        if output.overlay_performance:
-            sink_cmd += ' queue ! tiperfoverlay !'
+        if output.overlay_perf_type != None:
+            sink_cmd += ' queue ! tiperfoverlay overlay-type=%s !' % output.overlay_perf_type
 
         if output.encoding == "mp4" or output.encoding == "h264":
 
@@ -440,8 +440,8 @@ def get_output_str(output):
 
     elif (sink == 'others'):
         sink_cmd = ''
-        if output.overlay_performance:
-            sink_cmd += ' queue ! tiperfoverlay !'
+        if output.overlay_perf_type != None:
+            sink_cmd += ' queue ! tiperfoverlay overlay-type=%s !' % output.overlay_perf_type
         sink_cmd += ' ' + output.sink
 
     if (output.mosaic):

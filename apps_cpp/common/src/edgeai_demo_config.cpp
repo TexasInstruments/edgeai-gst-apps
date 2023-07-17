@@ -1216,9 +1216,9 @@ OutputInfo::OutputInfo(const YAML::Node    &node,
     {
         m_bitrate = node["bitrate"].as<int32_t>();
     }
-    if (node["overlay-performance"])
+    if (node["overlay-perf-type"])
     {
-        m_overlayPerformance = node["overlay-performance"].as<bool>();
+        m_overlayPerfType = node["overlay-perf-type"].as<string>();
     }
     LOG_DEBUG("CONSTRUCTOR\n");
 }
@@ -1248,10 +1248,20 @@ int32_t OutputInfo::appendGstPipeline()
                     caps.c_str());
     }
 
-    if (m_overlayPerformance)
+    if (m_overlayPerfType != "")
     {
+        printf("%s\n",m_overlayPerfType.c_str());
         makeElement(m_dispElements,"queue",m_gstElementProperty,NULL);
         m_gstElementProperty = {{"title",m_title.c_str()}};
+
+        if (m_overlayPerfType == "text")
+        {
+            m_gstElementProperty.push_back({"overlay-type","1"});
+        }
+        else
+        {
+            m_gstElementProperty.push_back({"overlay-type","0"});
+        }
         makeElement(m_dispElements,"tiperfoverlay",m_gstElementProperty,NULL);
     }
 
@@ -1477,7 +1487,7 @@ int32_t OutputInfo::allocOutBuff(GstPipe   *gstPipe)
 
         m_titleFrame.setTo(Scalar(0,0,0));
 
-        if (!m_overlayPerformance)
+        if (m_overlayPerfType == "")
         {
             putText(m_titleFrame,
                     "Texas Instruments - Edge Analytics",
@@ -2338,7 +2348,7 @@ int32_t FlowInfo::getSinkPipeline(GstElement*       &sinkPipeline,
                 }
                 link(output->m_mosaicElements.back(),output->m_dispElements.front());
 
-                if (output->m_overlayPerformance
+                if (output->m_overlayPerfType != ""
                     &&
                     mosaic_name == "tiovxmosaic")
                 {

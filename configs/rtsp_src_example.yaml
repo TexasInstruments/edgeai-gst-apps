@@ -25,7 +25,7 @@ outputs:
         sink: kmssink
         width: 1920
         height: 1080
-        overlay-performance: True
+        overlay-perf-type: graph
     output1:
         sink: /opt/edgeai-test-data/output/output_video.mkv
         width: 1920
@@ -41,7 +41,7 @@ outputs:
         port: 8081
         host: 127.0.0.1
         encoding: jpeg
-        overlay-performance: True
+        overlay-perf-type: graph
 
 flows:
     flow0: [input0,model0,output0,[320,150,1280,720]]

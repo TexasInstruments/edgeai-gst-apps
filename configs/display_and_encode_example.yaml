@@ -30,7 +30,7 @@ outputs:
         sink: kmssink
         width: 1920
         height: 1080
-        overlay-performance: True
+        overlay-perf-type: graph
     output1:
         sink: /opt/edgeai-test-data/output/output_video0.mkv
         width: 1280

@@ -923,9 +923,10 @@ def get_output_elements(output):
     bg_elements = []
     mosaic_elements = []
 
-    if output.overlay_performance:
+    if output.overlay_perf_type != None:
         sink_elements += make_element("queue")
-        property = {"title":output.title}
+        property = {"title":output.title,
+                    "overlay-type":output.overlay_perf_type}
         sink_elements += make_element("tiperfoverlay",property=property)
 
     sink_ext = os.path.splitext(output.sink)[1]
@@ -1590,7 +1591,7 @@ def get_gst_pipe(flows, outputs):
                         )
                     link_elements(o.gst_mosaic_elements[-1], o.gst_disp_elements[0])
 
-                    if (o.overlay_performance
+                    if (o.overlay_perf_type != None
                         and
                         gst_element_map["mosaic"]["element"] == "tiovxmosaic"):
                         Gst.ChildProxy.set_property(mosaic, "src::pool-size", 4)
