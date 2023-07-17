@@ -462,7 +462,7 @@ namespace ti::edgeai::common
 
             /** Use tiperfoverlay.
              */
-            bool                            m_overlayPerformance{false};
+            string                          m_overlayPerfType{""};
 
             /** Output buffer. */
             GstWrapperBuffer                m_outBuff;

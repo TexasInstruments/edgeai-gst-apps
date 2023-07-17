@@ -222,8 +222,12 @@ outputs:
         # Output display height
         height: 1080
 
-        # Overlay performance stats (optional, Default=False)
-        overlay-performance: False
+        # Overlay performance stat type
+        # Ex:
+        # - graph
+        # - text
+        #(optional, Default=Disabled)
+        overlay-perf-type: graph
 
         # Connector id to select output display. (optional)
         # This field is ignored for sinks other than kmssink
