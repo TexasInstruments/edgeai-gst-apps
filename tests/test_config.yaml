@@ -28,7 +28,7 @@ outputs:
         sink: kmssink
         width: 1920
         height: 1080
-        overlay-performance: True
+        overlay-perf-type: graph
 
 flows:
     flow0: [input,dl_model,output,[320,180,1280,720]]
