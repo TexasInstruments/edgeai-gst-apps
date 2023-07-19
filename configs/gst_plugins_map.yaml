@@ -76,6 +76,8 @@ j721s2:
         element: tiovxldc
     h264dec:
         element: v4l2h264dec
+        property:
+            capture-io-mode: 5
     h265dec:
         element: v4l2h265dec
     h264enc:
@@ -119,6 +121,8 @@ j784s4:
             target: [0,1]
     h264dec:
         element: v4l2h264dec
+        property:
+            capture-io-mode: 5
     h265dec:
         element: v4l2h265dec
     h264enc:
@@ -155,6 +159,8 @@ am62a:
         element: tiovxldc
     h264dec:
         element: v4l2h264dec
+        property:
+            capture-io-mode: 5
     h265dec:
         element: v4l2h265dec
     h264enc:
@@ -162,7 +168,7 @@ am62a:
     h265enc:
         element: v4l2h265enc
     jpegenc:
-        element: jpegenc
+        element: v4l2jpegenc
     inferer:
         target: dsp
         core-id: [1]
