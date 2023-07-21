@@ -57,4 +57,4 @@ docker build \
     --build-arg USE_PROXY=$USE_PROXY \
     --build-arg REPO_LOCATION=$DOCKER_REPO_INTERNAL \
     --build-arg HTTP_PROXY=$HTTP_PROXY \
-    --build-arg NPROC=$NPROC --no-cache .
+    --build-arg NPROC=$NPROC .
