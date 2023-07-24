@@ -380,7 +380,7 @@ def get_output_str(output):
         sink_cmd = ''
         if output.overlay_perf_type != None:
             sink_cmd += ' queue ! tiperfoverlay overlay-type=%s !' % output.overlay_perf_type
-        sink_cmd += ' kmssink sync=false driver-name=tidss'
+        sink_cmd += ' kmssink driver-name=tidss sync=true force-modesetting=true max-lateness=200000000 processing-deadline=200000000'
         if (output.connector):
                 sink_cmd += ' connector-id=%d' % output.connector
     elif (sink == 'image'):
