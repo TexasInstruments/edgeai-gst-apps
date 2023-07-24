@@ -23,7 +23,7 @@ inputs:
         loop: True
 models:
     model0:
-        model_path: /opt/model_zoo/TFL-OD-2010-ssd-mobV2-coco-mlperf-300x300
+        model_path: /opt/model_zoo/TFL-OD-2020-ssdLite-mobDet-DSP-coco-320x320
         viz_threshold: 0.6
 outputs:
     output0:

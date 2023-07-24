@@ -272,7 +272,7 @@ INFER_CL()
   echo export C7X=$C7X > /tmp/.C7X
 }
 
-MODEL_SS=/opt/model_zoo/ONR-SS-8630-unetlite-aspp-mobv2-tv-ade20k32-512x512
+MODEL_SS=/opt/model_zoo/ONR-SS-8610-deeplabv3lite-mobv2-ade20k32-512x512
 MODEL_SS_PRE_PROC_PROPS="data-type=3 channel-order=0 tensor-format=rgb out-pool-size=4"
 MODEL_SS_CAPS="video/x-raw, width=512, height=512"
 

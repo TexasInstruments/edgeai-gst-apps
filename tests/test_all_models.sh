@@ -39,7 +39,7 @@ NOCOLOR='\033[0m'
 
 ####################################################################################################
 export TEST_ENGINE_DEBUG=1
-timeout=45
+timeout=30
 config_file="$topdir/tests/test_config.yaml"
 parse_script="$topdir/tests/parse_log_data.py"
 filter=""
