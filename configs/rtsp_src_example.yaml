@@ -15,10 +15,10 @@ models:
         model_path: /opt/model_zoo/ONR-CL-6360-regNetx-200mf
         topN: 5
     model1:
-        model_path: /opt/model_zoo/TFL-OD-2010-ssd-mobV2-coco-mlperf-300x300
+        model_path: /opt/model_zoo/TFL-OD-2020-ssdLite-mobDet-DSP-coco-320x320
         viz_threshold: 0.6
     model2:
-        model_path: /opt/model_zoo/ONR-SS-8630-unetlite-aspp-mobv2-tv-ade20k32-512x512
+        model_path: /opt/model_zoo/ONR-SS-8610-deeplabv3lite-mobv2-ade20k32-512x512
         alpha: 0.4
 outputs:
     output0:
