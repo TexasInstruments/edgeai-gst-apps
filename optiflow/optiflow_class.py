@@ -36,8 +36,6 @@ from gst_element_map import gst_element_map
 
 class OptiFlowClass:
 
-    C7_CORE_ID_INDEX = 0
-
     def __init__(self, config):
         """
         Constructor of EdgeAIDemo class
@@ -82,17 +80,9 @@ class OptiFlowClass:
                 model_path = model_config["model_path"]
 
                 # Make model Config. This class is present in edgeai_dl_inferer
-                core_id = 1
-                if (gst_element_map['inferer']):
-                    if 'core-id' in gst_element_map['inferer']:
-                        core_id = gst_element_map['inferer']['core-id'][OptiFlowClass.C7_CORE_ID_INDEX]
-                        OptiFlowClass.C7_CORE_ID_INDEX += 1
-                        if OptiFlowClass.C7_CORE_ID_INDEX >= len(gst_element_map['inferer']['core-id']):
-                            OptiFlowClass.C7_CORE_ID_INDEX = 0
-
                 # Enable TIDL here doesnt matter since we are not going to
                 # use python runtime anyway. We will use tidlinferer plugin
-                model_obj = ModelConfig(model_path,False,core_id)
+                model_obj = ModelConfig(model_path,False,1)
 
                 # task specific params
                 if "alpha" in model_config:
