@@ -45,6 +45,7 @@ from gi.repository import Gst
 
 Gst.init(None)
 
+tidl_target_idx = 0
 preproc_target_idx = 0
 isp_target_idx = 0
 ldc_target_idx = 0
@@ -461,7 +462,7 @@ def get_pre_proc_str(flow):
     Args:
         flow: flow configuration
     """
-    global preproc_target_idx
+    global preproc_target_idx, tidl_target_idx
     cmd = ''
 
     resize = flow.model.resize
@@ -569,9 +570,12 @@ def get_pre_proc_str(flow):
 
     # Set dl_inferer core number
     target_str = ''
-    if (gst_element_map['inferer']):
-        if 'core-id' in gst_element_map['inferer']:
-            target_str = 'target=%s' % flow.model.core_number
+    if "core-id" in gst_element_map["inferer"]:
+        target = gst_element_map["inferer"]["core-id"][tidl_target_idx]
+        tidl_target_idx += 1
+        if tidl_target_idx >= len(gst_element_map["inferer"]["core-id"]):
+            tidl_target_idx = 0
+        target_str = 'target=%d ' % target
 
     cmd =   split_name + '. ! queue ! ' + cmd + \
             'tidlinferer %s model=%s ! %s.tensor ' % (target_str, flow.model.path, flow.gst_post_name)
