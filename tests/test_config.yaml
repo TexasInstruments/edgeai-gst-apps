@@ -21,7 +21,7 @@ models:
         # This will be updated at runtime by the test_engine.sh
         model_path: /opt/edgeai-gst-apps/models/<type>/<model>
         topN: 5
-        viz_threshold: 0.3
+        viz_threshold: 0.5
         alpha: 0.4
 outputs:
     output:
