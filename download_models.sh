@@ -36,16 +36,16 @@ WGET="wget --proxy off"
 
 if [ "$SOC" == "j721e" ]
 then
-	URLs="https://software-dl.ti.com/jacinto7/esd/modelzoo/08_06_00_01/modelartifacts/TDA4VM/8bits/"
+	URLs="http://edgeaisrv2.dhcp.ti.com/publish/modelzoo/latest/j721e"
 elif [ "$SOC" == "j721s2" ]
 then
-	URLs="https://software-dl.ti.com/jacinto7/esd/modelzoo/08_06_00_01/modelartifacts/AM68A/8bits/"
+	URLs="http://edgeaisrv1.dhcp.ti.com/publish/modelzoo/latest/j721s2"
 elif [ "$SOC" == "j784s4" ]
 then
-	URLs="https://software-dl.ti.com/jacinto7/esd/modelzoo/08_06_00_01/modelartifacts/AM69A/8bits/"
+	URLs="http://edgeaisrv1.dhcp.ti.com/publish/modelzoo/latest/j784s4"
 elif [ "$SOC" == "am62a" ]
 then
-	URLs="https://software-dl.ti.com/jacinto7/esd/modelzoo/08_06_00_01/modelartifacts/AM62A/8bits/"
+	URLs="http://edgeaisrv2.dhcp.ti.com/publish/modelzoo/latest/am62a"
 elif [ "$SOC" == "am62x" ]
 then
 	URLs="https://software-dl.ti.com/jacinto7/esd/modelzoo/09_00_00/modelartifacts/AM62/32bits/"
