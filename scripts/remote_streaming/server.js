@@ -87,7 +87,7 @@ if (args.http_port)
   port = args.http_port
 
 if (udp_port == port){
-  console.log("\n[ERROR] Udp port and Htpp port cannot be same.\n");
+  console.log("\n[ERROR] Udp port and Http port cannot be same.\n");
   process.exit();
 }
 
@@ -214,7 +214,8 @@ udpServer.bind(udp_port);
 
 httpServer.listen(port);
 
-console.log(`\nStream WebApp at http://${IpAddr}:${port}\n`)
+console.log(`\nView Jpeg encoded frames at http://${IpAddr}:${port}/jpeg\n`)
+console.log(`View H264 encoded frames at http://${IpAddr}:${port}/mp4\n`)
 
 process.on('uncaughtException', function (err) {
     console.log(err);
