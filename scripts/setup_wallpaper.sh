@@ -30,13 +30,7 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-BG_IMAGE=/usr/share/demo/
-if grep -q sk /proc/device-tree/compatible
-then
-    BG_IMAGE+=$SOC-sk-wallpaper.jpg
-else
-    BG_IMAGE+=$SOC-evm-wallpaper.jpg
-fi
+BG_IMAGE=$OOB_DEMO_ASSETS_PATH/wallpaper.jpg
 
 if [ "$BG_IMAGE" != "" ]
 then
@@ -46,7 +40,7 @@ ip_eth0=${arr[1]}
 arr=(`ifconfig wlp1s0 2>&1 | grep inet | grep -v inet6`)
 ip_wlp1s0=${arr[1]}
 
-TEXTOVERLAY="textoverlay font-desc=\"Arial 8\" color=0xFF000000 \
+TEXTOVERLAY="textoverlay font-desc=\"Arial 8\" color=0xFF00FF00 \
             valignment=3 halignment=right draw-shadow=false \
             draw-outline=false"
 
