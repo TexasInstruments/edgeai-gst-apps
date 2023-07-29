@@ -60,44 +60,66 @@ namespace ti::utils
                 ::appPerfStatsExportAll(fp, perf_arr, 1);
 
 #if defined(SOC_J721E)
-                /* Read temperature data*/
-                ret = fscanf(cpuTempFd, "%u", &cpuTemp);
-                if (ret != 1)
-                    printf("[ERROR]Failed to read cpuTemp\n");
-                rewind(cpuTempFd);
-                fflush(cpuTempFd);
-                ret = fscanf(wkupTempFd, "%u", &wkupTemp);
-                if (ret != 1)
-                    printf("[ERROR]Failed to read wkupTemp\n");
-                rewind(wkupTempFd);
-                fflush(wkupTempFd);
-                ret = fscanf(c7xTempFd, "%u", &c7xTemp);
-                if (ret != 1)
-                    printf("[ERROR]Failed to read c7xTemp\n");
-                rewind(c7xTempFd);
-                fflush(c7xTempFd);
-                ret = fscanf(gpuTempFd, "%u", &gpuTemp);
-                if (ret != 1)
-                    printf("[ERROR]Failed to read gpuTemp\n");
-                rewind(gpuTempFd);
-                fflush(gpuTempFd);
-                ret = fscanf(r5fTempFd, "%u", &r5fTemp);
-                if (ret != 1)
-                    printf("[ERROR]Failed to read r5fTemp\n");
-                rewind(r5fTempFd);
-                fflush(r5fTempFd);
-
                 /* print temperature stats*/
-                fprintf(fp,"\n");
-                fprintf(fp,"# Temperature statistics\n");
-                fprintf(fp,"\n");
-                fprintf(fp,"ZONE      | TEMPERATURE\n");
-                fprintf(fp,"----------|--------------\n");
-                fprintf(fp,"CPU   |   %0.2f Celsius\n",float(cpuTemp)/1000);
-                fprintf(fp,"WKUP  |   %0.2f Celsius\n",float(wkupTemp)/1000);
-                fprintf(fp,"C7X   |   %0.2f Celsius\n",float(c7xTemp)/1000);
-                fprintf(fp,"GPU   |   %0.2f Celsius\n",float(gpuTemp)/1000);
-                fprintf(fp,"R5F   |   %0.2f Celsius\n",float(r5fTemp)/1000);
+                if (NULL != cpuTempFd ||
+                    NULL != wkupTempFd ||
+                    NULL != c7xTempFd ||
+                    NULL != gpuTempFd ||
+                    NULL != r5fTempFd)
+                {
+                    fprintf(fp,"\n");
+                    fprintf(fp,"# Temperature statistics\n");
+                    fprintf(fp,"\n");
+                    fprintf(fp,"ZONE      | TEMPERATURE\n");
+                    fprintf(fp,"----------|--------------\n");
+                }
+
+                /* Read temperature data*/
+                if (NULL != cpuTempFd)
+                {
+                    ret = fscanf(cpuTempFd, "%u", &cpuTemp);
+                    if (ret != 1)
+                        printf("[ERROR]Failed to read cpuTemp\n");
+                    rewind(cpuTempFd);
+                    fflush(cpuTempFd);
+                    fprintf(fp,"CPU   |   %0.2f Celsius\n",float(cpuTemp)/1000);
+                }
+                if (NULL != wkupTempFd)
+                {
+                    ret = fscanf(wkupTempFd, "%u", &wkupTemp);
+                    if (ret != 1)
+                        printf("[ERROR]Failed to read wkupTemp\n");
+                    rewind(wkupTempFd);
+                    fflush(wkupTempFd);
+                    fprintf(fp,"WKUP  |   %0.2f Celsius\n",float(wkupTemp)/1000);
+                }
+                if (NULL != c7xTempFd)
+                {
+                    ret = fscanf(c7xTempFd, "%u", &c7xTemp);
+                    if (ret != 1)
+                        printf("[ERROR]Failed to read c7xTemp\n");
+                    rewind(c7xTempFd);
+                    fflush(c7xTempFd);
+                    fprintf(fp,"C7X   |   %0.2f Celsius\n",float(c7xTemp)/1000);
+                }
+                if (NULL != gpuTempFd)
+                {
+                    ret = fscanf(gpuTempFd, "%u", &gpuTemp);
+                    if (ret != 1)
+                        printf("[ERROR]Failed to read gpuTemp\n");
+                    rewind(gpuTempFd);
+                    fflush(gpuTempFd);
+                    fprintf(fp,"GPU   |   %0.2f Celsius\n",float(gpuTemp)/1000);
+                }
+                if (NULL != r5fTempFd)
+                {
+                    ret = fscanf(r5fTempFd, "%u", &r5fTemp);
+                    if (ret != 1)
+                        printf("[ERROR]Failed to read r5fTemp\n");
+                    rewind(r5fTempFd);
+                    fflush(r5fTempFd);
+                    fprintf(fp,"R5F   |   %0.2f Celsius\n",float(r5fTemp)/1000);
+                }
 #endif
                 ::appPerfStatsExportCloseFile(fp);
                 ::appPerfStatsResetAll();
@@ -115,12 +137,27 @@ namespace ti::utils
         }
 
 #if defined(SOC_J721E)
-        /* close fds*/
+    /* close fds*/
+    if (NULL != cpuTempFd)
+    {
         fclose(cpuTempFd);
+    }
+    if (NULL != wkupTempFd)
+    {
         fclose(wkupTempFd);
+    }
+    if (NULL != c7xTempFd)
+    {
         fclose(c7xTempFd);
+    }
+    if (NULL != gpuTempFd)
+    {
         fclose(gpuTempFd);
+    }
+    if (NULL != r5fTempFd)
+    {
         fclose(r5fTempFd);
+    }
 #endif
 #endif
     }

@@ -108,54 +108,92 @@ void displayThread()
         perfStatsResetDdrLoadCalcAll();
 
 #if defined(SOC_J721E)
-        /* Read temperature data*/
-        ret = fscanf(cpuTempFd, "%u", &cpuTemp);
-        if (ret != 1)
-            printf("[ERROR]Failed to read cpuTemp\n");
-        rewind(cpuTempFd);
-        fflush(cpuTempFd);
-        ret = fscanf(wkupTempFd, "%u", &wkupTemp);
-        if (ret != 1)
-            printf("[ERROR]Failed to read wkupTemp\n");
-        rewind(wkupTempFd);
-        fflush(wkupTempFd);
-        ret = fscanf(c7xTempFd, "%u", &c7xTemp);
-        if (ret != 1)
-            printf("[ERROR]Failed to read c7xTemp\n");
-        rewind(c7xTempFd);
-        fflush(c7xTempFd);
-        ret = fscanf(gpuTempFd, "%u", &gpuTemp);
-        if (ret != 1)
-            printf("[ERROR]Failed to read gpuTemp\n");
-        rewind(gpuTempFd);
-        fflush(gpuTempFd);
-        ret = fscanf(r5fTempFd, "%u", &r5fTemp);
-        if (ret != 1)
-            printf("[ERROR]Failed to read r5fTemp\n");
-        rewind(r5fTempFd);
-        fflush(r5fTempFd);
-
         /* print temperature stats*/
-        printf("\n");
-        printf("SoC temperature statistics\n");
-        printf("==========================\n");
-        printf("\n");
-        printf("CPU:\t%0.2f degree Celsius\n", float(cpuTemp)/1000);
-        printf("WKUP:\t%0.2f degree Celsius\n", float(wkupTemp)/1000);
-        printf("C7X:\t%0.2f degree Celsius\n", float(c7xTemp)/1000);
-        printf("GPU:\t%0.2f degree Celsius\n", float(gpuTemp)/1000);
-        printf("R5F:\t%0.2f degree Celsius\n", float(r5fTemp)/1000);
+        if (NULL != cpuTempFd ||
+            NULL != wkupTempFd ||
+            NULL != c7xTempFd ||
+            NULL != gpuTempFd ||
+            NULL != r5fTempFd)
+        {
+            printf("\n");
+            printf("SoC temperature statistics\n");
+            printf("==========================\n");
+            printf("\n");
+        }
+
+        /* Read temperature data*/
+        if (NULL != cpuTempFd)
+        {
+            ret = fscanf(cpuTempFd, "%u", &cpuTemp);
+            if (ret != 1)
+                printf("[ERROR]Failed to read cpuTemp\n");
+            rewind(cpuTempFd);
+            fflush(cpuTempFd);
+            printf("CPU:\t%0.2f degree Celsius\n", float(cpuTemp)/1000);
+        }
+        if (NULL != wkupTempFd)
+        {
+            ret = fscanf(wkupTempFd, "%u", &wkupTemp);
+            if (ret != 1)
+                printf("[ERROR]Failed to read wkupTemp\n");
+            rewind(wkupTempFd);
+            fflush(wkupTempFd);
+            printf("WKUP:\t%0.2f degree Celsius\n", float(wkupTemp)/1000);
+        }
+        if (NULL != c7xTempFd)
+        {
+            ret = fscanf(c7xTempFd, "%u", &c7xTemp);
+            if (ret != 1)
+                printf("[ERROR]Failed to read c7xTemp\n");
+            rewind(c7xTempFd);
+            fflush(c7xTempFd);
+            printf("C7X:\t%0.2f degree Celsius\n", float(c7xTemp)/1000);
+        }
+        if (NULL != gpuTempFd)
+        {
+            ret = fscanf(gpuTempFd, "%u", &gpuTemp);
+            if (ret != 1)
+                printf("[ERROR]Failed to read gpuTemp\n");
+            rewind(gpuTempFd);
+            fflush(gpuTempFd);
+            printf("GPU:\t%0.2f degree Celsius\n", float(gpuTemp)/1000);
+        }
+        if (NULL != r5fTempFd)
+        {
+            ret = fscanf(r5fTempFd, "%u", &r5fTemp);
+            if (ret != 1)
+                printf("[ERROR]Failed to read r5fTemp\n");
+            rewind(r5fTempFd);
+            fflush(r5fTempFd);
+            printf("R5F:\t%0.2f degree Celsius\n", float(r5fTemp)/1000);
+        }
+
 #endif
         std::this_thread::sleep_for(std::chrono::milliseconds(2000));
     }
 
 #if defined(SOC_J721E)
     /* close fds*/
-    fclose(cpuTempFd);
-    fclose(wkupTempFd);
-    fclose(c7xTempFd);
-    fclose(gpuTempFd);
-    fclose(r5fTempFd);
+    if (NULL != cpuTempFd)
+    {
+        fclose(cpuTempFd);
+    }
+    if (NULL != wkupTempFd)
+    {
+        fclose(wkupTempFd);
+    }
+    if (NULL != c7xTempFd)
+    {
+        fclose(c7xTempFd);
+    }
+    if (NULL != gpuTempFd)
+    {
+        fclose(gpuTempFd);
+    }
+    if (NULL != r5fTempFd)
+    {
+        fclose(r5fTempFd);
+    }
 #endif
 }
 
