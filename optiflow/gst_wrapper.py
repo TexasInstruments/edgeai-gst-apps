@@ -36,7 +36,7 @@ import time
 from pathlib import Path
 abspath = Path(__file__).parent.absolute()
 sys.path.insert(0,os.path.join(abspath,'../apps_python'))
-from gst_element_map import gst_element_map
+from gst_element_map import gst_element_map, SOC
 import gi
 
 gi.require_version("Gst", "1.0")
@@ -381,7 +381,10 @@ def get_output_str(output):
         sink_cmd = ''
         if output.overlay_perf_type != None:
             sink_cmd += ' queue ! tiperfoverlay overlay-type=%s !' % output.overlay_perf_type
-        sink_cmd += ' kmssink driver-name=tidss sync=true force-modesetting=true max-lateness=200000000 processing-deadline=200000000'
+        sink_cmd += ' kmssink driver-name=tidss sync=false'
+        #HACK - without this some models in am62a results in display flicker
+        if (SOC == "am62a"):
+            sink_cmd += ' force-modesetting=true'
         if (output.connector):
                 sink_cmd += ' connector-id=%d' % output.connector
     elif (sink == 'image'):
