@@ -59,5 +59,5 @@ def parse_gst_element_map():
 
     return gst_element_map[target]
 
-
+SOC = os.environ.get("SOC")
 gst_element_map = parse_gst_element_map()
