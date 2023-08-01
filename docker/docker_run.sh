@@ -54,7 +54,8 @@ then
         --privileged \
         --network host \
          --env USE_PROXY=$USE_PROXY \
-        edge_ai_kit $SOC $PYTHONPATH
+        edge_ai_kit $SOC $PYTHONPATH $EDGEAI_GST_APPS_PATH $EDGEAI_DATA_PATH \
+        $OOB_DEMO_ASSETS_PATH $MODEL_ZOO_PATH $EDGEAI_VERSION $EDGEAI_SDK_VERSION
 # If one container exist, execute that container.
 elif [ $cont_count -eq 1 ]
 then

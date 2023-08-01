@@ -49,8 +49,14 @@ if [ "$?" -ne "0" ]; then
 	echo cd /opt/edgeai-gst-apps >> ~/.bashrc
 fi
 
-# Add PYTHONPATH
+# Add ENV Variables
 export PYTHONPATH=$2
+export EDGEAI_GST_APPS_PATH=$3
+export EDGEAI_DATA_PATH=$4
+export OOB_DEMO_ASSETS_PATH=$5
+export MODEL_ZOO_PATH=$6
+export EDGEAI_VERSION=$7
+export EDGEAI_SDK_VERSION=$8
 
 # Spawn a shell
 bash
