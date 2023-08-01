@@ -33,6 +33,7 @@ import numpy as np
 import utils
 import sys
 import time
+import math
 from pathlib import Path
 abspath = Path(__file__).parent.absolute()
 sys.path.insert(0,os.path.join(abspath,'../apps_python'))
@@ -484,8 +485,8 @@ def get_pre_proc_str(flow):
         #factor < 1/4, So use "videoscale" insted
         if (float(crop_width)/crop[0] > 4 or \
                                             float(crop_height)/crop[0] > 4):
-            width = (crop_width + crop[0]) // 2
-            height = (crop_height + crop[1]) // 2
+            width = max(crop[0], math.ceil(crop_width / 4))
+            height = max(crop[1], math.ceil(crop_height / 4))
             if width % 2 != 0:
                 width += 1
             if height % 2 != 0:
