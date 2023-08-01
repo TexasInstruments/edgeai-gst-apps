@@ -38,7 +38,7 @@ ARG PROJECT_NAME=edgeai-gst-apps
 #=========================================================================
 # The environment variable REPO_LOCATION is set from outside as needed,
 # based on network
-FROM ${REPO_LOCATION}/ubuntu:20.04 AS base-0
+FROM ${REPO_LOCATION}/ubuntu:22.04 AS base-0
 
 #=========================================================================
 FROM base-0 AS base-1
