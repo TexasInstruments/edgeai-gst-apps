@@ -1111,10 +1111,13 @@ int32_t InputInfo::getSrcPipelines(vector<GstElement *>    &srcPipelines,
 YAML::Node InputInfo::getColorConvertConfig(string inputFmt, string outputFmt)
 {
     map<string, vector<string>> tiovxdlccCombination ={
+                                                        {"NV12", {"RGB","I420"}},
+                                                        {"NV21", {"RGB","I420"}},
                                                         {"RGB",  {"NV12"}},
                                                         {"I420", {"NV12"}},
-                                                        {"NV12", {"RGB","I420"}},
-                                                        {"NV21", {"RGB","I420"}}
+                                                        {"UYVY", {"NV12"}},
+                                                        {"YUY2", {"NV12"}},
+                                                        {"GRAY8", {"NV12"}}
                                                       };
 
 
