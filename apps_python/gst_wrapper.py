@@ -1209,10 +1209,13 @@ def get_color_convert_config(input_format, output_format):
         output_format: Output format
     """
     tiovxdlcc_combimations = {
-        "RGB": ["NV12"],
         "NV12": ["RGB", "I420"],
-        "I420": ["NV12"],
         "NV21": ["RGB", "I420"],
+        "RGB": ["NV12"],
+        "I420": ["NV12"],
+        "UYVY": ["NV12"],
+        "YUY2": ["NV12"],
+        "GRAY8": ["NV12"]
     }
 
     dl_color_convert_element_factory = Gst.ElementFactory.find(
