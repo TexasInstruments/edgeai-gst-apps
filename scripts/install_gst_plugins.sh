@@ -65,7 +65,7 @@ done
 cd $install_dir
 ls | grep "edgeai-gst-plugins"
 if [ "$?" -ne "0" ]; then
-    git clone --single-branch --branch develop https://github.com/TexasInstruments/edgeai-gst-plugins.git
+    git clone --single-branch --branch EDGEAI_APP_STACK_09_00_00_00 https://github.com/TexasInstruments/edgeai-gst-plugins.git
     if [ "$?" -ne "0" ]; then
         cd $current_dir
         exit 1

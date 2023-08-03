@@ -65,7 +65,7 @@ done
 cd $install_dir
 ls | grep "edgeai-apps-utils"
 if [ "$?" -ne "0" ]; then
-    git clone --single-branch --branch develop https://git.ti.com/cgit/edgeai/edgeai-apps-utils
+    git clone --single-branch --branch EDGEAI_APP_STACK_09_00_00_00 https://git.ti.com/cgit/edgeai/edgeai-apps-utils
     if [ "$?" -ne "0" ]; then
         cd $current_dir
         exit 1
