@@ -287,7 +287,7 @@ int32_t InputInfo::addGstPipeline(vector<vector<GstElement*>>   &preProcElementV
                 string caps = "video/x-bayer," + whStr + ",format=" + m_format;
                 makeElement(m_inputElements,"queue",m_gstElementProperty,caps.c_str());
 
-                string dcc_isp_file =  "/opt/imaging/" + m_sen_id + "/dcc_viss.bin";
+                string dcc_isp_file =  "/opt/imaging/" + m_sen_id + "/linear/dcc_viss.bin";
                 string senName;
                 string formatMsb;
 
@@ -349,7 +349,7 @@ int32_t InputInfo::addGstPipeline(vector<vector<GstElement*>>   &preProcElementV
                              ",height=" +
                              to_string(m_height);
 
-                    string dcc_file = "/opt/imaging/" + m_sen_id + "/dcc_ldc.bin";
+                    string dcc_file = "/opt/imaging/" + m_sen_id + "/linear/dcc_ldc.bin";
 
                     m_gstElementProperty = {{"sensor-name",senName.c_str()},
                                             {"dcc-file",dcc_file.c_str()},
@@ -816,7 +816,7 @@ int32_t InputInfo::getSrcPipelines(vector<GstElement *>    &srcPipelines,
             GValue val = G_VALUE_INIT;
             g_value_init (&val, G_TYPE_STRING);
 
-            string dcc_2a_file_path = "/opt/imaging/"+m_sen_id+"/dcc_2a.bin";
+            string dcc_2a_file_path = "/opt/imaging/"+m_sen_id+"/linear/dcc_2a.bin";
             g_value_set_string (&val,dcc_2a_file_path.c_str());
             gst_child_proxy_set_property (GST_CHILD_PROXY (m_inputElements[i]),
                                           "sink_0::dcc-2a-file",

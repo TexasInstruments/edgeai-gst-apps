@@ -130,12 +130,12 @@ IMX390()
 
   IMX390_SRC="v4l2src device=$IMX390_DEV io-mode=5 num-buffers=$NUM_BUFFERS"
   IMX390_FMT="video/x-bayer, width=1936, height=1100, format=rggb12"
-  IMX390_ISP_COMMON_PROPS="dcc-isp-file=/opt/imaging/imx390/dcc_viss.bin \
+  IMX390_ISP_COMMON_PROPS="dcc-isp-file=/opt/imaging/imx390/linear/dcc_viss.bin \
                            format-msb=11 \
                            sensor-name=SENSOR_SONY_IMX390_UB953_D3 \
-                           sink_0::dcc-2a-file=/opt/imaging/imx390/dcc_2a.bin"
+                           sink_0::dcc-2a-file=/opt/imaging/linear/imx390/dcc_2a.bin"
   IMX390_ISP="tiovxisp target=$VISS_TARGET $IMX390_ISP_COMMON_PROPS sink_0::device=$IMX390_SUBDEV"
-  IMX390_LDC_COMMON_PROPS="sensor-name=SENSOR_SONY_IMX390_UB953_D3 dcc-file=/opt/imaging/imx390/dcc_ldc.bin"
+  IMX390_LDC_COMMON_PROPS="sensor-name=SENSOR_SONY_IMX390_UB953_D3 dcc-file=/opt/imaging/imx390/linear/dcc_ldc.bin"
   IMX390_LDC="tiovxldc target=$VISS_TARGET $IMX390_LDC_COMMON_PROPS ! video/x-raw,format=NV12,width=1920,height=1080"
   echo "$IMX390_SRC ! queue ! $IMX390_FMT ! $IMX390_ISP ! video/x-raw,format=NV12 ! $IMX390_LDC"
   VISS_TARGET=$((($VISS_TARGET + 1) % $NUM_VISS))
@@ -170,9 +170,9 @@ IMX219()
 
   IMX219_SRC="v4l2src device=$IMX219_DEV io-mode=5 num-buffers=$NUM_BUFFERS"
   IMX219_FMT="video/x-bayer, width=1920, height=1080, format=rggb"
-  IMX219_ISP_COMMON_PROPS="dcc-isp-file=/opt/imaging/imx219/dcc_viss.bin \
+  IMX219_ISP_COMMON_PROPS="dcc-isp-file=/opt/imaging/imx219/linear/dcc_viss.bin \
                            format-msb=7 \
-                           sink_0::dcc-2a-file=/opt/imaging/imx219/dcc_2a.bin"
+                           sink_0::dcc-2a-file=/opt/imaging/imx219/linear/dcc_2a.bin"
   IMX219_ISP="tiovxisp target=$VISS_TARGET $IMX219_ISP_COMMON_PROPS sink_0::device=$IMX219_SUBDEV"
   echo "$IMX219_SRC ! queue ! $IMX219_FMT ! $IMX219_ISP"
   VISS_TARGET=$((($VISS_TARGET + 1) % $NUM_VISS))
