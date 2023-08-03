@@ -641,7 +641,7 @@ def get_input_elements(input):
             # TODO - Take sensor name and subdev as params
             property = {
                 "sensor-name": sen_name,
-                "dcc-isp-file": "/opt/imaging/%s/dcc_viss.bin" % input.sen_id,
+                "dcc-isp-file": "/opt/imaging/%s/linear/dcc_viss.bin" % input.sen_id,
                 "format-msb": format_msb,
             }
 
@@ -659,7 +659,7 @@ def get_input_elements(input):
             if input.ldc:
                 property = {
                     "sensor-name": sen_name,
-                    "dcc-file": "/opt/imaging/%s/dcc_ldc.bin" % input.sen_id,
+                    "dcc-file": "/opt/imaging/%s/linear/dcc_ldc.bin" % input.sen_id,
                 }
 
                 global ldc_target_idx
@@ -1298,7 +1298,7 @@ def get_gst_pipe(flows, outputs):
         # sink property are exposed only once element is added to bin and linked
         for elem in f.input.gst_inp_elements:
             if elem.get_factory().get_name() == "tiovxisp":
-                dcc_2a_file = "/opt/imaging/%s/dcc_2a.bin" % f.input.sen_id
+                dcc_2a_file = "/opt/imaging/%s/linear/dcc_2a.bin" % f.input.sen_id
                 Gst.ChildProxy.set_property(elem, "sink_0::dcc-2a-file", dcc_2a_file)
                 if not f.input.format.startswith("bggi"):
                     Gst.ChildProxy.set_property(elem, "sink_0::device", f.input.subdev_id)

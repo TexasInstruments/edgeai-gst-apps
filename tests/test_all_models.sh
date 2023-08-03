@@ -100,7 +100,6 @@ fi
 # TODO: The trap is not reliable currently, need to be fixed
 trap cleanup SIGINT
 
-set -x
 for test_suite in "${test_suite_array[@]}"; do
 	./test_engine.sh $test_suite $config_file $timeout $parse_script "$filter" $measure_cpuload
 done

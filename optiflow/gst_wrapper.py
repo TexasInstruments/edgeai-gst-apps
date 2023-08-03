@@ -211,11 +211,11 @@ def get_input_str(input):
                 format_msb = 9
            
             source_cmd += ' tiovxisp sensor-name=%s' % sen_name + \
-                          ' dcc-isp-file=/opt/imaging/%s/dcc_viss.bin'% \
+                          ' dcc-isp-file=/opt/imaging/%s/linear/dcc_viss.bin'% \
                             input.sen_id + \
                           ' format-msb=%d' % \
                             format_msb + \
-                          ' sink_0::dcc-2a-file=/opt/imaging/%s/dcc_2a.bin' % \
+                          ' sink_0::dcc-2a-file=/opt/imaging/%s/linear/dcc_2a.bin' % \
                             input.sen_id
             if (input.format.startswith('rggb')):
                 source_cmd += ' sink_0::device=%s' % input.subdev_id
@@ -233,7 +233,7 @@ def get_input_str(input):
 
             if input.ldc:
                 source_cmd += ' tiovxldc' + \
-                              ' dcc-file=/opt/imaging/%s/dcc_ldc.bin' % \
+                              ' dcc-file=/opt/imaging/%s/linear/dcc_ldc.bin' % \
                                 input.sen_id + \
                               ' sensor-name=%s' % sen_name
 
