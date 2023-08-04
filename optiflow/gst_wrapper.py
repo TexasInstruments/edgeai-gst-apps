@@ -318,7 +318,10 @@ def get_input_split_str(input,flow):
         crop_starty = int(crop_starty)
         crop_width = flow.input.width - (2*crop_startx)
         crop_height = flow.input.height - (2*crop_starty)
-        src_pad = ((input.splits -1) % 4) // 2
+        if ((input.splits - 1) // 2) % 2 == 0:
+            src_pad = 0
+        else:
+            src_pad = 2
         if input.splits % 2 == 0:
             input.roi_string += " src_%d::roi-startx=%d" % (src_pad,crop_startx)
             input.roi_string += " src_%d::roi-starty=%d" % (src_pad,crop_starty)
