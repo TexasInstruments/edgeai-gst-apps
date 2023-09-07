@@ -122,9 +122,12 @@ void logMsg(LogLevel level, const char *format, ...)
 
         struct tm* timeInfo = localtime(&tv.tv_sec);
 
-        printf("[%02i:%02i:%02i.%03i.%06i]:%s",
-                timeInfo->tm_hour, timeInfo->tm_min,
-                timeInfo->tm_sec, millisec, microsec, gLogStr);
+        if (NULL != timeInfo)
+        {
+            printf("[%02i:%02i:%02i.%03i.%06i]:%s",
+                    timeInfo->tm_hour, timeInfo->tm_min,
+                    timeInfo->tm_sec, millisec, microsec, gLogStr);
+        }
 
         va_end(ap);
     }

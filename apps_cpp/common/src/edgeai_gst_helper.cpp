@@ -152,7 +152,7 @@ namespace ti::edgeai::common
             padtemplate = get_pad_template(gst_element_get_factory(gstElements[i]),
                                            GST_PAD_SRC
                                           );
-            if (padtemplate->presence == GST_PAD_SOMETIMES)
+            if (NULL != padtemplate && GST_PAD_SOMETIMES == padtemplate->presence)
             {
                 g_signal_connect (gstElements[i],
                                   "pad-added",
@@ -384,8 +384,8 @@ namespace ti::edgeai::common
         GstBus              *bus;
         GstMessage          *msg;
         gboolean             terminate = false;
-        const gchar         *format;
-        GstPad              *peer_pad;
+        const gchar         *format = NULL;
+        GstPad              *peer_pad = NULL;
         GstElementFactory   *factory;
         const gchar         *factory_name;
         const char          *type;
@@ -480,7 +480,7 @@ namespace ti::edgeai::common
         }
         else
         {
-            if (GST_OBJECT_REFCOUNT_VALUE(peer_pad) > 1)
+            if (NULL != peer_pad && GST_OBJECT_REFCOUNT_VALUE(peer_pad) > 1)
             {
                  gst_object_unref(peer_pad);
             }
@@ -513,16 +513,20 @@ namespace ti::edgeai::common
 
     vector<string> get_format_list(const gchar *elementName, unsigned int pad)
     {
-        vector<string>           formats{};
+        vector<string>           formats = {"NULL"};
         GstElementFactory       *factory;
         GstStaticPadTemplate    *padtemplate;
 
         factory = gst_element_factory_find(elementName);
         padtemplate = get_pad_template(factory, pad);
 
-        if(padtemplate->static_caps.string)
+        if(NULL != padtemplate && padtemplate->static_caps.string)
         {
-            GstCaps *caps= gst_static_caps_get (&padtemplate->static_caps);
+            GstCaps *caps;
+
+            formats.clear();
+
+            caps= gst_static_caps_get (&padtemplate->static_caps);
             if(caps == NULL || gst_caps_is_empty (caps))
             {
                 formats.push_back("NULL");
@@ -901,7 +905,7 @@ namespace ti::edgeai::common
                 it = gst_element_iterate_src_pads (GST_ELEMENT (element));
 
                 while (!done && element->numsrcpads != 0){
-                    GstPad     *peer_pad;
+                    GstPad     *peer_pad = NULL;
                     GstElement *peer_element;
                     string      peer_element_name;
                     string      pfx{""};
@@ -949,7 +953,8 @@ namespace ti::edgeai::common
                             break;
                     }
 
-                    if (GST_OBJECT_REFCOUNT_VALUE(peer_pad) > 1)
+                    if (NULL != peer_pad &&
+                        GST_OBJECT_REFCOUNT_VALUE(peer_pad) > 1)
                     {
                         gst_object_unref(peer_pad);
                     }

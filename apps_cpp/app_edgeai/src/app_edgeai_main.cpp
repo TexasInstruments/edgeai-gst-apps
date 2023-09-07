@@ -54,7 +54,7 @@ static void sigHandler(int32_t sig)
     }
 }
 
-int32_t main(int argc, char * argv[])
+int main(int argc, char * argv[])
 {
     CmdlineArgs cmdArgs;
 
