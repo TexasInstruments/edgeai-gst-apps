@@ -167,7 +167,9 @@ int32_t Demo::setupFlows()
 
         /* Update the output set. */
         auto const &outputIds = flow->m_outputIds;
-        outputSet.insert(outputIds.begin(), outputIds.end());
+        auto const begin = outputIds.begin();
+        auto const end = outputIds.end();
+        outputSet.insert(begin, end);
     }
 
     /* Collect the sink pipeline. */

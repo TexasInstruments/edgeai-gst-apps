@@ -151,7 +151,10 @@ InputInfo::InputInfo(const YAML::Node &node)
     factory = gst_element_factory_find(scaler.c_str());
     padtemplate = get_pad_template(factory, GST_PAD_SRC);
 
-    m_scalerIsMulltiSrc = (padtemplate->presence == GST_PAD_REQUEST)?true:false;
+    if (NULL != padtemplate)
+    {
+        m_scalerIsMulltiSrc = (padtemplate->presence == GST_PAD_REQUEST) ? true : false;
+    }
 
     LOG_DEBUG("CONSTRUCTOR\n");
 }
@@ -2099,6 +2102,10 @@ int32_t FlowInfo::initialize(map<string, ModelInfo*>   &modelMap,
 
         if (status == -1)
         {
+            if (nullptr != preProcObj)
+            {
+                delete preProcObj;
+            }
             break;
         }
         
@@ -2123,6 +2130,10 @@ int32_t FlowInfo::initialize(map<string, ModelInfo*>   &modelMap,
 
         if (status < 0)
         {
+            if (nullptr != preProcObj)
+            {
+                delete preProcObj;
+            }
             LOG_ERROR("createPostprocCntxt() failed.\n");
             break;
         }
@@ -2390,7 +2401,8 @@ int32_t FlowInfo::getSinkPipeline(GstElement*       &sinkPipeline,
 
                     factory = gst_element_factory_find(gstElementMap["scaler"]["element"].as<string>().c_str());
                     padtemplate = get_pad_template(factory, GST_PAD_SRC);
-                    if (padtemplate->presence == GST_PAD_REQUEST) //Multiscaler
+                    if (NULL != padtemplate &&
+                        padtemplate->presence == GST_PAD_REQUEST) //Multiscaler
                     {
                         m_gstElementProperty = {{"target","1"}};
                         if ((sensorWidth/output->m_width) > 4 ||
@@ -2690,28 +2702,34 @@ int32_t DemoConfig::parseFlowInfo(const YAML::Node &config)
                 }
                 visited.push_back(t);
 
-                string      output = flows[t][2].as<string>();
-                vector<int> mosaic_info{};
-                string      debug = "";
+                string output = flows[t][2].as<string>();
+                subFlowConfig.outputs.push_back(output);
+
                 if (flows[t].size() > 3)
                 {
-                    mosaic_info = flows[t][3].as<vector<int>>();
+                    vector<int> mosaic_info = flows[t][3].as<vector<int>>();
+                    subFlowConfig.mosaic_infos.push_back(mosaic_info);
                 }
-                if (flows[t].size() > 4)
+                else
                 {
-                    debug = flows[t][4].as<string>();
+                    subFlowConfig.mosaic_infos.push_back({});
                 }
 
-                subFlowConfig.outputs.push_back(output);
-                subFlowConfig.mosaic_infos.push_back(mosaic_info);
-                subFlowConfig.debug_infos.push_back(debug);
+                if (flows[t].size() > 4)
+                {
+                    string debug = flows[t][4].as<string>();
+                    subFlowConfig.debug_infos.push_back(debug);
+                }
+                else
+                {
+                    subFlowConfig.debug_infos.push_back("");
+                }
             }
 
             flowConfig.subflow_configs.push_back(subFlowConfig);
         }
 
-        auto const     &f = new FlowInfo(flowConfig);
-        m_flowMap[flow_name] = f;
+        m_flowMap[flow_name] = new FlowInfo(flowConfig);
     }
 
     return status;

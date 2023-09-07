@@ -87,6 +87,14 @@ class EdgeAIDemoImpl
         int32_t setupFlows();
 
         /**
+         * Copy Constructor.
+         *
+         * Copy Constructor is not required and allowed and hence prevent
+         * the compiler from generating a default Copy Constructor.
+         */
+        EdgeAIDemoImpl(const EdgeAIDemoImpl& ) = delete;
+
+        /**
          * Assignment operator.
          *
          * Assignment is not required and allowed and hence prevent
@@ -168,7 +176,10 @@ int32_t EdgeAIDemoImpl::setupFlows()
 
         /* Update the output set. */
         auto const &outputIds = flow->m_outputIds;
-        outputSet.insert(outputIds.begin(), outputIds.end());
+
+        auto const begin = outputIds.begin();
+        auto const end = outputIds.end();
+        outputSet.insert(begin, end);
     }
 
     /* Collect the sink commands by scanning all the outputs. */

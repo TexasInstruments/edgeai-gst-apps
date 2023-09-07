@@ -94,6 +94,14 @@ namespace ti::edgeai::common
 
         private:
             /**
+             * Copy Constructor.
+             *
+             * Copy Constructor is not required and allowed and hence prevent
+             * the compiler from generating a default Copy Constructor.
+             */
+            EdgeAIDemo(const EdgeAIDemo& ) = delete;
+
+            /**
              * Assignment operator.
              *
              * Assignment is not required and allowed and hence prevent

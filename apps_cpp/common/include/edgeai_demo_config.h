@@ -565,6 +565,23 @@ namespace ti::edgeai::common
              */
             void dumpInfo(const char *prefix="") const;
 
+        private:
+            /**
+             * Copy Constructor.
+             *
+             * Copy Constructor is not required and allowed and hence prevent
+             * the compiler from generating a default Copy Constructor.
+             */
+            ModelInfo(const ModelInfo& ) = delete;
+
+            /**
+             * Assignment operator.
+             *
+             * Assignment is not required and allowed and hence prevent
+             * the compiler from generating a default assignment operator.
+             */
+            ModelInfo & operator=(const ModelInfo& rhs) = delete;
+
         public:
             /** Inference context. */
             DLInferer              *m_infererObj{nullptr};
@@ -635,6 +652,23 @@ namespace ti::edgeai::common
              * @param prefix Prefix to be added to the log outputs.
              */
             void dumpInfo(const char *prefix="") const;
+
+        private:
+            /**
+             * Copy Constructor.
+             *
+             * Copy Constructor is not required and allowed and hence prevent
+             * the compiler from generating a default Copy Constructor.
+             */
+            SubFlowInfo(const SubFlowInfo& ) = delete;
+
+            /**
+             * Assignment operator.
+             *
+             * Assignment is not required and allowed and hence prevent
+             * the compiler from generating a default assignment operator.
+             */
+            SubFlowInfo & operator=(const SubFlowInfo& rhs) = delete;
 
         public:
             /** Pre-processing context. */
