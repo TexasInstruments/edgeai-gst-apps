@@ -138,11 +138,11 @@ setup_imx390(){
             NEXT_PAD=$(($LAST_PAD+1))
         fi
 
-        CSI2RX_CONTEXT_NAME="$CSI2RX_NAME context $NEXT_PAD"
+        CSI2RX_CONTEXT_NAME="$CSI2RX_NAME context $((NEXT_PAD+1))"
 
         UB960_FMT_STR="${UB960_PAD}/0 -> 4/$(($NEXT_PAD)) [1]"
         CDNS_FMT_STR="0/${NEXT_PAD} -> 1/$(($NEXT_PAD)) [1]"
-        CSI2RX_FMT_STR="0/${NEXT_PAD} -> $(($NEXT_PAD+1))/0 [1]"
+        CSI2RX_FMT_STR="0/${NEXT_PAD} -> $(($NEXT_PAD+2))/0 [1]"
 
         # Append UB960 Routes
         if [[ -v "ALL_UB960_FMT_STR[$media_id,$UB960_NAME]" ]] ; then
@@ -210,12 +210,12 @@ setup_ov2312(){
 
         CSI2RX_NAME=`media-ctl -d $media_id -p -e "$CSI_BRIDGE_NAME" | grep "ticsi2rx\"" | cut -d "\"" -f 2`
 
-        CSI2RX_CONTEXT_NAME_IR="$CSI2RX_NAME context $(($UB960_PAD*2))"
-        CSI2RX_CONTEXT_NAME_RGB="$CSI2RX_NAME context $(($UB960_PAD*2 + 1))"
+        CSI2RX_CONTEXT_NAME_IR="$CSI2RX_NAME context $(($UB960_PAD*2 + 1))"
+        CSI2RX_CONTEXT_NAME_RGB="$CSI2RX_NAME context $(($UB960_PAD*2 + 2))"
 
         UB960_FMT_STR="${UB960_PAD}/0 -> 4/$(($UB960_PAD * 2)) [1], ${UB960_PAD}/1 -> 4/$(($UB960_PAD * 2  + 1)) [1]"
         CDNS_FMT_STR="0/$(($UB960_PAD * 2)) -> 1/$(($UB960_PAD * 2)) [1], 0/$(($UB960_PAD * 2 + 1)) -> 1/$(($UB960_PAD * 2 + 1)) [1]"
-        CSI2RX_FMT_STR="0/$(($UB960_PAD * 2)) -> $(($UB960_PAD * 2 + 1))/0 [1], 0/$(($UB960_PAD * 2 + 1)) -> $(($UB960_PAD * 2 + 2))/0 [1]"
+        CSI2RX_FMT_STR="0/$(($UB960_PAD * 2)) -> $(($UB960_PAD * 2 + 2))/0 [1], 0/$(($UB960_PAD * 2 + 1)) -> $(($UB960_PAD * 2 + 3))/0 [1]"
 
         # Append UB960 Routes
         if [[ -v "ALL_UB960_FMT_STR[$media_id,$UB960_NAME]" ]] ; then
