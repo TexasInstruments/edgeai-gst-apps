@@ -33,12 +33,14 @@
 current_dir=$(pwd)
 cd $(dirname $0)
 
+branch_name=EDGEAI_APP_STACK_09_00_00_00
+
 if [ `arch` == "aarch64" ]; then
     install_dir="/opt/"
 else
     install_dir="../../"
 fi
-while getopts ":i:d" flag; do
+while getopts ":i:b:d" flag; do
     case "${flag}" in
         i)
             if [ -z $OPTARG ] || [ ! -d $OPTARG ]; then
@@ -47,6 +49,9 @@ while getopts ":i:d" flag; do
                 exit 1
             fi
             install_dir="$OPTARG"
+            ;;
+        b)
+            branch_name="$OPTARG"
             ;;
         d)
             build_flag="-DCMAKE_BUILD_TYPE=Debug"
@@ -65,7 +70,7 @@ done
 cd $install_dir
 ls | grep "edgeai-apps-utils"
 if [ "$?" -ne "0" ]; then
-    git clone --single-branch --branch EDGEAI_APP_STACK_09_00_00_00 https://git.ti.com/cgit/edgeai/edgeai-apps-utils
+    git clone --single-branch --branch $branch_name https://git.ti.com/cgit/edgeai/edgeai-apps-utils
     if [ "$?" -ne "0" ]; then
         cd $current_dir
         exit 1
