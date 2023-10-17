@@ -146,8 +146,8 @@ run_single_test() {
 		start_cpuload_measurement $((timeout - 1)) &
 	fi
 
-    # Run the app with the timeout and force kill the test 4 after seconds
-	timeout -s INT -k $(($timeout + 4)) $timeout $test_command >> $stdout 2> $stderr
+    # Run the app with the timeout and force kill the test 5 after seconds
+	timeout --preserve-status --foreground -s INT -k $(($timeout + 5)) $timeout $test_command >> $stdout 2> $stderr
 	test_status=$?
 
 	if [ "$measure_cpuload" == "true" ]; then
