@@ -73,5 +73,5 @@ export EDGEAI_GST_APPS_PATH=/opt/edgeai-gst-apps
 export EDGEAI_DATA_PATH=/opt/edgeai-test-data
 export OOB_DEMO_ASSETS_PATH=/opt/oob-demo-assets
 export MODEL_ZOO_PATH=/opt/model_zoo
-export EDGEAI_VERSION=9.0
-export EDGEAI_SDK_VERSION=09_00_00
+export EDGEAI_VERSION=9.1
+export EDGEAI_SDK_VERSION=09_01_00
