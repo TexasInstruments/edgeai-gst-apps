@@ -69,6 +69,10 @@ k3conf set clock 48 0 480000000 &> /dev/null
 ulimit -Sn 10240
 ulimit -Hn 40960
 
+# Set primary plane z-pos to 0
+PRIMARY_PLANE_ID=`kmsprint | grep -i plane | cut -d "(" -f2 | cut -d ")" -f1`
+modetest -M tidss -w $PRIMARY_PLANE_ID:zpos:0 &> /dev/null
+
 export EDGEAI_GST_APPS_PATH=/opt/edgeai-gst-apps
 export EDGEAI_DATA_PATH=/opt/edgeai-test-data
 export OOB_DEMO_ASSETS_PATH=/opt/oob-demo-assets
