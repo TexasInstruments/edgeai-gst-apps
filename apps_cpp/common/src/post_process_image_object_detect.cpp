@@ -245,9 +245,15 @@ void *PostprocessImageObjDetect::operator()(void           *frameData,
             adj_class_id = m_config.labelOffsetMap.at(0) + label;
         }
 
-        if (m_config.classnames.find(adj_class_id) != m_config.classnames.end())
+        if (m_config.datasetInfo.find(adj_class_id) != m_config.datasetInfo.end())
         {
-            objectname = m_config.classnames.at(adj_class_id);
+            objectname = m_config.datasetInfo.at(adj_class_id).name;
+            if ("" != m_config.datasetInfo.at(adj_class_id).superCategory)
+            {
+                objectname = m_config.datasetInfo.at(adj_class_id).superCategory +
+                             "/" +
+                             objectname;
+            }
         }
         else
         {

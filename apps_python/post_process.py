@@ -137,13 +137,9 @@ class PostProcessClassification(PostProcess):
 
         bg_top_left = (0, (2 * row_size) - text_size[1] - 5)
         bg_bottom_right = (text_size[0] + 10, (2 * row_size) + 3 + 5)
-        font_coord = (5 , 2 * row_size)
+        font_coord = (5, 2 * row_size)
 
-        cv2.rectangle(frame,
-                      bg_top_left,
-                      bg_bottom_right,
-                      (5, 11, 120),
-                      -1)
+        cv2.rectangle(frame, bg_top_left, bg_bottom_right, (5, 11, 120), -1)
 
         cv2.putText(
             frame,
@@ -156,7 +152,17 @@ class PostProcessClassification(PostProcess):
         )
         row = 3
         for idx in topN_classes:
-            class_name = self.model.classnames.get(idx + self.model.label_offset)
+            idx = idx + self.model.label_offset
+            if idx in self.model.dataset_info:
+                class_name = self.model.dataset_info[idx].name
+                if not class_name:
+                    class_name = "UNDEFINED"
+                if self.model.dataset_info[idx].supercategory:
+                    class_name = (
+                        self.model.dataset_info[idx].supercategory + "/" + class_name
+                    )
+            else:
+                class_name = "UNDEFINED"
 
             text_size, _ = cv2.getTextSize(class_name, font, font_size, 2)
 
@@ -164,11 +170,7 @@ class PostProcessClassification(PostProcess):
             bg_bottom_right = (text_size[0] + 10, (row_size * row) + 3 + 5)
             font_coord = (5, row_size * row)
 
-            cv2.rectangle(frame,
-                         bg_top_left,
-                         bg_bottom_right,
-                         (5, 11, 120),
-                         -1)
+            cv2.rectangle(frame, bg_top_left, bg_bottom_right, (5, 11, 120), -1)
             cv2.putText(
                 frame,
                 class_name,
@@ -233,8 +235,16 @@ class PostProcessDetection(PostProcess):
                 else:
                     class_name_idx = self.model.label_offset + int(b[4])
 
-                if class_name_idx in self.model.classnames:
-                    class_name = self.model.classnames[class_name_idx]
+                if class_name_idx in self.model.dataset_info:
+                    class_name = self.model.dataset_info[class_name_idx].name
+                    if not class_name:
+                        class_name = "UNDEFINED"
+                    if self.model.dataset_info[class_name_idx].supercategory:
+                        class_name = (
+                            self.model.dataset_info[class_name_idx].supercategory
+                            + "/"
+                            + class_name
+                        )
                 else:
                     class_name = "UNDEFINED"
 
