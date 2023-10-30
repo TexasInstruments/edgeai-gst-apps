@@ -92,6 +92,8 @@ class PostProcess:
             return PostProcessDetection(flow)
         elif flow.model.task_type == "segmentation":
             return PostProcessSegmentation(flow)
+        elif flow.model.task_type == "keypoint_detection":
+            return PostProcessKeypointDetection(flow)
 
 
 class PostProcessClassification(PostProcess):
@@ -360,3 +362,102 @@ class PostProcessSegmentation(PostProcess):
         b_map = (inp * 30).astype(np.uint8)
 
         return cv2.merge((r_map, g_map, b_map))
+
+class PostProcessKeypointDetection(PostProcess):
+
+    def __init__(self, flow):
+        super().__init__(flow)
+
+    def __call__(self, img, results):
+        """
+        Post process function for keypoint detection
+        Args:
+            img: Input frame
+            results: output of inference
+        """
+        output = np.squeeze(results[0])
+
+        scale_x = img.shape[1] / self.model.resize[0]
+        scale_y = img.shape[0] / self.model.resize[1]
+
+        det_bboxes, det_scores, det_labels, kpts = (
+            np.array(output[:, 0:4]),
+            np.array(output[:, 4]),
+            np.array(output[:, 5]),
+            np.array(output[:, 6:]),
+        )
+        for idx in range(len(det_bboxes)):
+            det_bbox = det_bboxes[idx]
+            kpt = kpts[idx]
+            if det_scores[idx] > self.model.viz_threshold:
+                det_bbox[..., (0, 2)] *= scale_x
+                det_bbox[..., (1, 3)] *= scale_y
+
+                # Drawing bounding box
+                img = cv2.rectangle(
+                    img,
+                    (int(det_bbox[0]), int(det_bbox[1])),
+                    (int(det_bbox[2]), int(det_bbox[3])),
+                    (0, 255, 0),
+                    2,
+                )
+
+                dataset_idx = int(det_labels[idx])
+                # Put Label
+                if type(self.model.label_offset) == dict:
+                    dataset_idx = self.model.label_offset[dataset_idx]
+                else:
+                    dataset_idx = self.model.label_offset + dataset_idx
+
+                if dataset_idx in self.model.dataset_info:
+                    class_name = self.model.dataset_info[dataset_idx].name
+                    if not class_name:
+                        class_name = "UNDEFINED"
+                    if self.model.dataset_info[dataset_idx].supercategory:
+                        class_name = (
+                            self.model.dataset_info[dataset_idx].supercategory
+                            + "/"
+                            + class_name
+                        )
+                    skeleton = self.model.dataset_info[dataset_idx].skeleton
+                    if not skeleton:
+                        skeleton = []
+
+                else:
+                    class_name = "UNDEFINED"
+                    skeleton = []
+
+                cv2.putText(
+                    img,
+                    class_name,
+                    (int(det_bbox[0]), int(det_bbox[1]) + 15),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.5,
+                    (255, 0, 0),
+                    2,
+                )
+
+                # Drawing keypoints
+                num_kpts = len(kpt) // 3
+                for kidx in range(num_kpts):
+                    kx, ky, conf = kpt[3 * kidx], kpt[3 * kidx + 1], kpt[3 * kidx + 2]
+                    kx = int(kx * scale_x)
+                    ky = int(ky * scale_y)
+                    if conf > 0.5:
+                        cv2.circle(img, (kx, ky), 3, (255, 0, 0), -1)
+
+                # Drawing connections between keypoints
+                for sk in skeleton:
+                    pos1 = (kpt[(sk[0] - 1) * 3], kpt[(sk[0] - 1) * 3 + 1])
+                    pos1 = (int(pos1[0] * scale_x), int(pos1[1] * scale_y))
+
+                    pos2 = (kpt[(sk[1] - 1) * 3], kpt[(sk[1] - 1) * 3 + 1])
+                    pos2 = (int(pos2[0] * scale_x), int(pos2[1] * scale_y))
+
+                    conf1 = kpt[(sk[0] - 1) * 3 + 2]
+                    conf2 = kpt[(sk[1] - 1) * 3 + 2]
+                    if conf1 > 0.5 and conf2 > 0.5:
+                        cv2.line(img, pos1, pos2, (255, 0, 0), 1)
+
+
+        return img
