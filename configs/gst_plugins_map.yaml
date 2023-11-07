@@ -135,6 +135,47 @@ j784s4:
         target: dsp
         core-id: [1,2,3,4]
 
+#==================== J722S ====================
+j722s:
+    dlcolorconvert:
+        element: tiovxdlcolorconvert
+        property:
+            out-pool-size: 4
+    colorconvert:
+        element: tiovxcolorconvert
+        property:
+            target: [0]
+            out-pool-size: 4
+    scaler:
+        element: tiovxmultiscaler
+        property:
+            target: [0,1]
+    dlpreproc:
+        element: tiovxdlpreproc
+        property:
+            out-pool-size: 4
+    mosaic:
+        element: tiovxmosaic
+    isp:
+        element: tiovxisp
+    ldc:
+        element: tiovxldc
+    h264dec:
+        element: v4l2h264dec
+        property:
+            capture-io-mode: 5
+    h265dec:
+        element: v4l2h265dec
+    h264enc:
+        element: v4l2h264enc
+    h265enc:
+        element: v4l2h265enc
+    jpegenc:
+        element: jpegenc
+    inferer:
+        target: dsp
+        core-id: [1]
+
 #==================== AM62A ====================
 am62a:
     dlcolorconvert:

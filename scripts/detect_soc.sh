@@ -11,6 +11,10 @@ elif grep -q j784s4 /proc/device-tree/compatible
 then
     export SOC=j784s4
     export DEVICE_NAME=AM69A
+elif grep -q j722s /proc/device-tree/compatible
+then
+    export SOC=j722s
+    export DEVICE_NAME=AM67A
 elif grep -q am625 /proc/device-tree/compatible
 then
     export SOC=am62x
