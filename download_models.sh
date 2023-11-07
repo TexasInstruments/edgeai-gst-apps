@@ -43,6 +43,9 @@ then
 elif [ "$SOC" == "j784s4" ]
 then
 	URLs="https://software-dl.ti.com/jacinto7/esd/modelzoo/09_01_00/modelartifacts/AM69A/8bits/"
+elif [ "$SOC" == "j722s" ]
+then
+	URLs="https://software-dl.ti.com/jacinto7/esd/modelzoo/09_01_00/modelartifacts/AM62A/8bits/"
 elif [ "$SOC" == "am62a" ]
 then
 	URLs="https://software-dl.ti.com/jacinto7/esd/modelzoo/09_01_00/modelartifacts/AM62A/8bits/"

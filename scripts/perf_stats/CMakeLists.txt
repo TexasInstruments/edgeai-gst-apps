@@ -33,6 +33,11 @@ elseif ("${TARGET_SOC_LOWER}" STREQUAL "j784s4")
     set(TARGET_CPU          A72)
     set(TARGET_OS           LINUX)
     set(TARGET_SOC          J784S4)
+elseif ("${TARGET_SOC_LOWER}" STREQUAL "j722s")
+    set(TARGET_PLATFORM     J7)
+    set(TARGET_CPU          A53)
+    set(TARGET_OS           LINUX)
+    set(TARGET_SOC          J722S)
 elseif ("${TARGET_SOC_LOWER}" STREQUAL "am62a")
     set(TARGET_PLATFORM     SITARA)
     set(TARGET_CPU          A53)
@@ -60,7 +65,7 @@ add_definitions(
     -DSOC_${TARGET_SOC}
 )
 
-if ("${TARGET_SOC}" STREQUAL "J721E" OR "${TARGET_SOC}" STREQUAL "J721S2" OR "${TARGET_SOC}" STREQUAL "J784S4" OR "${TARGET_SOC}" STREQUAL "AM62A")
+if ("${TARGET_SOC}" STREQUAL "J721E" OR "${TARGET_SOC}" STREQUAL "J721S2" OR "${TARGET_SOC}" STREQUAL "J784S4" OR "${TARGET_SOC}" STREQUAL "J722S" OR "${TARGET_SOC}" STREQUAL "AM62A")
     include_directories(/usr/include/processor_sdk/vision_apps
                         /usr/include/processor_sdk/app_utils)
 endif()
