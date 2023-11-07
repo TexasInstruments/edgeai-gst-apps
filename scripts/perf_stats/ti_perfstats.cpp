@@ -169,6 +169,10 @@ void displayThread()
         }
 
 #endif
+        printf("\nAVP Demo stats\n");
+        printf("--------------\n");
+        system("tail -n 2 /run/remote_core_log | head -n 1");
+
         std::this_thread::sleep_for(std::chrono::milliseconds(2000));
     }
 
