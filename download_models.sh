@@ -36,19 +36,19 @@ WGET="wget --proxy off"
 
 if [ "$SOC" == "j721e" ]
 then
-	URLs="https://software-dl.ti.com/jacinto7/esd/modelzoo/09_00_00/modelartifacts/TDA4VM/8bits/"
+	URLs="https://software-dl.ti.com/jacinto7/esd/modelzoo/09_01_00/modelartifacts/TDA4VM/8bits/"
 elif [ "$SOC" == "j721s2" ]
 then
-	URLs="https://software-dl.ti.com/jacinto7/esd/modelzoo/09_00_00/modelartifacts/AM68A/8bits/"
+	URLs="https://software-dl.ti.com/jacinto7/esd/modelzoo/09_01_00/modelartifacts/AM68A/8bits/"
 elif [ "$SOC" == "j784s4" ]
 then
-	URLs="https://software-dl.ti.com/jacinto7/esd/modelzoo/09_00_00/modelartifacts/AM69A/8bits/"
+	URLs="https://software-dl.ti.com/jacinto7/esd/modelzoo/09_01_00/modelartifacts/AM69A/8bits/"
 elif [ "$SOC" == "am62a" ]
 then
-	URLs="https://software-dl.ti.com/jacinto7/esd/modelzoo/09_00_00/modelartifacts/AM62A/8bits/"
+	URLs="https://software-dl.ti.com/jacinto7/esd/modelzoo/09_01_00/modelartifacts/AM62A/8bits/"
 elif [ "$SOC" == "am62x" ]
 then
-	URLs="https://software-dl.ti.com/jacinto7/esd/modelzoo/09_00_00/modelartifacts/AM62/32bits/"
+	URLs="https://software-dl.ti.com/jacinto7/esd/modelzoo/09_01_00/modelartifacts/AM62/32bits/"
 else
 	echo "ERROR: "$SOC" not supported"
 	exit
