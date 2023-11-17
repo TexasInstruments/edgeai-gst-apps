@@ -172,6 +172,9 @@ setup_imx390(){
         ln -snf $CAM_DEV $CAM_DEV_NAME
         ln -snf $CAM_SUBDEV $CAM_SUBDEV_NAME
 
+        v4l2-ctl -d $CAM_SUBDEV_NAME --set-ctrl red_balance=256
+        v4l2-ctl -d $CAM_SUBDEV_NAME --set-ctrl blue_balance=256
+
         echo -e "${GREEN}IMX390 Camera $i detected${NOCOLOR}"
         echo "    device = $CAM_DEV_NAME"
         echo "    name = imx390"
