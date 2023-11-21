@@ -49,6 +49,9 @@ then
 elif [ "$SOC" == "am62x" ]
 then
 	URLs="https://software-dl.ti.com/jacinto7/esd/modelzoo/09_01_00/modelartifacts/AM62/32bits/"
+elif [ "$SOC" == "am62p" ]
+then
+	URLs="https://software-dl.ti.com/jacinto7/esd/modelzoo/09_01_00/modelartifacts/AM62P/32bits/"
 else
 	echo "ERROR: "$SOC" not supported"
 	exit

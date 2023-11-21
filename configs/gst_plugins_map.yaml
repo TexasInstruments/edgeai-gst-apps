@@ -201,6 +201,34 @@ am62x:
         element: jpegenc
     inferer:
         target: arm
+#==================== AM62P ====================
+am62p:
+    dlcolorconvert:
+        element: ticolorconvert
+    colorconvert:
+        element: ticolorconvert
+    scaler:
+        element: tiscaler
+    dlpreproc:
+        element: tidlpreproc
+        property:
+            out-pool-size: 4
+    mosaic:
+        element: timosaic
+    isp: null
+    ldc: null
+    h264dec:
+        element: avdec_h264
+    h265dec:
+        element: avdec_h265
+    h264enc:
+        element: v4l2h264enc
+    h265enc:
+        element: v4l2h265enc
+    jpegenc:
+        element: jpegenc
+    inferer:
+        target: arm
 #==================== ARM-ONLY ====================
 arm:
     dlcolorconvert:

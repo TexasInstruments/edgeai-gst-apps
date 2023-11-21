@@ -36,7 +36,7 @@
 /* Standard headers. */
 #include <string>
 
-#if !defined(SOC_AM62X)
+#if !defined(SOC_AM62X) && !defined(SOC_AM62P)
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -46,7 +46,7 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-#endif // !defined(SOC_AM62X)
+#endif // !defined(SOC_AM62X) && !defined(SOC_AM62P)
 
 /**
  * \defgroup group_edgeai_utils Utility libraries

@@ -17,13 +17,14 @@ namespace ti::utils
     static bool                printstats;
     static thread              perfThreadId;
     static const char         *sub_dir_name{nullptr};
-#if not defined(SOC_AM62X)
+
+#if not defined(SOC_AM62X) && not defined(SOC_AM62P)
     static app_perf_point_t    perf;
 #endif
 
     static void perfThread()
     {
-#if not defined(SOC_AM62X)
+#if not defined(SOC_AM62X) && not defined(SOC_AM62P)
         app_perf_point_t   *perf_arr[1];
         int32_t             logNumber = 0;
         const int32_t       save_history = 16;      // Defines how many log files to keep at a time
@@ -176,7 +177,7 @@ namespace ti::utils
     // When called, start recording and averaging performance metrics
     void startRec()
     {
-#if not defined(SOC_AM62X)
+#if not defined(SOC_AM62X) && not defined(SOC_AM62P)
         appPerfPointBegin(&perf);
 #endif
     }
@@ -184,7 +185,7 @@ namespace ti::utils
     // When called, pause recording and averaging performance metrics
     void endRec()
     {
-#if not defined(SOC_AM62X)
+#if not defined(SOC_AM62X) && not defined(SOC_AM62P)
         appPerfPointEnd(&perf);
 #endif
     }
