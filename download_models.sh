@@ -54,7 +54,7 @@ else
 	exit
 fi
 
-types="classification detection segmentation"
+types="classification detection segmentation keypoint_detection"
 DEST_DIR=../model_zoo/
 mkdir -p $DEST_DIR
 declare -A keys
@@ -198,6 +198,7 @@ list_models()
 	echo "                    classification          - To download all classification models"
 	echo "                    detection               - To download all object detection models"
 	echo "                    segmentation            - To download all semantic segmentation models"
+	echo "                    keypoint_detection      - To download all keypoint detection models"
 	echo "               Ex: ./download_models.sh -d classification - Will download all classification models"
 }
 
@@ -252,6 +253,7 @@ usage()
 	echo "                    classification          - To download all classification models"
 	echo "                    detection               - To download all object detection models"
 	echo "                    segmentation            - To download all semantic segmentation models"
+	echo "                    keypoint_detection      - To download all keypoint detection models"
 	echo "               Ex: ./download_models.sh -d classification - Will download all classification models"
 	echo "./download_models.sh --recommended  | -r - To download out of the box models"
 	echo "./download_models.sh --help | -h - To display this"
