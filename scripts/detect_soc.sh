@@ -19,6 +19,10 @@ elif grep -q am62a /proc/device-tree/compatible
 then
     export SOC=am62a
     export DEVICE_NAME=AM62A
+elif grep -q am62p /proc/device-tree/compatible
+then
+    export SOC=am62p
+    export DEVICE_NAME=AM62P
 else
     echo "WARNING: EdgeAI Apps is not supported in this Target"
 fi
