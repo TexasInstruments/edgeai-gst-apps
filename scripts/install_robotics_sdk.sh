@@ -31,7 +31,7 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 # Release tag info of the current release
-GIT_TAG="REL.09.00.00"
+GIT_TAG="REL.09.01.00"
 if [ "$#" -eq 1 ]; then
     GIT_TAG=$1
 fi
@@ -60,11 +60,6 @@ elif [[ "$ARCH" == "x86_64" ]]; then
 else
     echo "$ARCH is not supported"
     exit 1
-fi
-
-# To support previous versions
-if [[ "$GIT_TAG" == "v0.5.0" ]] || [[ "$GIT_TAG" == "v0.4.0" ]]; then
-    export SDK_DIR=$ROS_WS/src/jacinto_ros_perception
 fi
 
 # "git checkout" only if $GIT_TAG does not match with $RECENT_TAG
@@ -116,7 +111,7 @@ fi
 
 # Install TI mmWave radar driver node
 if [[ -f "$SDK_DIR/scripts/install_mmwave_rospkg.sh" ]]; then
-    bash $SDK_DIR/scripts/install_mmwave_rospkg.sh
+    bash $SDK_DIR/scripts/install_mmwave_rospkg.sh 2
 fi
 
 # Setup $WORK_DIR
