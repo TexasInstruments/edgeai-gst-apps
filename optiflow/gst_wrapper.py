@@ -281,13 +281,6 @@ def get_input_str(input):
     elif (source == 'raw_video'):
         source_cmd = 'multifilesrc location=' + input.source
         source_cmd += ' loop=true stop-index=-1' if input.loop else ' loop=false stop-index=0'
-
-        # Set caps only in case of hardware decoder
-        if ((input.format == "h264" and gst_element_map["h264dec"]["element"] == "v4l2h264dec") or
-            (input.format == "h265" and gst_element_map["h264dec"]["element"] == "v4l2h264dec")):
-            source_cmd += ' caps=video/x-' + input.format
-            source_cmd += ',width=%d,height=%d,framerate=%d/1' % (input.width,input.height,input.fps)
-
         source_cmd +=  video_dec[input.format]
         source_cmd += ' ! '
 
