@@ -33,12 +33,14 @@
 current_dir=$(pwd)
 cd $(dirname $0)
 
+branch_name=release-1.1.0
+
 if [ `arch` == "aarch64" ]; then
     install_dir="/opt/"
 else
     install_dir="../../"
 fi
-while getopts ":i:d" flag; do
+while getopts ":i:b:d" flag; do
     case "${flag}" in
         i)
             if [ -z $OPTARG ] || [ ! -d $OPTARG ]; then
@@ -47,6 +49,9 @@ while getopts ":i:d" flag; do
                 exit 1
             fi
             install_dir="$OPTARG"
+            ;;
+        b)
+            branch_name="$OPTARG"
             ;;
         d)
             build_flag="-DCMAKE_BUILD_TYPE=Debug"
@@ -66,7 +71,7 @@ cd $install_dir
 ls | grep "ti-gpio-py"
 if [ "$?" -ne "0" ]; then
     echo "Cloning TI.GPIO python project."
-    git clone --single-branch --branch release-1.1.0 https://github.com/TexasInstruments/ti-gpio-py.git
+    git clone --single-branch --branch $branch_name https://github.com/TexasInstruments/ti-gpio-py.git
     if [ "$?" -ne "0" ]; then
         cd $current_dir
         exit 1
@@ -106,7 +111,7 @@ fi
 ls | grep "ti-gpio-cpp"
 if [ "$?" -ne "0" ]; then
     echo "Cloning TI GPIO CPP project."
-    git clone --single-branch --branch release-1.1.0 https://github.com/TexasInstruments/ti-gpio-cpp.git
+    git clone --single-branch --branch $branch_name https://github.com/TexasInstruments/ti-gpio-cpp.git
     if [ "$?" -ne "0" ]; then
         cd $current_dir
         exit 1
