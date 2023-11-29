@@ -296,7 +296,7 @@ setup_imx219(){
 }
 
 setup_ov5640(){
-    OV5640_CAM_FMT='[fmt:UYVY8_1X16/1280x720@1/30]'
+    OV5640_CAM_FMT='[fmt:YUYV8_1X16/1280x720@1/30]'
     count=0
     for media_id in {0..1}; do
     for name in `media-ctl -d $media_id -p | grep entity | grep ov5640 | cut -d ' ' -f 5`; do
