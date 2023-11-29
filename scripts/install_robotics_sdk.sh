@@ -78,7 +78,7 @@ function git_checkout_with_tag {
     fi
 }
 
-# "git pull"" to the current folder
+# "git pull" to the current folder
 function git_pull_to_current_folder {
     git init
     git remote add origin $GIT_REPO
@@ -115,7 +115,7 @@ if [[ -f "$SDK_DIR/scripts/install_mmwave_rospkg.sh" ]]; then
 fi
 
 # Setup $WORK_DIR
-mkdir -p $ROS_WS
+mkdir -p $WORK_DIR
 cd $WORK_DIR
 ln -sf $SDK_DIR/docker/Makefile $WORK_DIR/Makefile
 if [[ "$ARCH" == "aarch64" ]]; then
