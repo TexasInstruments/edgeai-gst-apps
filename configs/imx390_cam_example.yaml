@@ -2,9 +2,7 @@ title: "IMX390 Camera"
 log_level: 2
 inputs:
     # Needs fusion board and imx390 cameras conneted over FPD links
-    # k3-j721e-cpb-fpdlink-fusion.dtbo and k3-j721e-cpb-fpdlink-imx390-*.dtbo
-    # should be applied in uenv.txt based on the number and type of the cameras
-    # connected
+    # Overlay for fusion board and cameras should be applied in /run/media/BOOT-mmcblk1p1/uEnv.txt (Refer to Documentation)
     input0:
         source: /dev/video-imx390-cam0
         subdev-id: /dev/v4l-imx390-subdev0

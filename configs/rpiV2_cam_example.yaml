@@ -1,9 +1,8 @@
 title: "RPi Camera"
 log_level: 2
 inputs:
-    # rpi camera is supported only in Starter Kit
-    # rpiV2 camera should be connected to CAM1 rpi header on SK
-    # k3-j721e-sk-rpi-cam-imx219.dtbo should be applied in uenv.txt
+    # RPi camera is supported only in Starter Kit
+    # To enable RPi camera, apply the overlay in /run/media/BOOT-mmcblk1p1/uEnv.txt (Refer to Documentation)
     input0:
         source: /dev/video-rpi-cam0
         subdev-id: /dev/v4l-rpi-subdev0

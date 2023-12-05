@@ -1,5 +1,5 @@
 title: "Remote Display"
-# If output is set to display, it runs the pipeline with udpsink as the output
+# If output is set to remote, it runs the pipeline with udpsink as the output
 # To view the output on web browser, run the node server
 # root@soc:/opt/edgeai-gst-apps> node scripts/remote_streaming/server.js
 # This will start node webserver and generate a link which you can open in browser
