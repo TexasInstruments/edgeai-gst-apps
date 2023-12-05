@@ -2,7 +2,7 @@ title: "OV5640 Camera"
 log_level: 2
 inputs:
     # ov5640 should be connected to MIPI connector
-    # k3-j721e-sk-csi2-ov5640.dtbo should be applied in uenv.txt
+    # To enable ov5640 camera, apply the overlay in /run/media/BOOT-mmcblk1p1/uEnv.txt (Refer to Documentation)
     input0:
         source: /dev/video-ov5640-cam0
         width: 1280
