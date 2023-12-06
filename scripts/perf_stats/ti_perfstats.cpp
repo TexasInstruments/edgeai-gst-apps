@@ -50,6 +50,8 @@ extern "C" {
 
 }
 
+#define SLEEP_INTERVAL 1000
+
 static bool gStop = false;
 static std::thread gDispThreadId;
 
@@ -117,7 +119,7 @@ void displayThread()
                   soc_temp.thermal_zone_name[i], soc_temp.thermal_zone_temp[i]);
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+        std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_INTERVAL));
     }
 
 }
