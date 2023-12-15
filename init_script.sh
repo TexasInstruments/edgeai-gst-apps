@@ -61,9 +61,11 @@ ldconfig
 #Remove stale gstreamer cache
 rm -rf ~/.cache/gstreamer-1.0/registry.aarch64.bin
 
-# Set VPAC Freq to 720 MHz to support 8 ch IMX390  use case at 30 FPS
-k3conf set clock 290 0 720000000 &> /dev/null
-k3conf set clock 48 0 480000000 &> /dev/null
+# Set VPAC Freq to 720 MHz to support 8 ch IMX390 use case at 30 FPS
+if [ "$SOC" == "j721e" ]; then
+    k3conf set clock 290 0 720000000 &> /dev/null
+    k3conf set clock 48 0 480000000 &> /dev/null
+fi
 
 # Increase ulimits for number of open files, to support multi channel demo
 ulimit -Sn 10240
