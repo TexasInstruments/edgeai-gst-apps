@@ -63,8 +63,15 @@ rm -rf ~/.cache/gstreamer-1.0/registry.aarch64.bin
 
 # Set VPAC Freq to 720 MHz to support 8 ch IMX390 use case at 30 FPS
 if [ "$SOC" == "j721e" ]; then
-    k3conf set clock 290 0 720000000 &> /dev/null
-    k3conf set clock 48 0 480000000 &> /dev/null
+    k3conf set clock 290 0 720000000 &> /dev/null #VPAC
+    k3conf set clock 48 0 480000000 &> /dev/null #DMPAC
+elif [ "$SOC" == "j721s2" ]; then
+    k3conf set clock 361 2 720000000 &> /dev/null #VPAC
+    k3conf set clock 58 0 480000000 &> /dev/null #DMPAC
+elif [ "$SOC" == "j784s4" ]; then
+    k3conf set clock 399 1 720000000 &> /dev/null #VPAC0
+    k3conf set clock 400 1 720000000 &> /dev/null #VPAC1
+    k3conf set clock 92 0 480000000 &> /dev/null #DMPAC
 fi
 
 # Increase ulimits for number of open files, to support multi channel demo
