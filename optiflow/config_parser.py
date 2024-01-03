@@ -85,6 +85,7 @@ class Input:
         Input.count += 1
         self.split_count = 0
         self.splits = 0
+        self.true_splits = 0
         self.roi_strings = []
         self.roi_string = ''
         self.msc_target_string = ''
@@ -96,10 +97,17 @@ class Input:
             if self.roi_string != '':
                 self.roi_strings.append(self.roi_string)
             self.roi_string = ''
+            self.true_splits = 0
+
+        self.true_splits += 1
         self.splits += 1
+        if flow.model == None:
+            self.splits += 1
+
         self.split_count = int(self.splits/4)
         if self.splits % 4:
             self.split_count += 1
+
         self.gst_split_str = gst_wrapper.get_input_split_str(self,flow)
         return 'split_%d%d' % (self.id, self.split_count)
 
@@ -256,11 +264,18 @@ class SubFlow:
 
         self.disp_id = output.get_disp_id(self, input.fps)
         self.id = SubFlow.count
+
         self.gst_pre_src_name = 'pre_%d' % self.id
         self.gst_post_name = 'post_%d' % self.id
         self.gst_sen_src_name = 'sen_%d' % self.id
+
+        self.gst_pre_proc_str = ""
+        self.gst_sensor_str = ""
+        self.gst_post_proc_str = ""
+
         self.gst_pre_proc_str = gst_wrapper.get_pre_proc_str(self)
         self.gst_sensor_str = gst_wrapper.get_sensor_str(self)
         self.gst_post_proc_str = gst_wrapper.get_post_proc_str(self)
+
         self.flow = flow
         SubFlow.count += 1

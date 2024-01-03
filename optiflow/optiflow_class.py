@@ -75,7 +75,7 @@ class OptiFlowClass:
             output = flow[2]
 
             # Parse Input/Model/Output Objects
-            if model not in self.models:
+            if model is not None and model not in self.models:
                 model_config =  config["models"][model]
                 model_path = model_config["model_path"]
 
@@ -135,7 +135,10 @@ class OptiFlowClass:
 
             for key in subflow_dictionary:
                 model,output = key.strip().split("%")
-                model_obj = self.models[model]
+                if model == 'None':
+                    model_obj = None
+                else:
+                    model_obj = self.models[model]
                 output_obj = self.outputs[output]
                 mosaic_list = subflow_dictionary[key]
                 subflow_list.append([model_obj, output_obj, mosaic_list])

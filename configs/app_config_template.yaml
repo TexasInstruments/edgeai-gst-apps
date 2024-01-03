@@ -305,9 +305,16 @@ flows:
 
     #################################################################################
     # flow: [*input*,*model*,*output*,[*pos_x*,*pos_y*,*width*,*height*](Optional)] #
+    #                                                                               #
     # input0,input1: Input(s) to use                                                #
+    #                                                                               #
     # model0,model1: Model(s) to be used (Same model can be share across as well)   #
+    # NOTE: This can be defined as null while using the config file with optiflow   #
+    #       Ex: [input0,null,output0,[640,480,640,480]]. This will ommit the        #
+    #       deep learning and just do input->output
+    #                                                                               #
     # output0,output1: Output(s) to be used.                                        #
+    #                                                                               #
     # If 4th argument i.e mosaic is not defined, it is assumed that no              #
     # mosaic will be used.                                                          #
     #                                                                               #

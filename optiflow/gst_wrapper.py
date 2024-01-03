@@ -305,21 +305,27 @@ def get_input_split_str(input,flow):
     global msc_target_idx
 
     if gst_element_map["scaler"]["element"] == "tiovxmultiscaler":
-        crop_startx = (((flow.model.resize[0] - flow.model.crop[0])/2)/flow.model.resize[0]) * flow.input.width
-        crop_startx = int(crop_startx)
-        crop_starty = (((flow.model.resize[1] - flow.model.crop[1])/2)/flow.model.resize[1]) * flow.input.height
-        crop_starty = int(crop_starty)
-        crop_width = flow.input.width - (2*crop_startx)
-        crop_height = flow.input.height - (2*crop_starty)
-        if ((input.splits - 1) // 2) % 2 == 0:
-            src_pad = 0
+        if flow.model:
+            crop_startx = (((flow.model.resize[0] - flow.model.crop[0])/2)/flow.model.resize[0]) * flow.input.width
+            crop_startx = int(crop_startx)
+            crop_starty = (((flow.model.resize[1] - flow.model.crop[1])/2)/flow.model.resize[1]) * flow.input.height
+            crop_starty = int(crop_starty)
+            crop_width = flow.input.width - (2*crop_startx)
+            crop_height = flow.input.height - (2*crop_starty)
+            if ((input.splits - 1) // 2) % 2 == 0:
+                src_pad = 0
+            else:
+                if input.true_splits % 2 == 0:
+                    src_pad = 2
+                else:
+                    src_pad = 1
+            if input.splits % 2 == 0:
+                input.roi_string += " src_%d::roi-startx=%d" % (src_pad,crop_startx)
+                input.roi_string += " src_%d::roi-starty=%d" % (src_pad,crop_starty)
+                input.roi_string += " src_%d::roi-width=%d" % (src_pad,crop_width)
+                input.roi_string += " src_%d::roi-height=%d" % (src_pad,crop_height)
         else:
-            src_pad = 2
-        if input.splits % 2 == 0:
-            input.roi_string += " src_%d::roi-startx=%d" % (src_pad,crop_startx)
-            input.roi_string += " src_%d::roi-starty=%d" % (src_pad,crop_starty)
-            input.roi_string += " src_%d::roi-width=%d" % (src_pad,crop_width)
-            input.roi_string += " src_%d::roi-height=%d" % (src_pad,crop_height)
+            input.roi_string += "\0"
 
         # Load-balancing the msc targets
         if input.msc_target_string == '':
@@ -465,6 +471,9 @@ def get_pre_proc_str(flow):
     global preproc_target_idx, tidl_target_idx
     cmd = ''
 
+    if flow.model == None:
+        return cmd
+
     resize = flow.model.resize
     crop = flow.model.crop
 
@@ -592,7 +601,12 @@ def get_sensor_str(flow):
     if (gst_element_map["scaler"]["element"] != "tiovxmultiscaler"):
         split_name = "tee_split%d" % (flow.input.id)
 
-    cmd = 'video/x-raw, width=%d, height=%d ! %s.sink ' % (flow.width, flow.height, flow.gst_post_name)
+    cmd = 'video/x-raw, width=%d, height=%d ! ' % (flow.width, flow.height)
+    if flow.model:
+        cmd += '%s.sink ' % (flow.gst_post_name)
+    elif flow.output.mosaic:
+        cmd += 'queue ! mosaic_%d. ' % (flow.output.id)
+
     if (gst_element_map["scaler"]["element"] == "tiovxmultiscaler"):
         cmd = split_name + '. ! queue ! ' + cmd
     else:
@@ -600,6 +614,11 @@ def get_sensor_str(flow):
     return cmd
 
 def get_post_proc_str(flow):
+    cmd = ''
+
+    if flow.model == None:
+        return cmd
+
     cmd = 'tidlpostproc name=%s model=%s alpha=%f viz-threshold=%f top-N=%d display-model=true ! ' % \
           (flow.gst_post_name, flow.model.path, flow.model.alpha, flow.model.viz_threshold, flow.model.topN)
 
@@ -623,12 +642,11 @@ def get_gst_str(flows, outputs):
         if (f.input.input_format != "NV12"):
             src_str += gst_element_map["dlcolorconvert"]["element"] + \
                        " ! video/x-raw,format=NV12 ! "
-
         if len(f.input.roi_strings) != f.input.split_count:
             f.input.roi_strings.append(f.input.roi_string)
         for i,roi_str in enumerate(f.input.roi_strings):
             actual_string = "tiovxmultiscaler name=split_%d%d" %  (f.input.id,(i+1))
-            replacement_string = actual_string + roi_str
+            replacement_string = actual_string + roi_str.replace('\0','')
             f.input.gst_split_str = f.input.gst_split_str.replace(actual_string,replacement_string)
 
         mosaic = True
