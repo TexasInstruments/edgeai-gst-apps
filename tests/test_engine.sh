@@ -38,18 +38,20 @@ performance, long run tests.
 Following are some of it's features:
 * Allow to run tests for all available models
 * Specify a filter for the models to be tested
-* Select between Python and C++ demos
+* Select between Python, C++ or Optiflow
 * Save the stdout and stderr for all the test cases
 * Provide custom parsing script for validation criteria
 DESCRIPTION
 
 # Global variables
 topdir=$EDGEAI_GST_APPS_PATH
+modelzoo=$MODEL_ZOO_PATH
 BRIGHTWHITE='\033[0;37;1m'
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 NOCOLOR='\033[0m'
 
+failcount=0
 cpuload=0
 
 debug() {
@@ -62,19 +64,17 @@ usage() {
 	cat <<- EOF
 		test_engine.sh - Run different tests on the edgeai apps
 		Usage:
-		  test_engine.sh TSUIT TARGS TIMEOUT PARSE_SCRIPT FILTER
-		    TSUIT        : Unique string for each varient of test
-		                   Must start with one of PY, CPP No underscores
-		    TARGS        : Arguments to be passed to the test scripts
-		                   Escape the quotes to pass as single argument
-		    TIMEOUT      : No of seconds to run the test before killing it
-		                   Useful for forever running camera tests
-		    PARSE_SCRIPT : Script to handle the test logs and decide the
-		                   validation criteria for the test run
-		    FILTER       : Optionally filter out models like below:
+		  test_engine.sh test_suite config timeout model_filter parse_script
+		    test_suite   : Unique string for each varient of test
+		                   Must start with one of PY, CPP or OPTIFLOW
+		    config       : Path to yaml config file
+		    timeout      : No of seconds to run the test before killing it
+			model_filter : Optionally filter out models like below:
 		                   "grep CL" to run only classification models
 		                   "grep TVM" to run only those models with TVM runtime
 		                   "grep TFL-CL-007" to run only specific model
+		    parse_script : Script to handle the test logs and decide the
+		                   validation criteria for the test run
 	EOF
 }
 
@@ -156,10 +156,13 @@ run_single_test() {
 
 	if [ "$test_status" -ne "0" ] && [ "$test_status" -ne "124" ]; then
 		# Test failed while running
+		printf "[EXIT-STATUS] FAIL $test_status\n"
 		printf "[TEST]$RED FAIL_RUN$NOCOLOR $test_name (retval $test_status)\n"
 		printf "        Test Log saved @ $RED$stdout$NOCOLOR\n"
 		return $test_status
 	fi
+
+	printf "[EXIT-STATUS] PASS $test_status\n"
 
 	if [ "$parse_script" != "null" ]; then
 		cd $topdir/tests/
@@ -193,11 +196,10 @@ fi
 test_suite=$1
 config_file=$2
 timeout=$3
-parse_script=${4:-"null"}
-test_filter=${5:-"null"}
-measure_cpuload=${6:-"true"}
-modelname=${7:-"null"}
-dump_inf_data=${8:-"false"}
+test_filter=${4:-"null"}
+parse_script=${5:-"null"}
+measure_cpuload=${6:-"false"}
+dump_inf_data=${7:-"false"}
 
 if [[ "$test_suite" = "CPP"* ]]; then
 	echo "[TEST] Building CPP applications..."
@@ -208,24 +210,21 @@ fi
 mkdir -p $topdir/logs
 cd $topdir/
 
-if [ "$modelname" == "null" ]; then
-	# Find out a list of models for which to run the test
-	searchcmd="find ../model_zoo -maxdepth 1 -mindepth 1 -type d"
-	if [ "$test_filter" != "null" ]; then
-		searchcmd="$searchcmd | $test_filter"
-	fi
-	searchcmd="$searchcmd | sort"
-else
-	searchcmd="find ../model_zoo/$modelname -maxdepth 0 -mindepth 0 -type d"
-	if [ -f "$searchcmd" ]; then
-		echo "ERROR: $searchcmd does not exist."
-		exit 1
-	fi
+# Find out a list of models for which to run the test
+searchcmd="find $modelzoo -maxdepth 1 -mindepth 1 -type d"
+if [ "$test_filter" != "null" ]; then
+	searchcmd="$searchcmd | $test_filter"
+fi
+searchcmd="$searchcmd | sort"
+model_list=$(eval $searchcmd)
+if [ -z "$model_list" ]; then
+    echo "ERROR: could not find model in $modelzoo"
+	exit 0
 fi
 
 # Iterate over the list of filtered models
-for model_path in $(eval $searchcmd); do
-	model=`echo $model_path | cut -d'/' -f3`
+for model_path in $model_list; do
+	model=$(basename $model_path)
 	model_type=`echo $model | cut -d'-' -f2`
 	case $model_type in
 		"CL")
@@ -267,11 +266,7 @@ for model_path in $(eval $searchcmd); do
 		exit 1
 	fi
 
-
-	# Update the config file with correct model path if modelname isnt specified
-	if [ "$modelname" == "null" ]; then
-		sed -i "s@model_path:.*@model_path: $topdir/$model_path@" $config_file
-	fi
+	sed -i "s@model_path:.*@model_path: $model_path@" $config_file
 
 	# Generate a unique test name for each test_suite / model
 	# This way, logs will not be overwritten
@@ -284,5 +279,11 @@ for model_path in $(eval $searchcmd); do
 
 	# This will run the test and save the logs
 	run_single_test $tname $test_dir $timeout $parse_script $measure_cpuload "$command"
+	ret=$?
+	if [ "$ret" -ne "0" ] && [ "$ret" -ne "124" ]; then
+		failcount=$((failcount + 1))
+	fi
 
 done
+
+exit $failcount

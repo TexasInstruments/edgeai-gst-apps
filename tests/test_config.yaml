@@ -1,20 +1,50 @@
 # Generic config file used for test engine
 # test script will use this to update at runtime and pass it to the applications
-
-title: "Test Demo"
+title: "Test in progress..."
 log_level: 2
 inputs:
-    input:
+    camera_usb:
+        source: /dev/video-usb-cam0
+        format: jpeg
+        width: 1280
+        height: 720
+        framerate: 30
+    camera_rpi:
+        source: /dev/video-rpi-cam0
+        subdev-id: /dev/v4l-rpi-subdev0
+        width: 1920
+        height: 1080
+        format: rggb
+        framerate: 30
+    camera_ov5640:
+        source: /dev/video-ov5640-cam0
+        width: 1280
+        height: 720
+        format: auto
+        framerate: 30
+    camera_imx390:
+        source: /dev/video-imx390-cam0
+        subdev-id: /dev/v4l-imx390-subdev0
+        width: 1936
+        height: 1100
+        format: rggb12
+        framerate: 30
+        sen-id: imx390
+        ldc: True
+    video:
         source: /opt/edgeai-test-data/videos/video0_1280_768.h264
         width: 1280
         height: 768
         framerate: 30
         format: h264
         loop: True
+    image:
+        source: /opt/edgeai-test-data/images/%04d.jpg
+        width: 1280
+        height: 720
         index: 0
-        subdev-id: /dev/v4l-subdev2
-        sen-id: ""
-        ldc: False
+        framerate: 1
+        loop: True
 
 models:
     dl_model:
@@ -24,11 +54,34 @@ models:
         viz_threshold: 0.5
         alpha: 0.4
 outputs:
-    output:
+    display:
         sink: kmssink
         width: 1920
         height: 1080
         overlay-perf-type: graph
+    fakesink:
+        sink: fakesink
+        width: 1920
+        height: 1080
+        overlay-perf-type: graph
+    save_as_video:
+        sink: /opt/edgeai-test-data/output/output_video0.mkv
+        width: 1920
+        height: 1080
+        overlay-perf-type: graph
+    save_as_image:
+        sink: /opt/edgeai-test-data/output/output_image_%04d.jpg
+        width: 1920
+        height: 1080
+        overlay-perf-type: graph
+    remote_streaming:
+        sink: remote
+        width: 1920
+        height: 1080
+        port: 8081
+        host: 127.0.0.1
+        encoding: jpeg
+        overlay-perf-type: graph
 
 flows:
-    flow0: [input,dl_model,output,[320,180,1280,720]]
+    flow0: [video,dl_model,display,[320,180,1280,720]]
