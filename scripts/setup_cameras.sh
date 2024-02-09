@@ -33,16 +33,16 @@
 GREEN='\033[0;32m'
 NOCOLOR='\033[0m'
 
+IMX219_CAM_FMT="${IMX219_CAM_FMT:-[fmt:SRGGB8_1X8/1920x1080]}"
+IMX390_CAM_FMT="${IMX390_CAM_FMT:-[fmt:SRGGB12_1X12/1936x1100 field: none]}"
+OV2312_CAM_FMT="${OV2312_CAM_FMT:-[fmt:SBGGI10_1X10/1600x1300 field: none]}"
+OV5640_CAM_FMT="${OV5640_CAM_FMT:-[fmt:YUYV8_1X16/1280x720@1/30]}"
 
 declare -A ALL_UB960_FMT_STR
 declare -A ALL_CDNS_FMT_STR
 declare -A ALL_CSI2RX_FMT_STR
 
 setup_routes(){
-
-    OV2312_CAM_FMT='[fmt:SBGGI10_1X10/1600x1300 field: none]'
-    IMX390_CAM_FMT='[fmt:SRGGB12_1X12/1936x1100 field: none]'
-
     for i in "${!ALL_UB960_FMT_STR[@]}"
     do
         id="$(cut -d',' -f1 <<<"$i")"
@@ -64,7 +64,6 @@ setup_routes(){
             UB960_PAD=`media-ctl -d $id -p -e "$UB953_NAME" | grep ub960 | cut -d : -f 2 | awk '{print $1}'`
             media-ctl -d $id -V "'$UB960_NAME':$UB960_PAD $IMX390_CAM_FMT"
         done
-
     done
 
     # CDNS ROUTING
@@ -103,12 +102,9 @@ setup_routes(){
         name="$(cut -d',' -f2 <<<"$i")"
         media-ctl -d $id -R "'$name' [${ALL_CSI2RX_FMT_STR[$i]}]"
     done
-
 }
 
 setup_imx390(){
-    IMX390_CAM_FMT='[fmt:SRGGB12_1X12/1936x1100 field: none]'               
-
     i=0
     for media_id in {0..1}; do
     # UB953 FORMATS
@@ -189,8 +185,6 @@ setup_imx390(){
 }
 
 setup_ov2312(){
-    OV2312_CAM_FMT='[fmt:SBGGI10_1X10/1600x1300 field: none]'
-
     i=0
     for media_id in {0..1}; do
     # UB953 FORMATS
@@ -265,7 +259,6 @@ setup_ov2312(){
 }
 
 setup_imx219(){
-    IMX219_CAM_FMT='[fmt:SRGGB8_1X8/1920x1080]'
     count=0
     for media_id in {0..1}; do
     for name in `media-ctl -d $media_id -p | grep entity | grep imx219 | cut -d ' ' -f 5`; do
@@ -296,7 +289,6 @@ setup_imx219(){
 }
 
 setup_ov5640(){
-    OV5640_CAM_FMT='[fmt:YUYV8_1X16/1280x720@1/30]'
     count=0
     for media_id in {0..1}; do
     for name in `media-ctl -d $media_id -p | grep entity | grep ov5640 | cut -d ' ' -f 5`; do
