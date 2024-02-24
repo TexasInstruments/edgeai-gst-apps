@@ -106,7 +106,7 @@ setup_routes(){
 
 setup_imx390(){
     i=0
-    for media_id in {0..1}; do
+    for media_id in {0..3}; do
     # UB953 FORMATS
     UB960_FMT_STR=""
     CDNS_FMT_STR=""
@@ -186,7 +186,7 @@ setup_imx390(){
 
 setup_ov2312(){
     i=0
-    for media_id in {0..1}; do
+    for media_id in {0..3}; do
     # UB953 FORMATS
     UB960_FMT_STR=""
     CDNS_FMT_STR=""
@@ -260,7 +260,7 @@ setup_ov2312(){
 
 setup_imx219(){
     count=0
-    for media_id in {0..1}; do
+    for media_id in {0..3}; do
     for name in `media-ctl -d $media_id -p | grep entity | grep imx219 | cut -d ' ' -f 5`; do
         CAM_SUBDEV=`media-ctl -d $media_id -p -e "imx219 $name" | grep v4l-subdev | awk '{print $4}'`
         media-ctl -d $media_id --set-v4l2 ''"\"imx219 $name\""':0 '$IMX219_CAM_FMT''
@@ -290,7 +290,7 @@ setup_imx219(){
 
 setup_ov5640(){
     count=0
-    for media_id in {0..1}; do
+    for media_id in {0..3}; do
     for name in `media-ctl -d $media_id -p | grep entity | grep ov5640 | cut -d ' ' -f 5`; do
         CAM_SUBDEV=`media-ctl -d $media_id -p -e "ov5640 $name" | grep v4l-subdev | awk '{print $4}'`
         media-ctl -d $media_id --set-v4l2 ''"\"ov5640 $name\""':0 '$OV5640_CAM_FMT''
