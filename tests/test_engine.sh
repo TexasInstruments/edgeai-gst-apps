@@ -109,6 +109,7 @@ build_cpp_apps() {
 		build_flag="-DEDGEAI_ENABLE_OUTPUT_FOR_TEST=ON"
 	fi
 	cd $topdir/apps_cpp
+	rm -rf build bin lib
 	mkdir -p build
 	cd build
 	cmake $build_flag ..
