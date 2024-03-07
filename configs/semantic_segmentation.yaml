@@ -24,13 +24,13 @@ inputs:
 models:
     model0:
         model_path: /opt/model_zoo/TVM-SS-5710-deeplabv3lite-mobv2-cocoseg21-512x512
-        alpha: 0.4
+        alpha: 0.2
     model1:
         model_path: /opt/model_zoo/TFL-SS-2580-deeplabv3_mobv2-ade20k32-mlperf-512x512
-        alpha: 0.4
+        alpha: 0.2
     model2:
         model_path: /opt/model_zoo/ONR-SS-8610-deeplabv3lite-mobv2-ade20k32-512x512
-        alpha: 0.4
+        alpha: 0.2
 outputs:
     output0:
         sink: kmssink

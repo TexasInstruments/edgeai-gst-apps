@@ -34,7 +34,7 @@ models:
         viz_threshold: 0.6
     model2:
         model_path: /opt/model_zoo/ONR-SS-8610-deeplabv3lite-mobv2-ade20k32-512x512
-        alpha: 0.4
+        alpha: 0.2
 outputs:
     # Jpeg encode and stream
     output0:

@@ -599,7 +599,7 @@ namespace ti::edgeai::common
             string                  m_labelsPath;
 
             /** Alpha value used for blending the sementic segmentation output. */
-            float                   m_alpha{0.5f};
+            float                   m_alpha{0.2f};
 
             /** Threshold for visualizing the output from the detection models. */
             float                   m_vizThreshold{0.5f};

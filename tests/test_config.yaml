@@ -22,7 +22,7 @@ models:
         model_path: /opt/edgeai-gst-apps/models/<type>/<model>
         topN: 5
         viz_threshold: 0.5
-        alpha: 0.4
+        alpha: 0.2
 outputs:
     output:
         sink: kmssink
