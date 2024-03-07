@@ -60,7 +60,8 @@ namespace ti::edgeai::common
                  m_config.inDataHeight,                 \
                  m_config.outDataWidth,                 \
                  m_config.outDataHeight,                \
-                 m_config.alpha)
+                 m_config.alpha,                        \
+                 m_config.datasetInfo)
 #else
 #define INVOKE_BLEND_LOGIC(T)                           \
     blendSegMask(reinterpret_cast<uint8_t*>(frameData), \
@@ -69,7 +70,8 @@ namespace ti::edgeai::common
                  m_config.inDataHeight,                 \
                  m_config.outDataWidth,                 \
                  m_config.outDataHeight,                \
-                 m_config.alpha)
+                 m_config.alpha,                        \
+                 m_config.datasetInfo)
 #endif // defined(EDGEAI_ENABLE_OUTPUT_FOR_TEST)
 
 PostprocessImageSemanticSeg::PostprocessImageSemanticSeg(const PostprocessImageConfig   &config,
@@ -94,16 +96,17 @@ PostprocessImageSemanticSeg::PostprocessImageSemanticSeg(const PostprocessImageC
  * @returns original frame with some in-place post processing done
  */
 template <typename T1, typename T2>
-static T1 *blendSegMask(T1         *frame,
-                        T2         *classes,
+static T1 *blendSegMask(T1                              *frame,
+                        T2                              *classes,
 #if defined(EDGEAI_ENABLE_OUTPUT_FOR_TEST)
-                        DebugDump  &debugObj,
+                        DebugDump                       &debugObj,
 #endif // defined(EDGEAI_ENABLE_OUTPUT_FOR_TEST)
-                        int32_t     inDataWidth,
-                        int32_t     inDataHeight,
-                        int32_t     outDataWidth,
-                        int32_t     outDataHeight,
-                        float       alpha)
+                        int32_t                         inDataWidth,
+                        int32_t                         inDataHeight,
+                        int32_t                         outDataWidth,
+                        int32_t                         outDataHeight,
+                        float                           alpha,
+                        std::map<int32_t, DatasetInfo>  datasetInfo)
 {
     uint8_t    *ptr;
     uint8_t     a;
@@ -120,8 +123,8 @@ static T1 *blendSegMask(T1         *frame,
     int32_t     sh;
     int32_t     class_id;
 
-    a  = alpha * 255;
-    sa = (1 - alpha ) * 255;
+    a  = alpha * 256;
+    sa = (1 - alpha ) * 256;
 
 #if defined(EDGEAI_ENABLE_OUTPUT_FOR_TEST)
     string output;
@@ -149,10 +152,20 @@ static T1 *blendSegMask(T1         *frame,
             index = (int32_t)(sh * inDataWidth + sw);
             class_id =  classes[index];
 
-            // random color assignment based on class-id's
-            r_m = 10 * class_id;
-            g_m = 20 * class_id;
-            b_m = 30 * class_id;
+            if (datasetInfo.find(class_id) != datasetInfo.end())
+            {
+                // get color from dataset information
+                r_m = datasetInfo.at(class_id).rgbColor[0];
+                g_m = datasetInfo.at(class_id).rgbColor[1];
+                b_m = datasetInfo.at(class_id).rgbColor[2];
+            }
+            else
+            {
+                // random color assignment based on class-id's
+                r_m = 10 * class_id;
+                g_m = 20 * class_id;
+                b_m = 30 * class_id;
+            }
 
             // Blend the original image with mask value
             *(ptr + 0) = ((r * a) + (r_m * sa)) / 255;

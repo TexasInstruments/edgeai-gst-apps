@@ -84,11 +84,13 @@ static void *overlayBoundingBox(void                         *frame,
                                 int                          *box,
                                 int32_t                      outDataWidth,
                                 int32_t                      outDataHeight,
-                                const std::string            objectname)
+                                const std::string            objectname,
+                                uint8_t                      *color)
 {
     Mat img = Mat(outDataHeight, outDataWidth, CV_8UC3, frame);
-    Scalar box_color(20, 220, 20);
-    Scalar text_color(0, 0, 0);
+    Scalar box_color(color[0], color[1], color[2]);
+
+    int32_t luma = ((66*(color[0])+129*(color[1])+25*(color[2])+128)>>8)+16;
 
     Point topleft = Point(box[0], box[1]);
     Point bottomright = Point(box[2], box[3]);
@@ -102,8 +104,17 @@ static void *overlayBoundingBox(void                         *frame,
 
     // Draw text with detected class with a background box
     rectangle(img, t_topleft, t_bottomright, box_color, -1);
-    putText(img, objectname, t_text,
-            FONT_HERSHEY_SIMPLEX, 0.5, text_color);
+
+    if(luma >= 128)
+    {
+        putText(img, objectname, t_text,
+            FONT_HERSHEY_SIMPLEX, 0.5, Scalar(0, 0, 0));
+    }
+    else
+    {
+        putText(img, objectname, t_text,
+            FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255, 255, 255));
+    }
 
     return frame;
 }
@@ -220,6 +231,7 @@ void *PostprocessImageObjDetect::operator()(void           *frameData,
     {
         float score;
         int label, adj_class_id, box[4];
+        uint8_t color[3];
         std::string objectname;
 
         score = getVal(i, m_config.formatter[5]);
@@ -254,14 +266,21 @@ void *PostprocessImageObjDetect::operator()(void           *frameData,
                              "/" +
                              objectname;
             }
+
+            color[0] = m_config.datasetInfo.at(adj_class_id).rgbColor[0];
+            color[1] = m_config.datasetInfo.at(adj_class_id).rgbColor[1];
+            color[2] = m_config.datasetInfo.at(adj_class_id).rgbColor[2];
         }
         else
         {
             objectname = "UNDEFINED";
+            color[0] = 20;
+            color[1] = 220;
+            color[2] = 20;
         }
 
         overlayBoundingBox(frameData, box, m_config.outDataWidth,
-                            m_config.outDataHeight, objectname);
+                            m_config.outDataHeight, objectname, color);
 
 #if defined(EDGEAI_ENABLE_OUTPUT_FOR_TEST)
         output.append(objectname + "[ ");

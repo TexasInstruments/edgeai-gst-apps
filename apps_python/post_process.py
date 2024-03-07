@@ -247,10 +247,12 @@ class PostProcessDetection(PostProcess):
                             + "/"
                             + class_name
                         )
+                    color = self.model.dataset_info[class_name_idx].rgb_color
                 else:
                     class_name = "UNDEFINED"
+                    color = (20, 220, 20)
 
-                img = self.overlay_bounding_box(img, b, class_name)
+                img = self.overlay_bounding_box(img, b, class_name, color)
 
         if self.debug:
             self.debug.log(self.debug_str)
@@ -258,7 +260,7 @@ class PostProcessDetection(PostProcess):
 
         return img
 
-    def overlay_bounding_box(self, frame, box, class_name):
+    def overlay_bounding_box(self, frame, box, class_name, color):
         """
         draw bounding box at given co-ordinates.
 
@@ -273,8 +275,14 @@ class PostProcessDetection(PostProcess):
             int(box[2] * frame.shape[1]),
             int(box[3] * frame.shape[0]),
         ]
-        box_color = (20, 220, 20)
-        text_color = (0, 0, 0)
+
+        box_color = color
+        luma = ((66*(color[0])+129*(color[1])+25*(color[2])+128)>>8)+16
+        if(luma >= 128):
+            text_color = (0, 0, 0)
+        else:
+            text_color = (255, 255, 255)
+
         cv2.rectangle(frame, (box[0], box[1]), (box[2], box[3]), box_color, 2)
         cv2.rectangle(
             frame,
