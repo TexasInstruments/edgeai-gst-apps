@@ -33,7 +33,7 @@
 current_dir=$(pwd)
 cd $(dirname $0)
 
-branch_name=EDGEAI_APP_STACK_09_01_00_00
+branch_name=EDGEAI_APP_STACK_09_02_00_00
 
 if [ `arch` == "aarch64" ]; then
     install_dir="/opt/"
