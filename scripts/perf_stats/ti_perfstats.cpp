@@ -83,13 +83,12 @@ void displayThread()
         printf("====================\n\n");
 
         for(int cpu_id=0; cpu_id<APP_IPC_CPU_MAX; cpu_id++) {
-            if (strstr(appIpcGetCpuName(cpu_id), "mcu") != NULL) {
-                continue;
-            }
-            status = appPerfStatsCpuLoadGet(cpu_id, &cpu_load);
-            if(status==0)
-            {
-                appPerfStatsCpuLoadPrint(cpu_id, &cpu_load);
+            if (appIpcIsCpuEnabled(cpu_id)) {
+                status = appPerfStatsCpuLoadGet(cpu_id, &cpu_load);
+                if(status==0)
+                {
+                    appPerfStatsCpuLoadPrint(cpu_id, &cpu_load);
+                }
             }
         }
 
