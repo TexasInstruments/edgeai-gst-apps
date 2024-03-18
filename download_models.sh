@@ -45,7 +45,7 @@ then
 	URLs="https://software-dl.ti.com/jacinto7/esd/modelzoo/$EDGEAI_SDK_VERSION/modelartifacts/AM69A/8bits/"
 elif [ "$SOC" == "j722s" ]
 then
-	URLs="https://software-dl.ti.com/jacinto7/esd/modelzoo/$EDGEAI_SDK_VERSION/modelartifacts/AM62A/8bits/"
+	URLs="https://software-dl.ti.com/jacinto7/esd/modelzoo/$EDGEAI_SDK_VERSION/modelartifacts/AM67A/8bits/"
 elif [ "$SOC" == "am62a" ]
 then
 	URLs="https://software-dl.ti.com/jacinto7/esd/modelzoo/$EDGEAI_SDK_VERSION/modelartifacts/AM62A/8bits/"
