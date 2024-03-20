@@ -142,10 +142,7 @@ j722s:
         property:
             out-pool-size: 4
     colorconvert:
-        element: tiovxcolorconvert
-        property:
-            target: [0]
-            out-pool-size: 4
+        element: videoconvert
     scaler:
         element: tiovxmultiscaler
         property:
@@ -174,7 +171,7 @@ j722s:
         element: jpegenc
     inferer:
         target: dsp
-        core-id: [1]
+        core-id: [1, 2]
 
 #==================== AM62A ====================
 am62a:
