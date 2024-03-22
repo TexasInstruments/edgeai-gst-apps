@@ -47,20 +47,6 @@ echo '{"enable_phone_home": false}' > $PYTHONPATH/dlr/counter/ccm_config.json
 
 bash /opt/edgeai-gst-apps/scripts/setup_cameras.sh
 
-rm -rf /usr/lib/libvx_tidl_rt.so.map
-rm -rf /usr/lib/libtidl_onnxrt_EP.so.map
-rm -rf /usr/lib/libtidl_tfl_delegate.so.map
-
-# Link headers and libraries for DLR
-mkdir -p /usr/dlr/
-ln -snf /usr/lib/python3.10/site-packages/dlr/libdlr.so /usr/dlr/libdlr.so
-ln -snf /usr/dlr/libdlr.so /usr/lib/libdlr.so
-
-ldconfig
-
-#Remove stale gstreamer cache
-rm -rf ~/.cache/gstreamer-1.0/registry.aarch64.bin
-
 # Set VPAC Freq to 720 MHz to support 8 ch IMX390 use case at 30 FPS
 if [ "$SOC" == "j721e" ]; then
     k3conf set clock 290 0 720000000 &> /dev/null #VPAC
