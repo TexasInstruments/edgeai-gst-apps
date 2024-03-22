@@ -91,7 +91,7 @@ add_definitions(
 
 set(TENSORFLOW_INSTALL_DIR ${TARGET_FS}/usr/include/tensorflow)
 set(ONNXRT_INSTALL_DIR ${TARGET_FS}/usr/include/onnxruntime)
-set(TFLITE_INSTALL_DIR ${TARGET_FS}/usr/lib/tflite_2.8)
+set(TFLITE_INSTALL_DIR ${TARGET_FS}/usr/lib/tflite_2.12)
 
 if(USE_DLR_RT)
 add_definitions(-DUSE_DLR_RT)
@@ -120,7 +120,7 @@ link_directories(${TFLITE_INSTALL_DIR}/ruy-build
                  ${TFLITE_INSTALL_DIR}/fft2d-build
                  ${TFLITE_INSTALL_DIR}/cpuinfo-build
                  ${TFLITE_INSTALL_DIR}/flatbuffers-build
-                 ${TFLITE_INSTALL_DIR}/clog-build
+                 ${TFLITE_INSTALL_DIR}/abseil-cpp-build
                  ${TFLITE_INSTALL_DIR}/farmhash-build
 )
 endif()
@@ -198,7 +198,6 @@ set(SYSTEM_LINK_LIBS ${SYSTEM_LINK_LIBS}
                      fft2d_fftsg2d
                      fft2d_fftsg
                      cpuinfo
-                     clog
                      farmhash
                      ruy_allocator
                      ruy_apply_multiplier
@@ -229,7 +228,6 @@ set(SYSTEM_LINK_LIBS ${SYSTEM_LINK_LIBS}
                      ruy_tune
                      ruy_wait
                      pthreadpool
-                     #xnn lib
                      XNNPACK
 )
 endif()
