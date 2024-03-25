@@ -159,8 +159,6 @@ j722s:
         element: tiovxldc
     h264dec:
         element: v4l2h264dec
-        property:
-            capture-io-mode: 5
     h265dec:
         element: v4l2h265dec
     h264enc:
