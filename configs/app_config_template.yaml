@@ -55,8 +55,8 @@ inputs:
 
         # v4l2 device id of the sensor, need for controlling sensor parameters
         # like exposure, gain etc...
-        # Ex: /dev/v4l-rpi-subdev0
-        subdev-id: /dev/v4l-rpi-subdev0
+        # Ex: /dev/v4l-imx219-subdev0
+        subdev-id: /dev/v4l-imx219-subdev0
 
     input1:
         # Raw Video Source
