@@ -1,11 +1,11 @@
-title: "RPi Camera"
+title: "IMX219 Camera"
 log_level: 2
 inputs:
     # RPi camera is supported only in Starter Kit
-    # To enable RPi camera, apply the overlay in /run/media/BOOT-mmcblk1p1/uEnv.txt (Refer to Documentation)
+    # To enable imx219 camera, apply the overlay in /run/media/BOOT-mmcblk1p1/uEnv.txt (Refer to Documentation)
     input0:
-        source: /dev/video-rpi-cam0
-        subdev-id: /dev/v4l-rpi-subdev0
+        source: /dev/video-imx219-cam0
+        subdev-id: /dev/v4l-imx219-subdev0
         width: 1920
         height: 1080
         format: rggb

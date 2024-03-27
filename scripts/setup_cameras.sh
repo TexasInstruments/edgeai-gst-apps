@@ -270,14 +270,14 @@ setup_imx219(){
         CSI2RX_CONTEXT_NAME="$CSI2RX_NAME context 0"
 
         CAM_DEV=`media-ctl -d $media_id -p -e "$CSI2RX_CONTEXT_NAME" | grep video | awk '{print $4}'`
-        CAM_DEV_NAME=/dev/video-rpi-cam$count
+        CAM_DEV_NAME=/dev/video-imx219-cam$count
 
-        CAM_SUBDEV_NAME=/dev/v4l-rpi-subdev$count
+        CAM_SUBDEV_NAME=/dev/v4l-imx219-subdev$count
 
         ln -snf $CAM_DEV $CAM_DEV_NAME
         ln -snf $CAM_SUBDEV $CAM_SUBDEV_NAME
 
-        echo -e "${GREEN}CSI Camera $media_id detected${NOCOLOR}"
+        echo -e "${GREEN}IMX219 Camera $media_id detected${NOCOLOR}"
         echo "    device = $CAM_DEV_NAME"
         echo "    name = imx219"
         echo "    format = $IMX219_CAM_FMT"
