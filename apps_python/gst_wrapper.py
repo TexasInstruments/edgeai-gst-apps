@@ -1172,11 +1172,17 @@ def get_post_proc_elements(flow):
     post_proc_elements = []
     property = {
         "format": 3,
-        #    "is-live": True,
         "block": True,
         "do-timestamp": True,
         "name": flow.gst_post_sink_name,
     }
+
+    for o in flow.outputs:
+        sink_ext = os.path.splitext(o.sink)[1]
+        if(sink_ext == ".mov" or sink_ext == ".mp4"):
+            property["is-live"] = True
+            break
+
     element = make_element("appsrc", property=property)
     post_proc_elements += element
 
