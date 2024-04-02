@@ -298,6 +298,10 @@ int32_t InputInfo::addGstPipeline(vector<vector<GstElement*>>   &preProcElementV
                 {
                     senName = "SENSOR_SONY_IMX219_RPI";
                     formatMsb = "7";
+                    if (m_format == "rggb10")
+                    {
+                        formatMsb = "9";
+                    }
                 }
                 else if (m_sen_id == "imx390")
                 {
