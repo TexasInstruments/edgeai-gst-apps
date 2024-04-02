@@ -632,6 +632,8 @@ def get_input_elements(input):
             if input.sen_id == "imx219":
                 sen_name = "SENSOR_SONY_IMX219_RPI"
                 format_msb = 7
+                if (input.format == "rggb10"):
+                    format_msb = 9
             elif input.sen_id == "imx390":
                 sen_name = "SENSOR_SONY_IMX390_UB953_D3"
                 format_msb = 11
