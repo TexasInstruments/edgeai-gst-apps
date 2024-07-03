@@ -132,7 +132,42 @@ setup_routes(){
     do
         id="$(cut -d',' -f1 <<<"$i")"
         name="$(cut -d',' -f2 <<<"$i")"
+        CSI2RX_NAME=$name
         media-ctl -d $id -R "'$name' [${ALL_CSI2RX_FMT_STR[$i]}]"
+        # CSI2RX ROUTING & FORMATS
+        for name in `media-ctl -d $id -p | grep entity | grep ov2312 | cut -d ' ' -f 5`; do
+            UB953_NAME=`media-ctl -d $id -p -e "ov2312 $name" | grep ub953 | cut -d "\"" -f 2`
+            UB960_NAME=`media-ctl -d $id -p -e "$UB953_NAME" | grep ub960 | cut -d "\"" -f 2`
+            UB960_PAD=`media-ctl -d $id -p -e "$UB953_NAME" | grep ub960 | cut -d : -f 2 | awk '{print $1}'`
+            CSI_PAD0=`media-ctl -d $id -p -e "$UB960_NAME" | grep $UB960_PAD/0.*[ACTIVE] | cut -d "/" -f 3 | awk '{print $1}'`
+            CSI_PAD1=`media-ctl -d $id -p -e "$UB960_NAME" | grep $UB960_PAD/1.*[ACTIVE] | cut -d "/" -f 3 | awk '{print $1}'`
+            media-ctl -d $id -V "'$CSI2RX_NAME':0/$CSI_PAD0 $OV2312_CAM_FMT"
+            media-ctl -d $id -V "'$CSI2RX_NAME':0/$CSI_PAD1 $OV2312_CAM_FMT"
+        done
+
+        for name in `media-ctl -d $id -p | grep entity | grep imx390 | cut -d ' ' -f 5`; do
+            UB953_NAME=`media-ctl -d $id -p -e "imx390 $name" | grep ub953 | cut -d "\"" -f 2`
+            UB960_NAME=`media-ctl -d $id -p -e "$UB953_NAME" | grep ub960 | cut -d "\"" -f 2`
+            UB960_PAD=`media-ctl -d $id -p -e "$UB953_NAME" | grep ub960 | cut -d : -f 2 | awk '{print $1}'`
+            CSI_PAD=`media-ctl -d $id -p -e "$UB960_NAME" | grep $UB960_PAD/.*[ACTIVE] | cut -d "/" -f 3 | awk '{print $1}'`
+            media-ctl -d $id -V "'$CSI2RX_NAME':0/$CSI_PAD $IMX390_CAM_FMT"
+        done
+
+        for name in `media-ctl -d $id -p | grep entity | grep imx219 | cut -d ' ' -f 5`; do
+            UB953_NAME=`media-ctl -d $id -p -e "imx219 $name" | grep ub953 | cut -d "\"" -f 2`
+            UB960_NAME=`media-ctl -d $id -p -e "$UB953_NAME" | grep ub960 | cut -d "\"" -f 2`
+            UB960_PAD=`media-ctl -d $id -p -e "$UB953_NAME" | grep ub960 | cut -d : -f 2 | awk '{print $1}'`
+            CSI_PAD=`media-ctl -d $id -p -e "$UB960_NAME" | grep $UB960_PAD/.*[ACTIVE] | cut -d "/" -f 3 | awk '{print $1}'`
+            media-ctl -d $id -V "'$CSI2RX_NAME':0/$CSI_PAD $IMX219_CAM_FMT"
+        done
+
+        for name in `media-ctl -d $id -p | grep entity | grep ov5640 | cut -d ' ' -f 5`; do
+            UB953_NAME=`media-ctl -d $id -p -e "ov5640 $name" | grep ub953 | cut -d "\"" -f 2`
+            UB960_NAME=`media-ctl -d $id -p -e "$UB953_NAME" | grep ub960 | cut -d "\"" -f 2`
+            UB960_PAD=`media-ctl -d $id -p -e "$UB953_NAME" | grep ub960 | cut -d : -f 2 | awk '{print $1}'`
+            CSI_PAD=`media-ctl -d $id -p -e "$UB960_NAME" | grep $UB960_PAD/.*[ACTIVE] | cut -d "/" -f 3 | awk '{print $1}'`
+            media-ctl -d $id -V "'$CSI2RX_NAME':0/$CSI_PAD $OV5640_CAM_FMT"
+        done
     done
 }
 
@@ -202,6 +237,10 @@ setup_imx390(){
 
         v4l2-ctl -d $CAM_SUBDEV_NAME --set-ctrl red_balance=256
         v4l2-ctl -d $CAM_SUBDEV_NAME --set-ctrl blue_balance=256
+
+        CAM_RESOLUTION=`echo $IMX390_CAM_FMT | cut -d / -f 2 | cut -d " " -f 1`
+        CAM_FMT=`echo $IMX390_CAM_FMT | cut -d : -f 2 | cut -d _ -f 1`
+        yavta -s $CAM_RESOLUTION -f $CAM_FMT $CAM_DEV &> /dev/null
 
         echo -e "${GREEN}IMX390 Camera $i detected${NOCOLOR}"
         echo "    device = $CAM_DEV_NAME"
@@ -275,6 +314,9 @@ setup_ov2312(){
         ln -snf $IR_CAM_DEV $IR_CAM_DEV_NAME
         ln -snf $RGB_CAM_DEV $RGB_CAM_DEV_NAME
         ln -snf $CAM_SUBDEV $CAM_SUBDEV_NAME
+
+        v4l2-ctl -d$IR_CAM_DEV -v width=1600,height=1300,pixelformat=BGI0
+        v4l2-ctl -d$RGB_CAM_DEV -v width=1600,height=1300,pixelformat=BGI0
 
         echo -e "${GREEN}OV2312 Camera $i detected${NOCOLOR}"
         echo "    device IR = $IR_CAM_DEV_NAME"
@@ -352,6 +394,10 @@ setup_imx219(){
         ln -snf $CAM_DEV $CAM_DEV_NAME
         ln -snf $CAM_SUBDEV $CAM_SUBDEV_NAME
 
+        CAM_RESOLUTION=`echo $IMX219_CAM_FMT | cut -d / -f 2 | cut -d " " -f 1`
+        CAM_FMT=`echo $IMX219_CAM_FMT | cut -d : -f 2 | cut -d _ -f 1`
+        yavta -s $CAM_RESOLUTION -f $CAM_FMT $CAM_DEV &> /dev/null
+
         echo -e "${GREEN}IMX219 Camera $i detected${NOCOLOR}"
         echo "    device = $CAM_DEV_NAME"
         echo "    name = imx219"
@@ -427,6 +473,10 @@ setup_ov5640(){
 
         ln -snf $CAM_DEV $CAM_DEV_NAME
         ln -snf $CAM_SUBDEV $CAM_SUBDEV_NAME
+
+        CAM_RESOLUTION=`echo $OV5640_CAM_FMT | cut -d / -f 2 | cut -d " " -f 1`
+        CAM_FMT=`echo $OV5640_CAM_FMT | cut -d : -f 2 | cut -d _ -f 1 | cut -c1-4`
+        yavta -s $CAM_RESOLUTION -f $CAM_FMT $CAM_DEV &> /dev/null
 
         echo -e "${GREEN}OV5640 Camera $i detected${NOCOLOR}"
         echo "    device = $CAM_DEV_NAME"
