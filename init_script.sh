@@ -40,7 +40,7 @@ cd $(dirname "$(readlink -f "$BASH_SOURCE")")
 
 source ./scripts/detect_soc.sh
 
-export PYTHONPATH=/usr/lib/python3.10/site-packages/
+export PYTHONPATH=/usr/lib/python3.12/site-packages/
 
 # Disable Neo-DLR phone-home feature
 echo '{"enable_phone_home": false}' > $PYTHONPATH/dlr/counter/ccm_config.json
