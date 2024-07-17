@@ -8,6 +8,7 @@ import os
 import sys
 import utils
 import time
+import copy
 from threading import Lock
 from gst_element_map import gst_element_map
 
@@ -105,7 +106,7 @@ class GstPipe:
 
         buffer = sample.get_buffer()
         _, map_info = buffer.map(Gst.MapFlags.READ)
-        frame = np.ndarray((height, width, 3), np.uint8, map_info.data)
+        frame = copy.deepcopy(np.ndarray((height, width, 3), np.uint8, map_info.data))
         buffer.unmap(map_info)
 
         return frame
@@ -1109,7 +1110,7 @@ def get_pre_proc_elements(flow):
             )
 
         property["tensor-format"] = tensor_fmt
-  
+
         if "property" in gst_element_map["dlpreproc"]:
             if "target" in gst_element_map["dlpreproc"]["property"]:
                 property["target"] = gst_element_map["dlpreproc"]["property"]["target"][preproc_target_idx]
