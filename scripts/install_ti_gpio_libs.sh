@@ -33,7 +33,7 @@
 current_dir=$(pwd)
 cd $(dirname $0)
 
-branch_name=release-1.3.0
+branch_name=release-2.0.0
 
 if [ `arch` == "aarch64" ]; then
     install_dir="/opt/"
