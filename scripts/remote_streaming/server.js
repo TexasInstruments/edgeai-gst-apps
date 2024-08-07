@@ -32,7 +32,7 @@ function getIPAddress() {
     var interfaces = require('os').networkInterfaces();
     for (var devName in interfaces) {
       var iface = interfaces[devName];
-  
+
       for (var i = 0; i < iface.length; i++) {
         var alias = iface[i];
         if (alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal)
@@ -66,11 +66,11 @@ function getArgs () {
 }
 
 var dgram = require('dgram');
-var express = require('express')
+var express = require('/usr/lib/node_modules/express')
 var http = require('http')
 var EventEmitter = require('events').EventEmitter;
-let cors = require("cors");
-var bodyParser = require('express/node_modules/body-parser')
+let cors = require("/usr/lib/node_modules/cors");
+var bodyParser = require('/usr/lib/node_modules/express/node_modules/body-parser')
 var IpAddr = getIPAddress();
 
 var app = express();
