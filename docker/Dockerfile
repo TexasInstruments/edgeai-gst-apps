@@ -38,7 +38,7 @@ ARG PROJECT_NAME=edgeai-gst-apps
 #=========================================================================
 # The environment variable REPO_LOCATION is set from outside as needed,
 # based on network
-FROM ${REPO_LOCATION}/ubuntu:22.04 AS base-0
+FROM ${REPO_LOCATION}/ubuntu:24.04 AS base-0
 
 #=========================================================================
 FROM base-0 AS base-1
@@ -77,7 +77,11 @@ RUN apt-get install -y \
     unzip \
     pkg-config \
     gfortran \
-    openexr
+    openexr \
+    autoconf-archive
+
+# Remove check for externally managed environments
+RUN rm -rf /usr/lib/python3.12/EXTERNALLY-MANAGED
 
 # Install python and pip
 RUN apt-get install -y \
@@ -91,7 +95,8 @@ RUN apt-get install -y \
         plotly==5.1.0 \
         jupyterlab \
         meson \
-        PyYAML
+        PyYAML \
+        gpiod==2.1
 
 # Install miscellaneous packages
 RUN apt-get install -y \
@@ -119,6 +124,13 @@ RUN apt-get install -y \
     gir1.2-gst-rtsp-server-1.0 && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+# Install GPIO CPP dependencies
+WORKDIR /opt
+RUN wget -q https://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git/snapshot/libgpiod-2.1.tar.gz && \
+    tar -xf libgpiod-2.1.tar.gz && \
+    cd libgpiod-2.1 && \
+    bash ./autogen.sh && make install && \
+    rm -rf libgpiod-2.1 libgpiod-2.1.tar.gz
+
 #setup entrypoint to run the demo application
 ENTRYPOINT ["/usr/bin/entrypoint.sh"]
-
