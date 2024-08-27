@@ -360,11 +360,11 @@ setup_imx219(){
         else
             NEXT_PAD=$(($LAST_PAD+1))
         fi
-        CSI2RX_CONTEXT_NAME="$CSI2RX_NAME context $((NEXT_PAD))"
+        CSI2RX_CONTEXT_NAME="$CSI2RX_NAME context $((NEXT_PAD+1))"
 
         UB960_FMT_STR="${UB960_PAD}/0 -> 4/$(($NEXT_PAD)) [1]"
         CDNS_FMT_STR="0/${NEXT_PAD} -> 1/$(($NEXT_PAD)) [1]"
-        CSI2RX_FMT_STR="0/${NEXT_PAD} -> $(($NEXT_PAD+1))/0 [1]"
+        CSI2RX_FMT_STR="0/${NEXT_PAD} -> $(($NEXT_PAD+2))/0 [1]"
 
         # Append UB960 Routes
         if [[ -v "ALL_UB960_FMT_STR[$media_id,$UB960_NAME]" ]] ; then
