@@ -156,16 +156,24 @@ class Output:
             self.overlay_perf_type = output_config['overlay-perf-type']
         else:
             self.overlay_perf_type = None
+        if 'dump' in output_config:
+            self.dump = output_config['dump']
+        else:
+            self.dump = False
+        if 'start-dumps' in output_config:
+            self.start_dumps = output_config['start-dumps']
+        else:
+            self.start_dumps = 150
         self.mosaic = False
         self.id = Output.count
         self.subflows = []
         Output.count += 1
 
-    def set_mosaic(self):
+    def set_mosaic(self, model_name, input_format):
         self.mosaic = (gst_element_map["mosaic"]) != None
-        self.gst_mosaic_str, self.gst_disp_str = gst_wrapper.get_output_str(self)
+        self.gst_mosaic_str, self.gst_disp_str = gst_wrapper.get_output_str(self, model_name, input_format)
 
-    def get_disp_id(self, subflow, fps):
+    def get_disp_id(self, subflow, fps, model_name, input_format):
         """
         Function to be called by flows which are using this output.
         Args:
@@ -178,7 +186,7 @@ class Output:
         if (subflow.x_pos == None or subflow.y_pos == None or not self.mosaic):
             if (len(self.subflows) == 0):
                 self.mosaic = False
-                self.gst_mosaic_str,self.gst_disp_str = gst_wrapper.get_output_str(self)
+                self.gst_mosaic_str,self.gst_disp_str = gst_wrapper.get_output_str(self, model_name, input_format)
             else:
                 print("[ERROR] Need mosaic to support multiple subflow" + \
                                                            " with same output")
@@ -262,7 +270,7 @@ class SubFlow:
                                                              "input resolution")
             sys.exit()
 
-        self.disp_id = output.get_disp_id(self, input.fps)
+        self.disp_id = output.get_disp_id(self, input.fps, model.model_path, input.format)
         self.id = SubFlow.count
 
         self.gst_pre_src_name = 'pre_%d' % self.id
