@@ -355,7 +355,7 @@ def get_input_split_str(input,flow):
 
     return source_cmd
 
-def get_output_str(output):
+def get_output_str(output, model_name, input_format):
     """
     Construct the gst output strings
     Args:
@@ -383,9 +383,16 @@ def get_output_str(output):
         sink = 'others'
 
     if (sink == 'display'):
+        if input_format == 'rggb':
+            source_input = 'camera'
+        else:
+            source_input = 'video'
         sink_cmd = ''
         if output.overlay_perf_type != None:
-            sink_cmd += ' queue ! tiperfoverlay overlay-type=%s !' % output.overlay_perf_type
+            sink_cmd += ' queue ! tiperfoverlay overlay-type=%s ' % output.overlay_perf_type
+            if output.dump != False:
+                sink_cmd += 'dump=true location=/run/%s_%s.csv num-dumps=1 start-dumps=%d ' % (source_input,model_name,output.start_dumps)
+            sink_cmd += '!'
         sink_cmd += ' kmssink driver-name=tidss sync=false'
         #HACK - without this some models in am62a results in display flicker
         if (SOC == "am62a"):
