@@ -30,7 +30,7 @@ outputs:
         height: 1080
         overlay-perf-type: graph
         dump: True
-
+        start-dumps: 150
 
 flows:
     flow0: [input,dl_model,output,[320,180,1280,720]]
