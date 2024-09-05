@@ -1,0 +1,36 @@
+# Generic config file used for test engine
+# test script will use this to update at runtime and pass it to the applications
+
+title: "Test Demo"
+log_level: 2
+inputs:
+    input:
+        source: /opt/edgeai-test-data/videos/video0_1280_768.h264
+        width: 1280
+        height: 768
+        framerate: 30
+        format: h264
+        loop: True
+        index: 0
+        subdev-id: /dev/v4l-subdev2
+        sen-id: ""
+        ldc: False
+
+models:
+    dl_model:
+        # This will be updated at runtime by the test_engine.sh
+        model_path: /opt/edgeai-gst-apps/models/<type>/<model>
+        topN: 5
+        viz_threshold: 0.5
+        alpha: 0.4
+outputs:
+    output:
+        sink: kmssink
+        width: 1920
+        height: 1080
+        overlay-perf-type: graph
+        dump: True
+        start-dumps: 150
+
+flows:
+    flow0: [input,dl_model,output,[320,180,1280,720]]

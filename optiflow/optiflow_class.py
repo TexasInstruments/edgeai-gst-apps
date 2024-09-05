@@ -107,7 +107,7 @@ class OptiFlowClass:
 
             # Set mosaic and start bg_pipeline
             if len(flow) > 3 and flow[3] and not self.outputs[output].mosaic:
-                self.outputs[output].set_mosaic()
+                self.outputs[output].set_mosaic(model_obj.model_name, input_obj.format)
 
         for input in self.inputs:
             input_obj = self.inputs[input]
