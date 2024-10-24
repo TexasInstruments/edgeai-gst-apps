@@ -17,31 +17,14 @@ root@j7-evm:/opt/edgeai-gst-apps/scripts/perf_stats/build# cmake .. && make
 # will be located under ../bin/Debug directory.
 root@j7-evm:/opt/edgeai-gst-apps/scripts/perf_stats/build# cmake -DCMAKE_BUILD_TYPE=Debug .. && make
 ```
-3. Run the app to get stats on the terminal. The tools could be invoked
-with different command line switches. By default, the display to the terminal
-is enabled and this can be turned off by using "-n" switch. In the following
-commands, the binary is assumed to be built in Release mode.
+3. Run the app to get stats on the terminal. In the following
+command, the binary is assumed to be built in Release mode.
 ```
-# The following usage will show the available command line switches
-root@j7-evm:/opt/edgeai-gst-apps/scripts/perf_stats/build# ../bin/Release/perf_stats -h
-
-# The following will run the tool with the output logged to the files and
-# no output is sent to the terminal
-root@j7-evm:/opt/edgeai-gst-apps/scripts/perf_stats/build# ../bin/Release/perf_stats -n -l
-
-# The following will run the tool with the output sent to the terminal and
-# at the same time logs to files under ``../perf_logs`` directory.
-root@j7-evm:/opt/edgeai-gst-apps/scripts/perf_stats/build# ../bin/Release/perf_stats -l
-
-# The following will run the tool with the output logged to the files and
-# no output is sent to the terminal. The files will be under ``../perf_logs/run1`` directory.
-root@j7-evm:/opt/edgeai-gst-apps/scripts/perf_stats/build# ../bin/Release/perf_stats -l -d run1
-
-# The following will run the tool with the output sent to the terminal only.
+# The following will run the tool with the output sent to the terminal.
 root@j7-evm:/opt/edgeai-gst-apps/scripts/perf_stats/build# ../bin/Release/perf_stats
 ```
-4. If display to the terminal is enabled, then you should see the stats printed
-on the terminal like shown below, it will refresh every 2 seconds
+4. You should see the stats printed
+on the terminal like shown below, it will refresh every 1 second
 ```text
 	Summary of CPU load,
 	====================
