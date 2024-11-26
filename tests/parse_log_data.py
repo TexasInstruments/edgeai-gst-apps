@@ -52,7 +52,8 @@ def error_in_logfile(log_file):
         ignore_tags = [
             "VX_ZONE_ERROR:Enabled",
             "ERROR:Enabled",
-            "VX_ZONE_ERROR:[tivxObjectDeInit"
+            "VX_ZONE_ERROR:[tivxObjectDeInit",
+            "Globally Enabled"
         ]
 
         for line in stdout_lines:
