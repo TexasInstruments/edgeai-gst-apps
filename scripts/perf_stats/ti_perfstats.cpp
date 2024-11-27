@@ -50,7 +50,7 @@ extern "C" {
 
 }
 
-#define SLEEP_INTERVAL 1000
+#define SLEEP_INTERVAL 200
 
 static bool gStop = false;
 static std::thread gDispThreadId;
