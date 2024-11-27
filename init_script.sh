@@ -58,6 +58,9 @@ elif [ "$SOC" == "j784s4" ]; then
     k3conf set clock 399 1 720000000 &> /dev/null #VPAC0
     k3conf set clock 400 1 720000000 &> /dev/null #VPAC1
     k3conf set clock 92 0 480000000 &> /dev/null #DMPAC
+elif [ "$SOC" == "am62a" ]; then
+    rmmod wave5
+    modprobe wave5 vpu_poll_interval=1
 fi
 
 # Increase ulimits for number of open files, to support multi channel demo
