@@ -31,18 +31,18 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 # Release tag info of the current release
-GIT_TAG="REL.10.00.00"
+GIT_TAG="REL.10.01.00"
 if [ "$#" -eq 1 ]; then
     GIT_TAG=$1
 fi
 echo "GIT_TAG = $GIT_TAG"
 
 # Git repository
-GIT_REPO="https://git.ti.com/git/processor-sdk-vision/jacinto_ros_perception.git"
-BRANCH=master
+GIT_REPO="https://github.com/TexasInstruments/edgeai-robotics-sdk.git"
+GIT_BRANCH="${GIT_BRANCH:-master}"
 
 # git config on the target to avoid warnings
-ARCH=`arch`
+ARCH=$(arch)
 if [[ "$ARCH" == "aarch64" ]]; then
     git config --global user.email "user@example.com"
     git config --global user.name "User"
@@ -52,11 +52,11 @@ fi
 export WORK_DIR=$HOME/j7ros_home
 export ROS_WS=$WORK_DIR/ros_ws
 
-# Installation path for Robotics SDK
+# Installation path for Robotics SDK: overriding is allowed from outside this script
 if [[ "$ARCH" == "aarch64" ]]; then
-    export SDK_DIR=/opt/robotics_sdk
+    export SDK_DIR="${SDK_DIR:-/opt/robotics_sdk}"
 elif [[ "$ARCH" == "x86_64" ]]; then
-    export SDK_DIR=$ROS_WS/src/robotics_sdk
+    export SDK_DIR="${SDK_DIR:-$ROS_WS/src/robotics_sdk}"
 else
     echo "$ARCH is not supported"
     exit 1
@@ -65,7 +65,7 @@ fi
 # "git checkout" only if $GIT_TAG does not match with $RECENT_TAG
 function git_checkout_with_tag {
     cd $1
-    RECENT_TAG=`git describe --tags --abbrev=0`
+    RECENT_TAG=$(git describe --tags --abbrev=0)
     if [[ $RECENT_TAG == ${GIT_TAG}* ]]; then
         echo "Robotics SDK: $GIT_TAG is the most up-to-date version on the remote git repository."
     else
@@ -83,8 +83,8 @@ function git_pull_to_current_folder {
     git init
     git remote add origin $GIT_REPO
     git fetch origin
-    git checkout -b $BRANCH --track origin/master
-    echo "$BRANCH checked out."
+    git checkout -b $GIT_BRANCH --track origin/master
+    echo "$GIT_BRANCH checked out."
 }
 
 # Install or update the Robotics SDK
@@ -99,7 +99,7 @@ else
     if [[ "$CWD" == "$SDK_DIR" ]]; then
         git_pull_to_current_folder
     else
-        git clone --branch $BRANCH $GIT_REPO $SDK_DIR
+        git clone --branch $GIT_BRANCH $GIT_REPO $SDK_DIR
     fi
 fi
 git_checkout_with_tag $SDK_DIR
@@ -111,7 +111,7 @@ fi
 
 # Install TI mmWave radar driver node
 if [[ -f "$SDK_DIR/scripts/install_mmwave_rospkg.sh" ]]; then
-    bash $SDK_DIR/scripts/install_mmwave_rospkg.sh 2
+    bash $SDK_DIR/scripts/install_mmwave_rospkg.sh
 fi
 
 # Setup $WORK_DIR
