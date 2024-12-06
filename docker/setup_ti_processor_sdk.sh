@@ -36,7 +36,7 @@ ln -snf /host/usr/lib/libtidl_tfl_delegate.so.1.0 /usr/lib/libtidl_tfl_delegate.
 
 # Link libraries for ONNX delegate
 ln -snf /host/usr/lib/libtidl_onnxrt_EP.so /usr/lib/libtidl_onnxrt_EP.so
-ln -snf /host/usr/lib/libtidl_onnxrt_EP.so.1.0 /usr/lib/libtidl_onnxrt_EP.1.0
+ln -snf /host/usr/lib/libtidl_onnxrt_EP.so.1.0 /usr/lib/libtidl_onnxrt_EP.so.1.0
 
 # Link TI specific headers and libraries
 ln -snf /host/usr/lib/libvx_tidl_rt.so /usr/lib/libvx_tidl_rt.so
@@ -45,7 +45,7 @@ ln -snf /host/usr/include/processor_sdk /usr/include/processor_sdk
 ln -snf /host/usr/lib/libIL.so.1 /usr/lib/libIL.so.1
 ln -snf /host/usr/lib/libILU.so.1 /usr/lib/libILU.so.1
 ln -snf /host/usr/lib/libtivision_apps.so /usr/lib/libtivision_apps.so
-ln -snf /host/usr/lib/libtivision_apps.so.10.0.0 /usr/lib/libtivision_apps.so.10.0.0
+ln -snf /host/usr/lib/libtivision_apps.so.10.1.0 /usr/lib/libtivision_apps.so.10.1.0
 ln -snf /host/usr/lib/libti_rpmsg_char.so.0 /usr/lib/libti_rpmsg_char.so.0
 
 # Softlink update required for v4l2h264enc
