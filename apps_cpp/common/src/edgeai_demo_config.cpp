@@ -273,6 +273,17 @@ int32_t InputInfo::addGstPipeline(vector<vector<GstElement*>>   &preProcElementV
                 makeElement(m_inputElements,"jpegdec", m_gstElementProperty, NULL);
             }
 
+            else if (m_format.rfind("YUY2") == 0)
+            {
+                m_gstElementProperty = {{"device",m_source.c_str()},
+                                        {"io-mode","5"},
+                                        {"name",srcName.c_str()}};
+                makeElement(m_inputElements,"v4l2src",m_gstElementProperty,NULL);
+
+                m_gstElementProperty = {{"leaky","2"}};
+                string caps = "video/x-raw," + whStr + ",format=" + m_format;
+                makeElement(m_inputElements,"queue",m_gstElementProperty,caps.c_str());
+            }
             else if (m_format.rfind("rggb") == 0 || m_format.rfind("bggi") == 0)
             {
                 if(!gstElementMap["isp"]["element"])

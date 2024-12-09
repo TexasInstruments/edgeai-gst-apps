@@ -251,6 +251,11 @@ def get_input_str(input):
                 source_cmd += ' ! video/x-raw,format=NV12,width=1920,height=1080 ! '
                 input.width = 1920
                 input.height = 1080
+        elif input.format.startswith('YUY2'):
+            source_cmd = 'v4l2src device=%s ! ' % input.source
+            source_cmd += 'video/x-raw, width=%d, height=%d, format=%s ! ' % \
+                                                     (input.width, input.height, input.format)
+            source_cmd += gst_element_map["dlcolorconvert"]["element"] + ' ! video/x-raw, format=NV12 ! '
         else:
             source_cmd = 'v4l2src device=%s ! ' % input.source
             source_cmd += 'video/x-raw, width=%d, height=%d ! ' % \
