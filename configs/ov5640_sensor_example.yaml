@@ -7,7 +7,7 @@ inputs:
         source: /dev/video-ov5640-cam0
         width: 1280
         height: 720
-        format: auto
+        format: YUY2
         framerate: 30
 models:
     model0:

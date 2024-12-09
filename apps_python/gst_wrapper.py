@@ -681,6 +681,18 @@ def get_input_elements(input):
                 input.width = 1920
                 input.height = 1080
 
+        elif input.format.startswith("YUY2"):
+            property = {"device": input.source, "io-mode": 5, "name": source_name}
+            element = make_element("v4l2src", property=property)
+            input_element_list += element
+            property = {"leaky": 2}
+            caps = "video/x-raw, width=%d, height=%d, format=%s" % (
+                input.width,
+                input.height,
+                input.format,
+            )
+            element = make_element("queue", property=property, caps=caps)
+            input_element_list += element
         else:
             property = {"device": input.source, "name": source_name}
             caps = "video/x-raw, width=%d, height=%d" % (input.width, input.height)
