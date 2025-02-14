@@ -39,7 +39,7 @@ else
     install_dir="../../"
 fi
 
-branch_name=EDGEAI_APP_STACK_10_00_00_00
+branch_name=EDGEAI_APP_STACK_10_01_00_00
 
 while getopts ":i:b:d" flag; do
     case "${flag}" in
