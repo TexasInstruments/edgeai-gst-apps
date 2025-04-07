@@ -188,6 +188,13 @@ setup_imx390(){
 
         UB960_NAME=`media-ctl -d $media_id -p -e "$UB953_NAME" | grep ub960 | cut -d "\"" -f 2`
         UB960_PAD=`media-ctl -d $media_id -p -e "$UB953_NAME" | grep ub960 | cut -d : -f 2 | awk '{print $1}'`
+        UB960_NUM_PADS=`media-ctl -d $media_id -p -e "$UB960_NAME" | grep ub960 | grep "pads" | awk -F'[()]' '{print $2}' | awk '{print $1}'`
+        UB960_SOURCE_PAD=-1
+        if [ "$UB960_NUM_PADS" -eq 6 ]; then
+            UB960_SOURCE_PAD=4
+        elif [ "$UB960_NUM_PADS" -eq 3 ]; then
+            UB960_SOURCE_PAD=2
+        fi
 
         CSI_BRIDGE_NAME=`media-ctl -d $media_id -p -e "$UB960_NAME" | grep csi-bridge | cut -d "\"" -f 2`
 
@@ -203,7 +210,7 @@ setup_imx390(){
 
         CSI2RX_CONTEXT_NAME="$CSI2RX_NAME context $((NEXT_PAD+1))"
 
-        UB960_FMT_STR="${UB960_PAD}/0 -> 4/$(($NEXT_PAD)) [1]"
+        UB960_FMT_STR="${UB960_PAD}/0 -> $UB960_SOURCE_PAD/$(($NEXT_PAD)) [1]"
         CDNS_FMT_STR="0/${NEXT_PAD} -> 1/$(($NEXT_PAD)) [1]"
         CSI2RX_FMT_STR="0/${NEXT_PAD} -> $(($NEXT_PAD+2))/0 [1]"
 
@@ -273,6 +280,13 @@ setup_ov2312(){
 
         UB960_NAME=`media-ctl -d $media_id -p -e "$UB953_NAME" | grep ub960 | cut -d "\"" -f 2`
         UB960_PAD=`media-ctl -d $media_id -p -e "$UB953_NAME" | grep ub960 | cut -d : -f 2 | awk '{print $1}'`
+        UB960_NUM_PADS=`media-ctl -d $media_id -p -e "$UB960_NAME" | grep ub960 | grep "pads" | awk -F'[()]' '{print $2}' | awk '{print $1}'`
+        UB960_SOURCE_PAD=-1
+        if [ "$UB960_NUM_PADS" -eq 6 ]; then
+            UB960_SOURCE_PAD=4
+        elif [ "$UB960_NUM_PADS" -eq 3 ]; then
+            UB960_SOURCE_PAD=2
+        fi
 
         CSI_BRIDGE_NAME=`media-ctl -d $media_id -p -e "$UB960_NAME" | grep csi-bridge | cut -d "\"" -f 2`
 
@@ -281,7 +295,7 @@ setup_ov2312(){
         CSI2RX_CONTEXT_NAME_IR="$CSI2RX_NAME context $(($UB960_PAD*2 + 1))"
         CSI2RX_CONTEXT_NAME_RGB="$CSI2RX_NAME context $(($UB960_PAD*2 + 2))"
 
-        UB960_FMT_STR="${UB960_PAD}/0 -> 4/$(($UB960_PAD * 2)) [1], ${UB960_PAD}/1 -> 4/$(($UB960_PAD * 2  + 1)) [1]"
+        UB960_FMT_STR="${UB960_PAD}/0 -> $UB960_SOURCE_PAD/$(($UB960_PAD * 2)) [1], ${UB960_PAD}/1 -> 4/$(($UB960_PAD * 2  + 1)) [1]"
         CDNS_FMT_STR="0/$(($UB960_PAD * 2)) -> 1/$(($UB960_PAD * 2)) [1], 0/$(($UB960_PAD * 2 + 1)) -> 1/$(($UB960_PAD * 2 + 1)) [1]"
         CSI2RX_FMT_STR="0/$(($UB960_PAD * 2)) -> $(($UB960_PAD * 2 + 2))/0 [1], 0/$(($UB960_PAD * 2 + 1)) -> $(($UB960_PAD * 2 + 3))/0 [1]"
 
