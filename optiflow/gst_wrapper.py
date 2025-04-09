@@ -73,7 +73,7 @@ class GstPipe:
         bus = self.pipeline.get_bus()
         ret = self.pipeline.set_state(Gst.State.PLAYING)
         if ret == Gst.StateChangeReturn.FAILURE:
-            msg = self.bus.timed_pop_filtered(Gst.CLOCK_TIME_NONE, Gst.MessageType.ERROR)
+            msg = bus.timed_pop_filtered(Gst.CLOCK_TIME_NONE, Gst.MessageType.ERROR)
             err, debug_info = msg.parse_error()
             print("[ERROR]", err.message)
             sys.exit(1)
