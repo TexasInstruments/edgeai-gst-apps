@@ -45,7 +45,7 @@ ln -snf /host/usr/include/processor_sdk /usr/include/processor_sdk
 ln -snf /host/usr/lib/libIL.so.1 /usr/lib/libIL.so.1
 ln -snf /host/usr/lib/libILU.so.1 /usr/lib/libILU.so.1
 ln -snf /host/usr/lib/libtivision_apps.so /usr/lib/libtivision_apps.so
-ln -snf /host/usr/lib/libtivision_apps.so.10.1.0 /usr/lib/libtivision_apps.so.10.1.0
+ln -snf /host/usr/lib/libtivision_apps.so.11.0.0 /usr/lib/libtivision_apps.so.11.0.0
 ln -snf /host/usr/lib/libti_rpmsg_char.so.0 /usr/lib/libti_rpmsg_char.so.0
 
 # Softlink update required for v4l2h264enc
