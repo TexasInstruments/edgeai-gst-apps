@@ -424,7 +424,7 @@ setup_imx219(){
             echo "    ldc_required = yes"
 
         else
-            IMX219_CAM_FMT='[fmt:SRGGB10_1X10/640x480]'
+            IMX219_CAM_FMT='[fmt:SRGGB8_1X8/1920x1080]'
             CAM_SUBDEV=`media-ctl -d $media_id -p -e "imx219 $name" | grep v4l-subdev | awk '{print $4}'`
             media-ctl -d $media_id --set-v4l2 ''"\"imx219 $name\""':0 '$IMX219_CAM_FMT''
 
