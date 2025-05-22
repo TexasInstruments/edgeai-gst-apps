@@ -35,6 +35,7 @@ NOCOLOR='\033[0m'
 
 IMX219_CAM_FMT="${IMX219_CAM_FMT:-[fmt:SRGGB8_1X8/1920x1080 field: none]}"
 IMX390_CAM_FMT="${IMX390_CAM_FMT:-[fmt:SRGGB12_1X12/1936x1100 field: none]}"
+IMX728_CAM_FMT="${IMX728_CAM_FMT:-[fmt:SRGGB12_1X12/3856x2176 field: none]}"
 OV2312_CAM_FMT="${OV2312_CAM_FMT:-[fmt:SBGGI10_1X10/1600x1300 field: none]}"
 OV5640_CAM_FMT="${OV5640_CAM_FMT:-[fmt:YUYV8_1X16/640x480 field:none]}"
 
@@ -77,6 +78,13 @@ setup_routes(){
             UB960_NAME=`media-ctl -d $id -p -e "$UB953_NAME" | grep ub960 | cut -d "\"" -f 2`
             UB960_PAD=`media-ctl -d $id -p -e "$UB953_NAME" | grep ub960 | cut -d : -f 2 | awk '{print $1}'`
             media-ctl -d $id -V "'$UB960_NAME':$UB960_PAD $OV5640_CAM_FMT"
+        done
+
+        for name in `media-ctl -d $id -p | grep entity | grep imx728 | cut -d ' ' -f 5`; do
+            UB953_NAME=`media-ctl -d $id -p -e "imx728 $name" | grep ub953 | cut -d "\"" -f 2`
+            UB960_NAME=`media-ctl -d $id -p -e "$UB953_NAME" | grep ub960 | cut -d "\"" -f 2`
+            UB960_PAD=`media-ctl -d $id -p -e "$UB953_NAME" | grep ub960 | cut -d : -f 2 | awk '{print $1}'`
+            media-ctl -d $id -V "'$UB960_NAME':$UB960_PAD $IMX728_CAM_FMT"
         done
     done
 
@@ -125,6 +133,15 @@ setup_routes(){
             CSI_BRIDGE_NAME=`media-ctl -d $id -p -e "$UB960_NAME" | grep csi-bridge | cut -d "\"" -f 2`
             media-ctl -d $id -V "'$CSI_BRIDGE_NAME':0/$CSI_PAD $OV5640_CAM_FMT"
         done
+
+        for name in `media-ctl -d $id -p | grep entity | grep imx728 | cut -d ' ' -f 5`; do
+            UB953_NAME=`media-ctl -d $id -p -e "imx728 $name" | grep ub953 | cut -d "\"" -f 2`
+            UB960_NAME=`media-ctl -d $id -p -e "$UB953_NAME" | grep ub960 | cut -d "\"" -f 2`
+            UB960_PAD=`media-ctl -d $id -p -e "$UB953_NAME" | grep ub960 | cut -d : -f 2 | awk '{print $1}'`
+            CSI_PAD=`media-ctl -d $id -p -e "$UB960_NAME" | grep $UB960_PAD/.*[ACTIVE] | cut -d "/" -f 3 | awk '{print $1}'`
+            CSI_BRIDGE_NAME=`media-ctl -d $id -p -e "$UB960_NAME" | grep csi-bridge | cut -d "\"" -f 2`
+            media-ctl -d $id -V "'$CSI_BRIDGE_NAME':0/$CSI_PAD $IMX728_CAM_FMT"
+        done
     done
 
     # CSI2RX ROUTING
@@ -167,6 +184,14 @@ setup_routes(){
             UB960_PAD=`media-ctl -d $id -p -e "$UB953_NAME" | grep ub960 | cut -d : -f 2 | awk '{print $1}'`
             CSI_PAD=`media-ctl -d $id -p -e "$UB960_NAME" | grep $UB960_PAD/.*[ACTIVE] | cut -d "/" -f 3 | awk '{print $1}'`
             media-ctl -d $id -V "'$CSI2RX_NAME':0/$CSI_PAD $OV5640_CAM_FMT"
+        done
+
+        for name in `media-ctl -d $id -p | grep entity | grep imx728 | cut -d ' ' -f 5`; do
+            UB953_NAME=`media-ctl -d $id -p -e "imx728 $name" | grep ub953 | cut -d "\"" -f 2`
+            UB960_NAME=`media-ctl -d $id -p -e "$UB953_NAME" | grep ub960 | cut -d "\"" -f 2`
+            UB960_PAD=`media-ctl -d $id -p -e "$UB953_NAME" | grep ub960 | cut -d : -f 2 | awk '{print $1}'`
+            CSI_PAD=`media-ctl -d $id -p -e "$UB960_NAME" | grep $UB960_PAD/.*[ACTIVE] | cut -d "/" -f 3 | awk '{print $1}'`
+            media-ctl -d $id -V "'$CSI2RX_NAME':0/$CSI_PAD $IMX728_CAM_FMT"
         done
     done
 }
@@ -564,6 +589,86 @@ setup_ov5640(){
     done
 }
 
+setup_imx728(){
+    i=0
+    for media_id in {0..3}; do
+    # UB953 FORMATS
+    UB960_FMT_STR=""
+    CDNS_FMT_STR=""
+    CSI2RX_FMT_STR=""
+    for name in `media-ctl -d $media_id -p | grep entity | grep imx728 | cut -d ' ' -f 5`; do
+
+        CAM_SUBDEV=`media-ctl -d $media_id -p -e "imx728 $name" | grep v4l-subdev | awk '{print $4}'`
+
+        UB953_NAME=`media-ctl -d $media_id -p -e "imx728 $name" | grep ub953 | cut -d "\"" -f 2`
+        media-ctl -d $media_id -V "'$UB953_NAME':0 $IMX728_CAM_FMT"
+
+        UB960_NAME=`media-ctl -d $media_id -p -e "$UB953_NAME" | grep ub960 | cut -d "\"" -f 2`
+        UB960_PAD=`media-ctl -d $media_id -p -e "$UB953_NAME" | grep ub960 | cut -d : -f 2 | awk '{print $1}'`
+
+        CSI_BRIDGE_NAME=`media-ctl -d $media_id -p -e "$UB960_NAME" | grep csi-bridge | cut -d "\"" -f 2`
+
+        CSI2RX_NAME=`media-ctl -d $media_id -p -e "$CSI_BRIDGE_NAME" | grep "ticsi2rx\"" | cut -d "\"" -f 2`
+
+        LAST_PAD=`echo ${ALL_UB960_FMT_STR[$media_id,$UB960_NAME]} | rev | cut -d'/' -f 1 | rev`
+        LAST_PAD=${LAST_PAD:0:1}
+        if [[ "$LAST_PAD" == "" ]] ; then
+            NEXT_PAD=$UB960_PAD
+        else
+            NEXT_PAD=$(($LAST_PAD+1))
+        fi
+
+        CSI2RX_CONTEXT_NAME="$CSI2RX_NAME context $((NEXT_PAD+1))"
+
+        UB960_FMT_STR="${UB960_PAD}/0 -> 4/$(($NEXT_PAD)) [1]"
+        CDNS_FMT_STR="0/${NEXT_PAD} -> 1/$(($NEXT_PAD)) [1]"
+        CSI2RX_FMT_STR="0/${NEXT_PAD} -> $(($NEXT_PAD+2))/0 [1]"
+
+        # Append UB960 Routes
+        if [[ -v "ALL_UB960_FMT_STR[$media_id,$UB960_NAME]" ]] ; then
+            ALL_UB960_FMT_STR[$media_id,$UB960_NAME]="${ALL_UB960_FMT_STR[$media_id,$UB960_NAME]}, $UB960_FMT_STR"
+        else
+            ALL_UB960_FMT_STR[$media_id,$UB960_NAME]="$UB960_FMT_STR"
+        fi
+
+        # Append CDNS Routes
+        if [[ -v "ALL_CDNS_FMT_STR[$media_id,$CSI_BRIDGE_NAME]" ]] ; then
+            ALL_CDNS_FMT_STR[$media_id,$CSI_BRIDGE_NAME]="${ALL_CDNS_FMT_STR[$media_id,$CSI_BRIDGE_NAME]}, $CDNS_FMT_STR"
+        else
+            ALL_CDNS_FMT_STR[$media_id,$CSI_BRIDGE_NAME]="$CDNS_FMT_STR"
+        fi
+
+        # Append CSIRX Routes
+        if [[ -v "ALL_CSI2RX_FMT_STR[$media_id,$CSI2RX_NAME]" ]] ; then
+            ALL_CSI2RX_FMT_STR[$media_id,$CSI2RX_NAME]="${ALL_CSI2RX_FMT_STR[$media_id,$CSI2RX_NAME]}, $CSI2RX_FMT_STR"
+        else
+            ALL_CSI2RX_FMT_STR[$media_id,$CSI2RX_NAME]="$CSI2RX_FMT_STR"
+        fi
+        CAM_DEV=`media-ctl -d $media_id -p -e "$CSI2RX_CONTEXT_NAME" | grep video | awk '{print $4}'`
+        CAM_DEV_NAME=/dev/video-imx728-cam$i
+
+        CAM_SUBDEV_NAME=/dev/v4l-imx728-subdev$i
+
+        ln -snf $CAM_DEV $CAM_DEV_NAME
+        ln -snf $CAM_SUBDEV $CAM_SUBDEV_NAME
+
+        CAM_RESOLUTION=`echo $IMX728_CAM_FMT | cut -d / -f 2 | cut -d " " -f 1`
+        CAM_FMT=`echo $IMX728_CAM_FMT | cut -d : -f 2 | cut -d _ -f 1`
+        yavta -s $CAM_RESOLUTION -f $CAM_FMT $CAM_DEV &> /dev/null
+
+        echo -e "${GREEN}IMX728 Camera $i detected${NOCOLOR}"
+        echo "    device = $CAM_DEV_NAME"
+        echo "    name = imx728"
+        echo "    format = $IMX728_CAM_FMT"
+        echo "    subdev_id = $CAM_SUBDEV_NAME"
+        echo "    isp_required = yes"
+        echo "    ldc_required = yes"
+
+        ((i++))
+    done
+    done
+}
+
 setup_USB_camera(){
     ls /dev/v4l/by-path/*usb*video-index0 > /dev/null 2>&1
     if [ "$?" == "0" ]; then
@@ -587,4 +692,5 @@ setup_imx219
 setup_ov5640
 setup_ov2312
 setup_imx390
+setup_imx728
 setup_routes
