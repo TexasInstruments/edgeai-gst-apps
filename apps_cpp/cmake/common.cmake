@@ -3,7 +3,7 @@ include(CMakePackageConfigHelpers)
 
 add_compile_options(-std=c++17)
 
-option(USE_DLR_RT "Enable DLR inference" ON)
+option(USE_TVM_RT "Enable TVM-RT inference" ON)
 option(USE_TENSORFLOW_RT "Enable Tensorflow inference" ON)
 option(USE_ONNX_RT "Enable Onnx inference" ON)
 
@@ -92,9 +92,10 @@ add_definitions(
 set(TENSORFLOW_INSTALL_DIR ${TARGET_FS}/usr/include/tensorflow)
 set(ONNXRT_INSTALL_DIR ${TARGET_FS}/usr/include/onnxruntime)
 set(TFLITE_INSTALL_DIR ${TARGET_FS}/usr/lib/tflite_2.12)
+set(TVMRT_INSTALL_DIR ${TARGET_FS}/usr/include/tvm)
 
-if(USE_DLR_RT)
-add_definitions(-DUSE_DLR_RT)
+if(USE_TVM_RT)
+add_definitions(-DUSE_TVM_RT)
 endif()
 
 if(USE_TENSORFLOW_RT)
@@ -109,8 +110,8 @@ link_directories(${TARGET_FS}/usr/lib/aarch64-linux-gnu
                  ${TARGET_FS}/usr/lib/
                  )
 
-if(USE_DLR_RT)
-link_directories(${TARGET_FS}/usr/lib/python3.12/site-packages/dlr)
+if(USE_TVM_RT)
+link_directories(${TARGET_FS}/usr/lib/python3.12/site-packages/tvm)
 endif()
 
 if(USE_TENSORFLOW_RT)
@@ -145,8 +146,11 @@ include_directories(${PROJECT_SOURCE_DIR}
                     SYSTEM ${TARGET_FS}/usr/include/edgeai_dl_inferer
                     )
 
-if(USE_DLR_RT)
-include_directories(${TARGET_FS}/usr/lib/python3.12/site-packages/dlr/include/)
+if(USE_TVM_RT)
+include_directories(SYSTEM ${TVMRT_INSTALL_DIR}/tvm/include
+                    SYSTEM ${TVMRT_INSTALL_DIR}/tvm/3rdparty/dmlc-core/include
+                    SYSTEM ${TVMRT_INSTALL_DIR}/tvm/3rdparty/dlpack/include
+                    )
 endif()
 
 if(USE_TENSORFLOW_RT)
@@ -187,8 +191,8 @@ if(NOT ${TARGET_SOC} STREQUAL "AM62X" AND NOT ${TARGET_SOC} STREQUAL "AM62P")
 set(SYSTEM_LINK_LIBS ${SYSTEM_LINK_LIBS} tivision_apps)
 endif()
 
-if(USE_DLR_RT)
-set(SYSTEM_LINK_LIBS ${SYSTEM_LINK_LIBS} dlr)
+if(USE_TVM_RT)
+set(SYSTEM_LINK_LIBS ${SYSTEM_LINK_LIBS} tvm)
 endif()
 
 if(USE_TENSORFLOW_RT)
