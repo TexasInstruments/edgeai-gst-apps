@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#  Copyright (C) 2021 Texas Instruments Incorporated - http://www.ti.com/
+#  Copyright (C) 2021-2025 Texas Instruments Incorporated - https://www.ti.com/
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions
@@ -41,9 +41,6 @@ cd $(dirname "$(readlink -f "$BASH_SOURCE")")
 source ./scripts/detect_soc.sh
 
 export PYTHONPATH=/usr/lib/python3.12/site-packages/
-
-# Disable Neo-DLR phone-home feature
-echo '{"enable_phone_home": false}' > $PYTHONPATH/dlr/counter/ccm_config.json
 
 bash /opt/edgeai-gst-apps/scripts/setup_cameras.sh
 

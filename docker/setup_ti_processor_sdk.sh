@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#  Copyright (C) 2021 Texas Instruments Incorporated - http://www.ti.com/
+#  Copyright (C) 2021-2025 Texas Instruments Incorporated - https://www.ti.com/
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions
@@ -62,6 +62,3 @@ echo export LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libGLdispatch.so.0 >> ~/.bashr
 echo export LD_LIBRARY_PATH=/usr/lib:/usr/lib/aarch64-linux-gnu:/usr/lib/edgeai-tiovx-modules:/usr/lib/aarch64-linux-gnu/gstreamer-1.0 >> ~/.bashrc
 
 ldconfig
-
-# Disable Neo-DLR phone-home feature
-echo '{"enable_phone_home": false}' > /usr/local/lib/python3.10/dist-packages/dlr/counter/ccm_config.json
