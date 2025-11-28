@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#  Copyright (C) 2021 Texas Instruments Incorporated - http://www.ti.com/
+#  Copyright (C) 2021-2025 Texas Instruments Incorporated - https://www.ti.com/
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions
@@ -303,7 +303,7 @@ download_models()
 		mkdir ${!name}
 		tar xf ${!file}".tar.gz" -C ${!name}
 		rm ${!file}".tar.gz"
-		if [ ${!runtime} == "tvmdlr" ]
+		if [ ${!runtime} == "tvmrt" ]
 		then
 			rm -rf ${!name}"/model"
 			cd ${!name}"/artifacts"
