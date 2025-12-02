@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#  Copyright (C) 2023 Texas Instruments Incorporated - http://www.ti.com/
+#  Copyright (C) 2023-2025 Texas Instruments Incorporated - https://www.ti.com/
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions
@@ -48,6 +48,10 @@ tar xf $SOC-oob-demo-assets.tar.gz
 rm -rf $SOC-oob-demo-assets.tar.gz
 rm -rf $OOB_DEMO_ASSETS_PATH
 mv $SOC-oob-demo-assets $OOB_DEMO_ASSETS_PATH
+if [ "$SOC" == "am62a" ]
+then
+    rm -rf $OOB_DEMO_ASSETS_PATH/oob-gui-video0.h264
+fi
 ln -sf $OOB_DEMO_ASSETS_PATH/*.h264 $EDGEAI_DATA_PATH/videos/
 
 cd $BASE_DIR
