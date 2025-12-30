@@ -299,7 +299,7 @@ def get_name_with_prop(element):
             and i.flags & GObject.ParamFlags.WRITABLE
         ):
             try:
-                if element_name == "capsfilter" and i.name == "caps":
+                if (element_name == "capsfilter"  or element_name == "appsrc") and i.name == "caps":
                     caps = element.get_property("caps")
                     if caps and caps.get_size() > 0:
                         element_prop += " caps="
